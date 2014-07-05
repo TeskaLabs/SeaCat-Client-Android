@@ -1,2 +1,4 @@
 client/bin
 client/gen
+client/obj
+*.so
