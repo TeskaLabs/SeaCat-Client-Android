@@ -1,7 +1,6 @@
 client/bin
 client/gen
 client/obj
-*.so
 
 test/bin
 test/gen
