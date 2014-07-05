@@ -2,3 +2,11 @@ client/bin
 client/gen
 client/obj
 *.so
+
+test/bin
+test/gen
+test/obj
+
+demo/bin
+demo/gen
+demo/obj
