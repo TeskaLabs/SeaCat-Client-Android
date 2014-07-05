@@ -6,9 +6,9 @@ public class SeaCatClosedException extends IOException
 {
 	private static final long serialVersionUID = 302766813126931539L;
 
-	public SeaCatClosedException()
+	public SeaCatClosedException(int statusCode)
 	{
-		super();
+		super("SeaCatClosedException: "+statusCode);
 	}
 
 }

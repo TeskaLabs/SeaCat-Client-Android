@@ -47,7 +47,7 @@ public class Reactor implements Runnable
 		if (shutdownStatus.getStatus() != 1) return;
 		
 		rc = JNI.seacat_reactor_shutdown();
-		if (rc < 0) throw new SeaCatIOException(rc);
+		if (rc < 0) throw SeaCatIOException.create(rc);
 
 		synchronized(shutdownStatus)
 		{
@@ -66,16 +66,14 @@ public class Reactor implements Runnable
 		}
 
 		rc = shutdownStatus.getStatus();
-		if (rc < 0) throw new SeaCatIOException(rc);
+		if (rc < 0) throw SeaCatIOException.create(rc);
 
 		while (true)
 		{
 			try {
 				this.sessionThread.join();
-			}
-			
+			}			
 			catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			break;
@@ -88,7 +86,7 @@ public class Reactor implements Runnable
 		int rc;
 
 		if (shutdownStatus.getStatus() != 1)
-			throw new SeaCatClosedException();
+			throw new SeaCatClosedException(shutdownStatus.getStatus());
 		
 		synchronized(readyStatus)
 		{
@@ -107,7 +105,7 @@ public class Reactor implements Runnable
 		}
 
 		rc = readyStatus.getStatus();
-		if (rc < 0) throw new SeaCatIOException(rc);	
+		if (rc < 0) throw SeaCatIOException.create(rc);	
 	}
 
 
@@ -129,6 +127,8 @@ public class Reactor implements Runnable
 
 		rc = JNI.seacat_reactor_run();
 
+		android.util.Log.i("Reactor", String.format("JNI.seacat_reactor_run(): %d", rc));
+		
 		// Tell the world that we are going down
 		synchronized (shutdownStatus)
 	    {
@@ -169,7 +169,7 @@ public class Reactor implements Runnable
 	
 	private void send(ByteBuffer frame) throws SeaCatClosedException
 	{
-		if (shutdownStatus.getStatus() != 1) throw new SeaCatClosedException();
+		if (shutdownStatus.getStatus() != 1) throw new SeaCatClosedException(shutdownStatus.getStatus());
 
 		while (true)
 		{

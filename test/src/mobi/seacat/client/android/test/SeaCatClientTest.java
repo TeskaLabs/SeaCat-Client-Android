@@ -13,7 +13,8 @@ import mobi.seacat.client.SeaCatClient;
 
 public class SeaCatClientTest extends AndroidTestCase
 {
-	
+
+
 	public void testConnect() throws IOException
 	{
 		SeaCatClient.connect();
@@ -39,6 +40,7 @@ public class SeaCatClientTest extends AndroidTestCase
 		SeaCatClient.disconnect();
 	}
 
+
 	public void testPing() throws Exception
 	{
 		SeaCatClient.ping(1000);
@@ -63,6 +65,7 @@ public class SeaCatClientTest extends AndroidTestCase
 		}
 		rd.close();
 
+		assertEquals(HttpURLConnection.HTTP_OK, conn.getResponseCode());
 		assertEquals("Hello World!", result);
 		
 		is.close();

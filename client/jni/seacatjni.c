@@ -4,6 +4,8 @@
 #include <seacatclcc.h>
 #include "mobi_seacat_client_internal_JNI.h"
 
+#include <android/log.h>
+
 ///
 
 static JavaVM * g_java_vm = NULL;
@@ -24,11 +26,32 @@ static jobject g_read_buffer_obj = NULL;
 
 ///
 
+static void seacat_jni_log_fnct(char level, const char * format, va_list arg)
+{
+	static char * seacat_TAG = "SeaCat";
+	int prio;
+
+	switch (level)
+	{
+		case 'D': prio = ANDROID_LOG_DEBUG; break;
+		case 'I': prio = ANDROID_LOG_INFO; break;
+		case 'W': prio = ANDROID_LOG_WARN; break;
+		case 'E': prio = ANDROID_LOG_ERROR; break;
+		case 'F': prio = ANDROID_LOG_FATAL; break;
+		default:  prio = ANDROID_LOG_DEBUG;
+	}
+
+	__android_log_vprint(prio, seacat_TAG, format, arg);
+}
+
+
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	JNIEnv* env;
 
 	g_java_vm = vm;
+
+	seacat_log_setfnct(seacat_jni_log_fnct);
 
 	int rc = seacat_init();
 	if (rc != SEACAT_RC_OK) return -1;
@@ -63,7 +86,7 @@ static void JNICALLBACK_write_ready(void ** data, size_t * data_len)
 	int getEnvStat = (*g_java_vm)->GetEnv(g_java_vm, (void **)&g_env, JNI_VERSION_1_6);
 	if (getEnvStat == JNI_EDETACHED)
 	{
-		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (void **) &g_env, NULL) != 0)
+		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, &g_env, NULL) != 0)
 			return;
 	}
 	else if (getEnvStat == JNI_EVERSION)
@@ -99,7 +122,7 @@ static void JNICALLBACK_read_ready(void ** data, size_t * data_len)
 	int getEnvStat = (*g_java_vm)->GetEnv(g_java_vm, (void **)&g_env, JNI_VERSION_1_6);
 	if (getEnvStat == JNI_EDETACHED)
 	{
-		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (void **) &g_env, NULL) != 0)
+		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, &g_env, NULL) != 0)
 			return;
 	}
 	else if (getEnvStat == JNI_EVERSION)
@@ -140,7 +163,7 @@ static void JNICALLBACK_frame_sent(void * data)
 	int getEnvStat = (*g_java_vm)->GetEnv(g_java_vm, (void **)&g_env, JNI_VERSION_1_6);
 	if (getEnvStat == JNI_EDETACHED)
 	{
-		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (void **) &g_env, NULL) != 0)
+		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, &g_env, NULL) != 0)
 			return;
 	}
 	else if (getEnvStat == JNI_EVERSION)
@@ -168,7 +191,7 @@ static void JNICALLBACK_frame_received(void * data, size_t frame_len)
 	int getEnvStat = (*g_java_vm)->GetEnv(g_java_vm, (void **)&g_env, JNI_VERSION_1_6);
 	if (getEnvStat == JNI_EDETACHED)
 	{
-		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (void **) &g_env, NULL) != 0)
+		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, &g_env, NULL) != 0)
 			return;
 	}
 	else if (getEnvStat == JNI_EVERSION)
