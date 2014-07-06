@@ -46,23 +46,19 @@ public class Reactor implements Runnable
 		
 		if (shutdownStatus.getStatus() != 1) return;
 		
-		rc = JNI.seacat_reactor_shutdown();
-		if (rc < 0) throw SeaCatIOException.create(rc);
-
 		synchronized(shutdownStatus)
 		{
-			try
+			while (shutdownStatus.getStatus() == 1)
 			{
-				while (shutdownStatus.getStatus() == 1)
-				{
-					shutdownStatus.wait();
-				}
-			}
-				
-			catch (InterruptedException e)
-			{
-					e.printStackTrace();
-			}
+				// Since shutdown signal can be 'lost', we rather send that repeativelly times if needed 
+				rc = JNI.seacat_reactor_shutdown();
+				if (rc < 0) throw SeaCatIOException.create(rc);
+
+				try {
+					shutdownStatus.wait(500); // Milliseconds
+				}				
+				catch (InterruptedException e) {}
+			}				
 		}
 
 		rc = shutdownStatus.getStatus();
