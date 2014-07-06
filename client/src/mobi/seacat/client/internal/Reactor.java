@@ -123,8 +123,6 @@ public class Reactor implements Runnable
 
 		rc = JNI.seacat_reactor_run();
 
-		android.util.Log.i("Reactor", String.format("JNI.seacat_reactor_run(): %d", rc));
-		
 		// Tell the world that we are going down
 		synchronized (shutdownStatus)
 	    {
