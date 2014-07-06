@@ -5,6 +5,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
+import mobi.seacat.client.okhttp.Headers;
 import mobi.seacat.client.okhttp.HttpDate;
 
 public class SPDY
@@ -48,7 +49,7 @@ public class SPDY
 		frame.putInt(pingId);
 	}
 
-	public static void buildALX1SynStream(ByteBuffer buffer, int streamId, java.net.HttpURLConnection connection, boolean fin_flag, int priority)
+	public static void buildALX1SynStream(ByteBuffer buffer, int streamId, HttpURLConnectionImpl connection, boolean fin_flag, int priority)
 	{
 		assert((streamId & 0x80000000) == 0);
 		
@@ -84,19 +85,19 @@ public class SPDY
 			appendVLEString(buffer, "If-Modified-Since");
 			appendVLEString(buffer, HttpDate.format(new Date(ifModifiedSince)));
 		}
-		
-		// TODO: Add other request headers - connection.getRequestProperties();
-		for (String header : connection.getRequestProperties().keySet())
+
+		Headers headers = connection.getRequestHeaders();		
+		for (int i = 0; i < headers.size(); i++)
 		{
-			if (header != null)
-			{
-				for (String value : connection.getRequestProperties().get(header))
-				{
-					//TODO: Do some filtering (if needed)
-					appendVLEString(buffer, header);
-					appendVLEString(buffer, value);
-				}
-			}
+			String header = headers.name(i);
+			if (header == null) continue;
+			
+			String value = headers.value(i);
+			if (value == null) continue;
+
+			//TODO: Do some filtering (if needed)
+			appendVLEString(buffer, header);
+			appendVLEString(buffer, value);
 		}
 
 		// Update length entry

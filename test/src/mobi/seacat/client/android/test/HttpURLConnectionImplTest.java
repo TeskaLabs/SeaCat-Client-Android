@@ -72,21 +72,68 @@ public class HttpURLConnectionImplTest extends AndroidTestCase
 		conn.setRequestProperty("X-Test-2", "foo");
 		conn.setRequestProperty("X-Test-2", "bar");
 		
-		Map<String, List<String>> map = conn.getRequestProperties();
-		
-		Map<String, List<String>> expected = new HashMap<String, List<String>>();
-		expected.put("X-Test-1", Arrays.asList("bar", "foo"));
-		expected.put("X-Test-2", Arrays.asList("bar"));
-		
-		assertEquals(expected, map);
-
 		assertEquals("bar", conn.getRequestProperty("X-Test-1"));
 		assertEquals("bar", conn.getRequestProperty("X-Test-2"));
 		assertNull(conn.getRequestProperty("X-Test-3"));
 
+		Map<String, List<String>> map = conn.getRequestProperties();
+		
+		Map<String, List<String>> expected = new HashMap<String, List<String>>();
+		expected.put("X-Test-1", Arrays.asList("foo", "bar"));
+		expected.put("X-Test-2", Arrays.asList("bar"));
+		
+		assertEquals(expected, map);
 	}
 
 
+	public void test_setRequestProperties_nullPropertyName() throws Exception
+	{
+		HttpURLConnection conn = SeaCatClient.open(url);
+		try
+		{
+			conn.setRequestProperty(null, "foo");
+			fail();
+		}
+		catch (NullPointerException e)
+		{
+			//OK
+		}
+	}
+
+	
+	public void test_setRequestProperties_nullPropertyValue() throws Exception
+	{
+		HttpURLConnection conn = SeaCatClient.open(url);
+		conn.setRequestProperty("X-Test-NULLValue", "foo");
+		conn.setRequestProperty("X-Test-NULLValue", null);
+		assertEquals("foo",conn.getRequestProperty("X-Test-NULLValue"));
+	}
+
+
+	public void test_addRequestProperties_nullPropertyName() throws Exception
+	{
+		HttpURLConnection conn = SeaCatClient.open(url);
+		try
+		{
+			conn.addRequestProperty(null, "foo");
+			fail();
+		}
+		catch (NullPointerException e)
+		{
+			//OK
+		}
+	}
+
+	
+	public void test_addRequestProperties_nullPropertyValue() throws Exception
+	{
+		HttpURLConnection conn = SeaCatClient.open(url);
+		conn.setRequestProperty("X-Test-NULLValue", "foo");
+		conn.addRequestProperty("X-Test-NULLValue", null);
+		assertEquals("foo",conn.getRequestProperty("X-Test-NULLValue"));
+	}
+
+	
 	public void test_useCaches() throws Exception
 	{
 		HttpURLConnection conn = SeaCatClient.open(url);

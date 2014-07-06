@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import mobi.seacat.client.SeaCatClient;
-import mobi.seacat.client.SeaCatIOException;
 import mobi.seacat.client.okhttp.Headers;
 
 public final class HttpURLConnectionImpl extends HttpURLConnection
@@ -25,6 +24,7 @@ public final class HttpURLConnectionImpl extends HttpURLConnection
 	private HttpInputStream inboundStream = null;
 	private HttpOutputStream outboundStream = null;
 	private Headers responseHeaders = null;
+	private final Headers.Builder requestHeaders = new Headers.Builder();
 	
 	public HttpURLConnectionImpl(URL url)
 	{
@@ -188,6 +188,81 @@ public final class HttpURLConnectionImpl extends HttpURLConnection
 
 	///
 
+	@Override
+	public void setRequestProperty(String field, String newValue)
+	{
+		//TODO: Consider this: if (connected) throw new IllegalStateException("Cannot set request property after connection is made");
+		if (field == null)
+		{
+			throw new NullPointerException("field == null");
+		}
+
+		if (newValue == null)
+		{
+			// Silently ignore null header values for backwards compatibility with older
+			// android versions as well as with other URLConnection implementations.
+			//
+			// Some implementations send a malformed HTTP header when faced with
+			// such requests, we respect the spec and ignore the header.
+			return;
+		}
+
+		requestHeaders.set(field, newValue);
+	}
+
+
+	@Override
+	public void addRequestProperty(String field, String newValue)
+	{
+		//TODO: Consider this: if (connected) throw new IllegalStateException("Cannot set request property after connection is made");
+
+		if (field == null)
+		{
+			throw new NullPointerException("field == null");
+		}
+
+		if (newValue == null)
+		{
+			// Silently ignore null header values for backwards compatibility with older
+			// android versions as well as with other URLConnection implementations.
+			//
+			// Some implementations send a malformed HTTP header when faced with
+			// such requests, we respect the spec and ignore the header.
+			return;
+		}
+
+		requestHeaders.add(field, newValue);
+	}
+
+	
+	@Override
+	public String getRequestProperty(String field)
+	{
+		if (field == null) return null;
+	    return requestHeaders.get(field);
+	}
+
+
+	@Override
+	public Map<String, List<String>> getRequestProperties()
+	{
+		//TODO: Consider following: if (connected) throw new IllegalStateException("Cannot access request header fields after connection is set");
+
+		Headers rh = requestHeaders.build();
+		TreeMap<String, List<String>> m = new TreeMap<String, List<String>>(Headers.FIELD_NAME_COMPARATOR);
+		for(String name : rh.names())
+			m.put(name, rh.values(name));
+		return m;
+	}
+
+	
+	public Headers getRequestHeaders()
+	{
+		return requestHeaders.build();
+	}
+	
+	///
+	
 	@Override
 	public boolean usingProxy()
 	{
