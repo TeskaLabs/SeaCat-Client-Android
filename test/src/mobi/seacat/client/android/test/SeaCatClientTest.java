@@ -43,7 +43,7 @@ public class SeaCatClientTest extends AndroidTestCase
 
 	public void testPing() throws Exception
 	{
-		SeaCatClient.ping(1000);
+		SeaCatClient.ping(5000);
 	}
 
 
