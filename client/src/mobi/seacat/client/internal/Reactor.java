@@ -12,9 +12,10 @@ import mobi.seacat.client.SeaCatClosedException;
 import mobi.seacat.client.SeaCatIOException;
 import mobi.seacat.client.internal.FramePool.HighWaterMarkReachedException;
 
-//TODO: This needs to be singleton !
 public class Reactor implements Runnable
 {
+	static private boolean instantiated = false; 
+	
 	final public FramePool framePool;
 	final private Thread sessionThread;
 
@@ -31,12 +32,15 @@ public class Reactor implements Runnable
 	
 	public Reactor(FramePool framePool) throws IOException
 	{
+		if (Reactor.instantiated) throw new IOException("Reactor is already created.");
+
 		this.framePool = framePool;
 		this.sessionThread = new Thread(this);
 		this.sessionThread.setName("SeaCat Reactor");
 		this.sessionThread.start();
 		
 		waitForReady();
+		Reactor.instantiated = true;
 	}
 
 	
@@ -74,6 +78,8 @@ public class Reactor implements Runnable
 			}
 			break;
 		}
+
+		Reactor.instantiated = false;
 	}
 	
 	
