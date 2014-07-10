@@ -225,7 +225,7 @@ public class Reactor implements Runnable
 			stream = new HttpInputStream(streamId, conn);
 	
 			// Build SYN_STREAM frame
-			SPDY.buildALX1SynStream(frame, streamId, conn, fin_flag, priority);
+			SPDY.buildALX1SynStream(frame, streamId, conn.getURL(), conn.getRequestMethod(), conn.getRequestHeaders(), fin_flag, priority);
 			frame.flip();
 	
 			// Register callbacks

@@ -246,7 +246,10 @@ JNIEXPORT jint JNICALL Java_mobi_seacat_client_internal_JNI_seacat_1reactor_1ini
 		.write_ready = JNICALLBACK_write_ready,
 		.read_ready = JNICALLBACK_read_ready,
 		.frame_sent = JNICALLBACK_frame_sent,
-		.frame_received = JNICALLBACK_frame_received
+		.frame_received = JNICALLBACK_frame_received,
+
+		.timeout = 0, .timeout_sec = 5, .timeout_usec = 0,
+
 	};
 
 	return seacat_reactor_init(&srd);

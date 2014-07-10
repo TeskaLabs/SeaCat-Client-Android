@@ -13,9 +13,11 @@ import java.nio.ByteBuffer;
 import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 import mobi.seacat.client.SeaCatClient;
 import mobi.seacat.client.okhttp.Headers;
+import mobi.seacat.client.okhttp.HttpDate;
 
 public final class HttpURLConnectionImpl extends HttpURLConnection
 {
@@ -122,6 +124,13 @@ public final class HttpURLConnectionImpl extends HttpURLConnection
 	private void sendSYN_STREAM() throws IOException
 	{	
 		if (fixedContentLength > 0) addRequestProperty("Content-length", String.format("%d", fixedContentLength));
+
+		//TODO: addRequestProperty("X-Seacat-Client", isAndroid ? "android" : "java");
+		addRequestProperty("X-Seacat-Client", "java");
+
+		// Add If-Modified-Since header
+		long ifModifiedSince = getIfModifiedSince();
+		if (ifModifiedSince != 0) addRequestProperty("If-Modified-Since", HttpDate.format(new Date(ifModifiedSince)));
 		
 		boolean flag_fin = (outboundStream == null);
 		if (outboundState.getCode() > OutboundState.CONNECTED.getCode()) throw new IOException("Too late to open InputStream"); // TODO: Change that into some standard exception (check what java implementation raises here)

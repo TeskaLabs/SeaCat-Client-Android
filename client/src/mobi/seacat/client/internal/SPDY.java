@@ -3,10 +3,8 @@ package mobi.seacat.client.internal;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.Date;
 
 import mobi.seacat.client.okhttp.Headers;
-import mobi.seacat.client.okhttp.HttpDate;
 
 public class SPDY
 {
@@ -49,7 +47,7 @@ public class SPDY
 		frame.putInt(pingId);
 	}
 
-	public static void buildALX1SynStream(ByteBuffer buffer, int streamId, HttpURLConnectionImpl connection, boolean fin_flag, int priority)
+	public static void buildALX1SynStream(ByteBuffer buffer, int streamId, URL url, String method, Headers headers, boolean fin_flag, int priority)
 	{
 		assert((streamId & 0x80000000) == 0);
 		
@@ -64,29 +62,14 @@ public class SPDY
 		assert buffer.position() == 18;
 
 		// Host (without .seacat)
-		final URL url = connection.getURL();
 		String host = url.getHost();
 		final int lastPeriodPos = host.lastIndexOf('.');
 		if (lastPeriodPos > 0) host = host.substring(0, lastPeriodPos);
 		appendVLEString(buffer, host);
 
-		appendVLEString(buffer, connection.getRequestMethod());
+		appendVLEString(buffer, method);
 		appendVLEString(buffer, url.getPath());
-
-		// Add headers
-		appendVLEString(buffer, "X-Seacat-Client");
-		//TODO: appendVLEString(buffer, isAndroid ? "android" : "java");
-		appendVLEString(buffer, "java");
-
-		// Add If-Modified-Since header
-		long ifModifiedSince = connection.getIfModifiedSince();
-		if (ifModifiedSince != 0)
-		{
-			appendVLEString(buffer, "If-Modified-Since");
-			appendVLEString(buffer, HttpDate.format(new Date(ifModifiedSince)));
-		}
-
-		Headers headers = connection.getRequestHeaders();		
+		
 		for (int i = 0; i < headers.size(); i++)
 		{
 			String header = headers.name(i);
