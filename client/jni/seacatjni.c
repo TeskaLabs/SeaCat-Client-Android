@@ -26,7 +26,7 @@ static jobject g_read_buffer_obj = NULL;
 
 ///
 
-static void seacat_jni_log_fnct(char level, const char * format, va_list arg)
+static void seacat_jni_log_fnct(char level, const char * message)
 {
 	static char * seacat_TAG = "SeaCat";
 	int prio;
@@ -41,7 +41,7 @@ static void seacat_jni_log_fnct(char level, const char * format, va_list arg)
 		default:  prio = ANDROID_LOG_DEBUG;
 	}
 
-	__android_log_vprint(prio, seacat_TAG, format, arg);
+	__android_log_write(prio, seacat_TAG, message);
 }
 
 
