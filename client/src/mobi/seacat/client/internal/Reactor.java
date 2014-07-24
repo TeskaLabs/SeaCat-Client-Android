@@ -104,10 +104,10 @@ public class Reactor implements Runnable
 			{
 					e.printStackTrace();
 			}
+			
+			rc = readyStatus.getStatus();
+			if (rc < 0) throw SeaCatIOException.create(rc);	
 		}
-
-		rc = readyStatus.getStatus();
-		if (rc < 0) throw SeaCatIOException.create(rc);	
 	}
 
 
