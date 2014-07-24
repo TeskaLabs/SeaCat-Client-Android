@@ -77,7 +77,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 
 ////
 
-static void JNICALLBACK_write_ready(void ** data, size_t * data_len)
+static void JNICALLBACK_write_ready(void ** data, uint16_t * data_len)
 {
 	JNIEnv * g_env;
 	assert(g_java_vm != NULL);
@@ -105,15 +105,18 @@ static void JNICALLBACK_write_ready(void ** data, size_t * data_len)
 		jint pos = (*g_env)->CallIntMethod(g_env, g_write_buffer_obj, g_buffer_position_mid, NULL);
 		jint limit = (*g_env)->CallIntMethod(g_env, g_write_buffer_obj, g_buffer_limit_mid, NULL);
 
-		*data = trg_data + pos;
-		*data_len = limit - pos;
+		assert(pos == 0);
+		assert(limit <= 0xFFFF);
+
+		*data = trg_data;
+		*data_len = limit;
 	}
 
 	if (getEnvStat == JNI_EDETACHED)
 		(*g_java_vm)->DetachCurrentThread(g_java_vm);
 }
 
-static void JNICALLBACK_read_ready(void ** data, size_t * data_len)
+static void JNICALLBACK_read_ready(void ** data, uint16_t * data_len)
 {
 	JNIEnv * g_env;
 	assert(g_java_vm != NULL);
@@ -141,8 +144,11 @@ static void JNICALLBACK_read_ready(void ** data, size_t * data_len)
 		jint pos = (*g_env)->CallIntMethod(g_env, g_read_buffer_obj, g_buffer_position_mid, NULL);
 		jlong capacity = (*g_env)->GetDirectBufferCapacity(g_env, g_read_buffer_obj);
 
-		*data = trg_data + pos;
-		*data_len = capacity - pos;
+		assert(pos == 0);
+		assert(capacity <= 0xFFFF);
+
+		*data = trg_data;
+		*data_len = capacity;
 	}
 
 	else
@@ -181,7 +187,7 @@ static void JNICALLBACK_frame_sent(void * data)
 		(*g_java_vm)->DetachCurrentThread(g_java_vm);
 }
 
-static void JNICALLBACK_frame_received(void * data, size_t frame_len)
+static void JNICALLBACK_frame_received(void * data, uint16_t frame_len)
 {
 	JNIEnv * g_env;
 
