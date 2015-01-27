@@ -14,7 +14,7 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := ccore
-LOCAL_SRC_FILES := $(SEACAT_CLIENT_CCORE_PATH)/android/libs/$(TARGET_ARCH_ABI)/libseacatclcc.a
+LOCAL_SRC_FILES := $(SEACAT_CLIENT_CCORE_PATH)/android/libs/$(TARGET_ARCH_ABI)/libseacatcc.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
