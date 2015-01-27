@@ -19,7 +19,7 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_C_INCLUDES := $(SEACAT_CLIENT_CCORE_PATH)/src
-LOCAL_LDLIBS := -llog
+LOCAL_LDLIBS := -llog -lz
 LOCAL_MODULE    := seacatjni
 LOCAL_SRC_FILES := seacatjni.c
 
