@@ -19,15 +19,15 @@ public class SPDY
 	final static public short CNTL_TYPE_PING = 6;
 
 	final static public short CNTL_TYPE_STATS_REQ = 0xA1;
-	final static public short _CNTL_TYPE_STATS_REP = 0xA2;
+	final static public short CNTL_TYPE_STATS_REP = 0xA2;
 
 	final static public short CNTL_TYPE_CSR = 0xC1;
 	final static public short CNTL_TYPE_CERT_QUERY = 0xC2;
 	final static public short CNTL_TYPE_CERT = 0xC3;
 	
-	public static final byte FLAG_FIN = (byte) 0x01;
-	public static final byte FLAG_UNIDIRECTIONAL = (byte) 0x02;
-	public static final byte FLAG_CSR_NOT_FOUND = (byte) 0x80;
+	final static public byte FLAG_FIN = (byte) 0x01;
+	final static public byte FLAG_UNIDIRECTIONAL = (byte) 0x02;
+	final static public byte FLAG_CSR_NOT_FOUND = (byte) 0x80;
 
 	
 	///

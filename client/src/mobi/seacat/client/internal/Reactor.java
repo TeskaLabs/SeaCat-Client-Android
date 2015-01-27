@@ -66,7 +66,6 @@ public class Reactor implements Runnable
 		}
 
 		rc = shutdownStatus.getStatus();
-		if (rc < 0) throw SeaCatIOException.create(rc);
 
 		while (true)
 		{
@@ -80,6 +79,8 @@ public class Reactor implements Runnable
 		}
 
 		Reactor.instantiated = false;
+
+		if (rc < 0) throw SeaCatIOException.create(rc);
 	}
 	
 	
@@ -283,7 +284,10 @@ public class Reactor implements Runnable
 				if (rc != 0) break;
 				
 				if ((System.currentTimeMillis() - tBefore) > timeout)
+				{
+					pingWaits.remove(pingId);
 					throw new TimeoutException();
+				}
 
 				try
 				{
@@ -295,7 +299,6 @@ public class Reactor implements Runnable
 					continue;
 				}
 			}
-			pingWaits.remove(pingId);
 	    }
 		
 	}
@@ -336,6 +339,7 @@ public class Reactor implements Runnable
 
 		try
 		{
+			// Control or data frame ?
 			if ((fb & (1L << 7)) != 0)
 			{
 				giveBackFrame = receivedControlFrame(frame);
@@ -361,7 +365,7 @@ public class Reactor implements Runnable
 	}
 
 	
-	protected boolean receivedControlFrame(ByteBuffer frame)
+	private boolean receivedControlFrame(ByteBuffer frame)
 	{
 		short frameVersion = (short)(frame.getShort() & 0x7fff);
 		short frameType = frame.getShort();
@@ -394,7 +398,7 @@ public class Reactor implements Runnable
 	}
 
 	
-	protected boolean receivedControlFrame_ALX1_SYN_REPLY(ByteBuffer frame, boolean fin_flag)
+	private boolean receivedControlFrame_ALX1_SYN_REPLY(ByteBuffer frame, boolean fin_flag)
 	{
 		int streamId = frame.getInt();
 		
@@ -418,8 +422,9 @@ public class Reactor implements Runnable
 	}
 
 	
-	protected boolean receivedControlFrame_SPD3_PING(ByteBuffer frame)
+	private boolean receivedControlFrame_SPD3_PING(ByteBuffer frame)
 	{
+		//TODO: pingId is unsigned (based on SPDY specifications)
 		int pingId = frame.getInt();
 		if ((pingId % 2) == 1)
 		{
@@ -461,7 +466,7 @@ public class Reactor implements Runnable
 	}
 
 
-	protected boolean receivedDataFrame(ByteBuffer frame)
+	private boolean receivedDataFrame(ByteBuffer frame)
 	{
 		int streamId = frame.getInt();
 		int frameLength = frame.getInt();

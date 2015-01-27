@@ -15,6 +15,8 @@ public final class SeaCatClient
 	static final private FramePool framePool = new FramePool();
 	static private Reactor reactor = null;
 
+	///
+
 	public static synchronized Reactor connect() throws IOException
 	{
 		if (reactor != null)
