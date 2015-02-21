@@ -1,4 +1,4 @@
-SEACAT_CLIENT_CCORE_PATH := /Users/alex/Workspace/seacat/client-ccore
+SEACAT_CLIENT_CCORE_PATH := ${HOME}/Workspace/seacat/client-ccore
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
