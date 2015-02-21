@@ -135,7 +135,7 @@ JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_init(JNIEnv * env, 
 	if (rc != SEACATCC_RC_OK) return rc;
 
 	// Register other hooks
-	rc = seacatcc_hook_register('r', JNICALLBACK_run_started);
+	rc = seacatcc_hook_register('E', JNICALLBACK_run_started);
 	assert(rc == SEACATCC_RC_OK);
 	rc = seacatcc_hook_register('R', JNICALLBACK_gwconn_reset);
 	assert(rc == SEACATCC_RC_OK);
@@ -169,7 +169,7 @@ static void JNICALLBACK_write_ready(void ** data, uint16_t * data_len)
 	}
 
 	// Get buffer object
-	jobject obj = (*g_env)->CallObjectMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_write_ready_mid);
+	jobject obj = (*g_env)->CallObjectMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_write_ready_mid, NULL);
 	if (obj != NULL)
 	{
 		g_write_buffer_obj = (*g_env)->NewGlobalRef(g_env, obj);
@@ -209,7 +209,7 @@ static void JNICALLBACK_read_ready(void ** data, uint16_t * data_len)
 	}
 
 	// Get buffer object
-	jobject obj = (*g_env)->CallObjectMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_read_ready_mid);
+	jobject obj = (*g_env)->CallObjectMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_read_ready_mid, NULL);
 	if (obj != NULL)
 	{
 		g_read_buffer_obj = (*g_env)->NewGlobalRef(g_env, obj);
@@ -254,7 +254,8 @@ static void JNICALLBACK_frame_received(void * data, uint16_t frame_len)
 		return;
 	}
 
-	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_frame_received_mid, g_read_buffer_obj, frame_len);
+	jint frame_len_jint = frame_len; // Be conservative, we deal with Java here
+	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_frame_received_mid, g_read_buffer_obj, frame_len_jint, NULL);
 
 	(*g_env)->DeleteGlobalRef(g_env, g_read_buffer_obj);
 	g_read_buffer_obj = NULL;
@@ -286,14 +287,14 @@ static void JNICALLBACK_frame_return(void * data)
 
 	if ((g_read_buffer_obj != NULL) && ((*g_env)->GetDirectBufferAddress(g_env, g_read_buffer_obj) == data))
 	{
-		(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_frame_return_mid, g_read_buffer_obj);
+		(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_frame_return_mid, g_read_buffer_obj, NULL);
 		(*g_env)->DeleteGlobalRef(g_env, g_read_buffer_obj);
 		g_read_buffer_obj = NULL;
 	}
 
 	else if  ((g_write_buffer_obj != NULL) && ((*g_env)->GetDirectBufferAddress(g_env, g_write_buffer_obj) == data))
 	{
-		(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_frame_return_mid, g_write_buffer_obj);
+		(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_frame_return_mid, g_write_buffer_obj, NULL);
 		(*g_env)->DeleteGlobalRef(g_env, g_write_buffer_obj);
 		g_write_buffer_obj = NULL;
 	}
@@ -330,7 +331,8 @@ static void JNICALLBACK_worker_request(char worker)
 		return;
 	}
 
-	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_worker_request_mid, worker);
+	jchar worker_jchar = worker;
+	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_worker_request_mid, worker_jchar, NULL);
 
 	if (getEnvStat == JNI_EDETACHED)
 		(*g_java_vm)->DetachCurrentThread(g_java_vm);
@@ -358,7 +360,7 @@ static void JNICALLBACK_run_started(void)
 		return;
 	}
 
-	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_run_started_mid);
+	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_run_started_mid, NULL);
 
 	if (getEnvStat == JNI_EDETACHED)
 		(*g_java_vm)->DetachCurrentThread(g_java_vm);
@@ -385,7 +387,7 @@ static void JNICALLBACK_gwconn_reset(void)
 		return;
 	}
 
-	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_gwconn_reset_mid);
+	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_gwconn_reset_mid, NULL);
 
 	if (getEnvStat == JNI_EDETACHED)
 		(*g_java_vm)->DetachCurrentThread(g_java_vm);
@@ -411,7 +413,7 @@ static void JNICALLBACK_gwconn_connected(void)
 		return;
 	}
 
-	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_gwconn_connected_mid);
+	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_gwconn_connected_mid, NULL);
 
 	if (getEnvStat == JNI_EDETACHED)
 		(*g_java_vm)->DetachCurrentThread(g_java_vm);
