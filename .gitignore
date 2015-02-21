@@ -2,6 +2,7 @@ client/bin
 client/gen
 client/obj
 client/jni/mobi_seacat_client_core_seacatcc.h
+client/libs/*/*.so
 
 test/bin
 test/gen
