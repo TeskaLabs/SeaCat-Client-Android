@@ -1,13 +1,10 @@
-client/bin
-client/gen
-client/obj
-client/jni/mobi_seacat_client_core_seacatcc.h
-client/libs/*/*.so
+.DS_Store
+.gradle
 
-test/bin
-test/gen
-test/obj
+/build
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
 
-demo/bin
-demo/gen
-demo/obj
+/client/build
+/demo/build
