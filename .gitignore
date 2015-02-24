@@ -7,4 +7,6 @@
 /.idea/libraries
 
 /client/build
+/client/src/main/libs/
+/client/src/main/obj/
 /demo/build
