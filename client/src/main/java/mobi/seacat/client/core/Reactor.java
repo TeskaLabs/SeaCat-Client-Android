@@ -186,52 +186,39 @@ public class Reactor
 
 	
 	protected void JNICallbackFrameReceived(ByteBuffer frame, int frame_len)
-	{
-		System.err.println("JNICallbackFrameReceived 00");
-		
+	{		
 		int pos = frame.position();
 		frame.position(pos + frame_len);
 		frame.flip();
 
-		System.err.println("JNICallbackFrameReceived 10");
-		
 		byte fb = frame.get(0);
 		boolean giveBackFrame = true;
 
-		System.err.println("JNICallbackFrameReceived 20");
-		
 		try
 		{			
  			if ((fb & (1L << 7)) != 0)
  			{
- 				System.err.println("JNICallbackFrameReceived 30");
 				giveBackFrame = receivedControlFrame(frame);
-				System.err.println("JNICallbackFrameReceived 39");
  			}
 			
 			else
 			{
-				System.err.println("JNICallbackFrameReceived 40");
 				giveBackFrame = streamFactory.receivedDataFrame(this, frame);
-				System.err.println("JNICallbackFrameReceived 49");
 			}
 				
 		}
 		
 		catch (Exception e)
 		{
-			System.err.println("JNICallbackFrameReceived 70");
 			e.printStackTrace();
 			giveBackFrame = true;
 		}
 		
 		finally
 		{
-			System.err.println("JNICallbackFrameReceived 80");
 			if (giveBackFrame) framePool.giveBack(frame);
 		}
 		
-		System.err.println("JNICallbackFrameReceived 90");
 	}
 
 

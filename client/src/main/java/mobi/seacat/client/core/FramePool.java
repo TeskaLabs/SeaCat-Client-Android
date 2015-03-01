@@ -59,7 +59,6 @@ public class FramePool
 		{
 			frame.clear();
 			totalCount.decrementAndGet();
-			System.err.println("TRACE: Frame discarted - current count: " + totalCount.get());
 			// Discard frame
 		}
 
@@ -79,7 +78,6 @@ public class FramePool
 	{
 		totalCount.incrementAndGet();
 		ByteBuffer frame = ByteBuffer.allocateDirect(frameSize);
-		System.err.println("TRACE: New frame created - current count: " + totalCount.get());
 		return frame;
 	}
 
