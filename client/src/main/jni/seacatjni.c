@@ -181,6 +181,9 @@ static void JNICALLBACK_write_ready(void ** data, uint16_t * data_len)
 		g_write_buffer_obj = (*g_env)->NewGlobalRef(g_env, obj);
 		assert(g_write_buffer_obj != NULL);
 
+		(*g_env)->DeleteLocalRef(g_env, obj);
+		obj = NULL;
+
 		void * trg_data = (*g_env)->GetDirectBufferAddress(g_env, g_write_buffer_obj);
 		jint pos = (*g_env)->CallIntMethod(g_env, g_write_buffer_obj, g_buffer_position_mid, NULL);
 		jint limit = (*g_env)->CallIntMethod(g_env, g_write_buffer_obj, g_buffer_limit_mid, NULL);
@@ -219,7 +222,10 @@ static void JNICALLBACK_read_ready(void ** data, uint16_t * data_len)
 	if (obj != NULL)
 	{
 		g_read_buffer_obj = (*g_env)->NewGlobalRef(g_env, obj);
-		assert(obj != NULL);
+		assert(g_read_buffer_obj != NULL);
+		
+		(*g_env)->DeleteLocalRef(g_env, obj);
+		obj = NULL;
 
 		void * trg_data = (*g_env)->GetDirectBufferAddress(g_env, g_read_buffer_obj);
 		jint pos = (*g_env)->CallIntMethod(g_env, g_read_buffer_obj, g_buffer_position_mid, NULL);
