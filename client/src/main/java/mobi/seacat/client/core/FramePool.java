@@ -39,8 +39,6 @@ public class FramePool
 			{
 				frame = stack.pop();
 			}
-			
-			assert(frame.getInt(0) == 0xFFF1FEFF);
 		}
 
 		catch (java.util.EmptyStackException e)
@@ -67,7 +65,6 @@ public class FramePool
 			frame.clear();
 			synchronized(stack)
 			{
-				frame.putInt(0, 0xFFF1FEFF);
 				stack.push(frame);
 			}
 		}
