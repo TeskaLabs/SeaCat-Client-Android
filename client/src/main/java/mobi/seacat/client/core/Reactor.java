@@ -42,7 +42,7 @@ public class Reactor
 		this.sessionThread.setDaemon(true);
 		this.workerExecutor = new ThreadPoolExecutor(0, 1000, 5, TimeUnit.SECONDS, workerQueue);
 
-        File vardir = context.getDir("seacat", Context.MODE_PRIVATE);
+        java.io.File vardir = context.getDir("seacat", Context.MODE_PRIVATE);
 
 		int rc = seacatcc.init(context.getPackageName(), vardir.getAbsolutePath(), this);
 		RC.checkAndThrowIOException("seacatcc.init", rc);
