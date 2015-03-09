@@ -26,6 +26,9 @@ public final class seacatcc
 	static public native String cacert_url();
 	static public native void cacert_worker(byte[] cacert);
 
+	// This is thread-safe (but quite expensive) method to obtain current time in format used by SeaCatCC event loop
+	static public native double time();
+	
 	///
 	static public final int RC_OK = (0);
 	static public final int RC_E_GENERIC = (-9999);

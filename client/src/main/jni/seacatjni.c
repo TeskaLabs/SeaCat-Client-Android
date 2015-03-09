@@ -520,3 +520,8 @@ JNIEXPORT void JNICALL Java_mobi_seacat_client_core_seacatcc_cacert_1worker(JNIE
 
     (*env)->ReleaseByteArrayElements(env, cert, ptr, 0);
 }
+
+JNIEXPORT jdouble JNICALL Java_mobi_seacat_client_core_seacatcc_time(JNIEnv * env, jclass cls)
+{
+	return seacatcc_time();
+}
