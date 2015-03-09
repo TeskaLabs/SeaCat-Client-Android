@@ -22,7 +22,7 @@ public final class SeaCatClient
 	{
 		if (reactor != null) throw new IOException("Already configured.");
 		Reactor lreactor = new Reactor(context);
-		
+
 		if (delegate == null) SeaCatClient.delegate = null;
 		else SeaCatClient.delegate = new WeakReference<IDelegate>(delegate);
 
@@ -33,10 +33,10 @@ public final class SeaCatClient
 		{
 			public void run()
 			{
-				try {
-					reactor.shutdown();
-				} catch (Exception e) {
-					e.printStackTrace();
+			try {
+				reactor.shutdown();
+			} catch (Exception e) {
+				e.printStackTrace();
 				}
 			}
 		});
@@ -44,9 +44,9 @@ public final class SeaCatClient
 
 	public static void configure(Context context) throws IOException
 	{
-		SeaCatClient.configure(context, null);
+        if (!SeaCatClient.isConfigured()) SeaCatClient.configure(context, null);
 	}
-	
+
 	///
 	
 	public static int ping() throws IOException

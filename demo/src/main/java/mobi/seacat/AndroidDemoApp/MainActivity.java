@@ -1,11 +1,9 @@
 package mobi.seacat.AndroidDemoApp;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.util.Log;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -13,19 +11,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import mobi.seacat.client.SeaCatClient;
-import mobi.seacat.client.SeaCatService;
 
 
 public class MainActivity extends ActionBarActivity
 {
 
-    private TextView resultTextView;
+    private TextView resultTextView = null;
+    private Timer pingTimer = null;
+    private Timer getTimer = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -34,12 +32,16 @@ public class MainActivity extends ActionBarActivity
         setContentView(R.layout.activity_main);
 
         resultTextView = (TextView) findViewById(R.id.resultTextView);
-        
-        // Enable SeaCat
-        startService(new Intent(getBaseContext(), SeaCatService.class));
+    }
+
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
 
         // Start ping timer
-        Timer pingTimer = new Timer();
+        if (pingTimer == null) pingTimer = new Timer();
         pingTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -49,7 +51,7 @@ public class MainActivity extends ActionBarActivity
         }, 0, 1000);
 
         // Start get timer
-        Timer getTimer = new Timer();
+        if (getTimer == null) getTimer = new Timer();
         getTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -66,6 +68,19 @@ public class MainActivity extends ActionBarActivity
 
         }, 0, 1000);
 
+    }
+
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+
+        getTimer.cancel();
+        getTimer = null;
+
+        pingTimer.cancel();
+        pingTimer = null;
     }
 
 
