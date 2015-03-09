@@ -8,10 +8,9 @@ import android.widget.Toast;
 import java.io.IOException;
 
 import mobi.seacat.client.SeaCatClient;
-import mobi.seacat.client.intf.IDelegate;
 import mobi.seacat.client.ui.SeaCatSplashActivity;
 
-public class AndroidDemoApplication extends Application implements IDelegate
+public class AndroidDemoApplication extends Application
 {
 
     @Override
@@ -22,7 +21,7 @@ public class AndroidDemoApplication extends Application implements IDelegate
         // Enable SeaCat
         try
         {
-            SeaCatClient.configure(getApplicationContext(), this);
+            SeaCatClient.configure(getApplicationContext());
         }
         catch (IOException e)
         {
@@ -30,16 +29,6 @@ public class AndroidDemoApplication extends Application implements IDelegate
             e.printStackTrace();
             System.exit(1);
         }
-    }
-
-    @Override
-    public void pong(int pingId)
-    {
-        //Intent i = new Intent(this, SeaCatSplashActivity.class);
-        //i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //startActivity(i);
-
-        Log.i("AndroidDemoApplication", "Pong: "+pingId);
     }
 
 }
