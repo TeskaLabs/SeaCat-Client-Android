@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 
 #include <seacatcc.h>
 
@@ -21,6 +22,7 @@ static jmethodID g_reactor_JNICALLBACK_read_ready_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_frame_received_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_frame_return_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_worker_request_mid = 0;
+static jmethodID g_reactor_JNICALLBACK_evloop_heartbeat_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_run_started_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_gwconn_reset_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_gwconn_connected_mid = 0;
@@ -35,6 +37,7 @@ static void JNICALLBACK_read_ready(void ** data, uint16_t * data_len);
 static void JNICALLBACK_frame_received(void * data, uint16_t frame_len);
 static void JNICALLBACK_frame_return(void * data);
 static void JNICALLBACK_worker_request(char worker);
+static double JNICALLBACK_evloop_heartbeat(double now);
 
 static void JNICALLBACK_run_started(void);
 static void JNICALLBACK_gwconn_reset(void);
@@ -53,7 +56,6 @@ static void JNICALLBACK_gwconn_connected(void);
 void seacatjni_log_fnct(char level, const char * message);
 
 ////
-
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
@@ -111,6 +113,9 @@ JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_init(JNIEnv * env, 
 	g_reactor_JNICALLBACK_worker_request_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackWorkerRequest", "(C)V");
 	if (g_reactor_JNICALLBACK_worker_request_mid == NULL) return SEACATCC_RC_E_GENERIC;
 
+	g_reactor_JNICALLBACK_evloop_heartbeat_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackEvLoopHeartBeat", "(D)D");
+	if (g_reactor_JNICALLBACK_evloop_heartbeat_mid == NULL) return SEACATCC_RC_E_GENERIC;
+
 	g_reactor_JNICALLBACK_run_started_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackRunStarted", "()V");
 	if (g_reactor_JNICALLBACK_run_started_mid == NULL) return SEACATCC_RC_E_GENERIC;
 
@@ -132,7 +137,8 @@ JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_init(JNIEnv * env, 
 		JNICALLBACK_read_ready,
 		JNICALLBACK_frame_received,
 		JNICALLBACK_frame_return,
-		JNICALLBACK_worker_request
+		JNICALLBACK_worker_request,
+		JNICALLBACK_evloop_heartbeat
 	);
 
 	(*env)->ReleaseStringUTFChars(env, varDir, varDirChar);
@@ -348,6 +354,36 @@ static void JNICALLBACK_worker_request(char worker)
 
 	if (getEnvStat == JNI_EDETACHED)
 		(*g_java_vm)->DetachCurrentThread(g_java_vm);
+}
+
+////
+
+double JNICALLBACK_evloop_heartbeat(double now)
+{
+	JNIEnv * g_env;
+	assert(g_java_vm != NULL);
+
+	int getEnvStat = (*g_java_vm)->GetEnv(g_java_vm, (void **)&g_env, JNI_VERSION_1_6);
+	if (getEnvStat == JNI_EDETACHED)
+	{
+		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
+		{
+			seacatcc_log_p('E', "AttachCurrentThread failed");
+			return NAN;
+		}
+	}
+	else if (getEnvStat == JNI_EVERSION)
+	{
+		seacatcc_log_p('E', "version not supported");
+		return NAN;
+	}
+
+	double ret = (*g_env)->CallDoubleMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_evloop_heartbeat_mid, now, NULL);
+
+	if (getEnvStat == JNI_EDETACHED)
+		(*g_java_vm)->DetachCurrentThread(g_java_vm);
+
+	return ret;
 }
 
 ////

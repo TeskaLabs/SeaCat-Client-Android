@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import mobi.seacat.client.core.Reactor;
+import mobi.seacat.client.ping.Ping;
 
 public final class SeaCatClient
 {
@@ -38,10 +39,10 @@ public final class SeaCatClient
 
 	///
 	
-	public static int ping() throws IOException
+	public static void ping(Ping ping) throws IOException
 	{
 		if (reactor == null) throw new IOException("Not configured.");
-		return reactor.pingFactory.ping(reactor);
+		reactor.pingFactory.ping(reactor, ping);
 	}
 	
 	public static HttpURLConnection open(URL url) throws IOException

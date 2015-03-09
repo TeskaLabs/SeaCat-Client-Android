@@ -186,7 +186,7 @@ public class Reactor
 
 	
 	protected void JNICallbackFrameReceived(ByteBuffer frame, int frame_len)
-	{		
+	{
 		int pos = frame.position();
 		frame.position(pos + frame_len);
 		frame.flip();
@@ -195,7 +195,7 @@ public class Reactor
 		boolean giveBackFrame = true;
 
 		try
-		{			
+		{
  			if ((fb & (1L << 7)) != 0)
  			{
 				giveBackFrame = receivedControlFrame(frame);
@@ -218,7 +218,6 @@ public class Reactor
 		{
 			if (giveBackFrame) framePool.giveBack(frame);
 		}
-		
 	}
 
 
@@ -274,6 +273,17 @@ public class Reactor
 			default:
 				System.err.println("WARNING: Unknown Worker Request " + workerCode);
 		}
+	}
+
+	protected double JNICallbackEvLoopHeartBeat(double now)
+	{
+		// This method is called periodically from event loop (period is fairly arbitrary)
+		// Return value of this method represent the longest time when it should be called again
+		// It will very likely be called in shorter period too (as a result of heart beat triggered by other events)
+
+		pingFactory.heartBeat(now);
+		
+		return 5.0; // Seconds
 	}
 
 	protected void JNICallbackRunStarted()
