@@ -3,28 +3,22 @@ package mobi.seacat.client;
 import android.content.Context;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import mobi.seacat.client.core.Reactor;
-import mobi.seacat.client.intf.IDelegate;
 
 public final class SeaCatClient
 {
-	static private WeakReference<IDelegate> delegate = null;
 	static private Reactor reactor = null; 
 	
 	///
 
-	synchronized public static void configure(Context context, IDelegate delegate) throws IOException
+	synchronized public static void configure(Context context) throws IOException
 	{
 		if (reactor != null) throw new IOException("Already configured.");
 		Reactor lreactor = new Reactor(context);
-
-		if (delegate == null) SeaCatClient.delegate = null;
-		else SeaCatClient.delegate = new WeakReference<IDelegate>(delegate);
 
 		lreactor.start();
 		reactor = lreactor;
@@ -40,11 +34,6 @@ public final class SeaCatClient
 				}
 			}
 		});
-	}
-
-	public static void configure(Context context) throws IOException
-	{
-        if (!SeaCatClient.isConfigured()) SeaCatClient.configure(context, null);
 	}
 
 	///
@@ -71,12 +60,6 @@ public final class SeaCatClient
 	public static boolean isConfigured()
 	{
 		return (reactor != null);
-	}
-
-	public static IDelegate getDelegate()
-	{
-		if (delegate == null) return null;
-		return delegate.get();
 	}
 
 	///
