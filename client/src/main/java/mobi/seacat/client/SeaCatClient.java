@@ -27,10 +27,10 @@ public final class SeaCatClient
 		{
 			public void run()
 			{
-			try {
-				reactor.shutdown();
-			} catch (Exception e) {
-				e.printStackTrace();
+				try {
+					reactor.shutdown();
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		});
