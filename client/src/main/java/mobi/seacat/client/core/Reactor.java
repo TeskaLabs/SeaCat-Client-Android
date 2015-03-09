@@ -3,7 +3,6 @@ package mobi.seacat.client.core;
 import android.content.Context;
 
 import java.io.IOException;
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.HashMap;
@@ -17,6 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import mobi.seacat.client.intf.*;
+import mobi.seacat.client.ping.PingFactory;
 import mobi.seacat.client.util.RC;
 
 public class Reactor
