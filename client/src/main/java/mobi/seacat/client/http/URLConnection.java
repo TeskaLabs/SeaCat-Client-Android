@@ -186,8 +186,8 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	{	
 		if (fixedContentLength > 0) addRequestProperty("Content-length", String.format("%d", fixedContentLength));
 
-		//TODO: addRequestProperty("X-Seacat-Client", isAndroid ? "android" : "java");
-		addRequestProperty("X-Seacat-Client", "java");
+		//TODO: addRequestProperty("X-Seacat-Client", isAndroid ? "and" : "jav");
+		addRequestProperty("X-Seacat-Client", "and");
 
 		// Add If-Modified-Since header
 		long ifModifiedSince = getIfModifiedSince();
