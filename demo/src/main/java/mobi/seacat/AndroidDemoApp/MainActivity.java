@@ -22,6 +22,7 @@ public class MainActivity extends ActionBarActivity
 {
 
     private TextView resultTextView = null;
+    private TextView pingTextView = null;
     private Timer pingTimer = null;
     private Timer getTimer = null;
 
@@ -32,6 +33,7 @@ public class MainActivity extends ActionBarActivity
         setContentView(R.layout.activity_main);
 
         resultTextView = (TextView) findViewById(R.id.resultTextView);
+        pingTextView = (TextView) findViewById(R.id.pingTextView);
     }
 
 
@@ -87,7 +89,30 @@ public class MainActivity extends ActionBarActivity
     private void PingTimerMethod()
     {
         try {
-            SeaCatClient.ping();
+            SeaCatClient.ping(new mobi.seacat.client.ping.Ping() {
+                @Override
+                public void pong()
+                {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            pingTextView.setText("Ping received: "+pingId);
+                        }
+                    });
+                }
+
+                @Override
+                public void cancel()
+                {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            pingTextView.setText("Ping failed :-(");
+                        }
+                    });
+                }
+
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
