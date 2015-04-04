@@ -37,7 +37,12 @@ public final class SeaCatClient
 		});
 	}
 
-	///
+    synchronized public static boolean isConfigured()
+    {
+        return (reactor != null);
+    }
+
+    ///
 	
 	public static void ping(Ping ping) throws IOException
 	{
@@ -56,12 +61,6 @@ public final class SeaCatClient
 		return open(new URL(url));
 	}
 
-	/// Getters
-	
-	public static boolean isConfigured()
-	{
-		return (reactor != null);
-	}
 
 	///
 
