@@ -12,48 +12,28 @@ import mobi.seacat.client.ping.Ping;
 
 public final class SeaCatClient
 {
-	static private Reactor reactor = null; 
-	
-	///
+    static private Reactor reactor = null;
 
-	synchronized public static void configure(Context context) throws IOException
-	{
-		if (reactor != null) throw new IOException("Already configured.");
-		Reactor lreactor = new Reactor(context);
-
-		lreactor.start();
-		reactor = lreactor;
-
-		Runtime.getRuntime().addShutdownHook(new Thread()
-		{
-			public void run()
-			{
-				try {
-					reactor.shutdown();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-    synchronized public static boolean isConfigured()
+    synchronized protected static void setReactor(Reactor reactor)
     {
-        return (reactor != null);
+        SeaCatClient.reactor = reactor;
+    }
+
+    synchronized public static Reactor getReactor()
+    {
+        return SeaCatClient.reactor;
     }
 
     ///
 	
 	public static void ping(Ping ping) throws IOException
 	{
-		if (reactor == null) throw new IOException("Not configured.");
-		reactor.pingFactory.ping(reactor, ping);
+        getReactor().pingFactory.ping(reactor, ping);
 	}
 	
 	public static HttpURLConnection open(URL url) throws IOException
 	{
-		if (reactor == null) throw new IOException("Not configured.");
-		return new mobi.seacat.client.http.URLConnection(reactor, url, 3 /*priority*/);
+		return new mobi.seacat.client.http.URLConnection(getReactor(), url, 3 /*priority*/);
 	}
 
 	public static HttpURLConnection open(String url) throws IOException, MalformedURLException
@@ -61,9 +41,12 @@ public final class SeaCatClient
 		return open(new URL(url));
 	}
 
+	///
+
+	// disconnect;
+	// reset
 
 	///
 
 	protected SeaCatClient() { }
-
 }

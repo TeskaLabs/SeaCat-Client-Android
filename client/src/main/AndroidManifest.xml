@@ -5,12 +5,16 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
-
         <activity
             android:name=".ui.SeaCatSplashActivity"
             android:label="@string/title_activity_sea_cat_splash" >
         </activity>
 
+        <service
+            android:name=".SeaCatService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>
