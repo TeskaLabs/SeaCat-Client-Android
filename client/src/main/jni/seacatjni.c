@@ -23,9 +23,10 @@ static jmethodID g_reactor_JNICALLBACK_frame_received_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_frame_return_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_worker_request_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_evloop_heartbeat_mid = 0;
-static jmethodID g_reactor_JNICALLBACK_run_started_mid = 0;
+static jmethodID g_reactor_JNICALLBACK_evloop_started_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_gwconn_reset_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_gwconn_connected_mid = 0;
+static jmethodID g_reactor_JNICALLBACK_state_changed_mid = 0;
 
 static jobject g_write_buffer_obj = NULL;
 static jobject g_read_buffer_obj = NULL;
@@ -39,9 +40,10 @@ static void JNICALLBACK_frame_return(void * data);
 static void JNICALLBACK_worker_request(char worker);
 static double JNICALLBACK_evloop_heartbeat(double now);
 
-static void JNICALLBACK_run_started(void);
-static void JNICALLBACK_gwconn_reset(void);
+static void JNICALLBACK_evloop_started(void);
 static void JNICALLBACK_gwconn_connected(void);
+static void JNICALLBACK_gwconn_reset(void);
+static void JNICALLBACK_state_changed(void);
 
 ///
 
@@ -116,15 +118,17 @@ JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_init(JNIEnv * env, 
 	g_reactor_JNICALLBACK_evloop_heartbeat_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackEvLoopHeartBeat", "(D)D");
 	if (g_reactor_JNICALLBACK_evloop_heartbeat_mid == NULL) return SEACATCC_RC_E_GENERIC;
 
-	g_reactor_JNICALLBACK_run_started_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackRunStarted", "()V");
-	if (g_reactor_JNICALLBACK_run_started_mid == NULL) return SEACATCC_RC_E_GENERIC;
-
-	g_reactor_JNICALLBACK_gwconn_reset_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackGWConnReset", "()V");
-	if (g_reactor_JNICALLBACK_gwconn_reset_mid == NULL) return SEACATCC_RC_E_GENERIC;
+	g_reactor_JNICALLBACK_evloop_started_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackEvLoopStarted", "()V");
+	if (g_reactor_JNICALLBACK_evloop_started_mid == NULL) return SEACATCC_RC_E_GENERIC;
 
 	g_reactor_JNICALLBACK_gwconn_connected_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackGWConnConnected", "()V");
 	if (g_reactor_JNICALLBACK_gwconn_connected_mid == NULL) return SEACATCC_RC_E_GENERIC;
 
+	g_reactor_JNICALLBACK_gwconn_reset_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackGWConnReset", "()V");
+	if (g_reactor_JNICALLBACK_gwconn_reset_mid == NULL) return SEACATCC_RC_E_GENERIC;
+
+	g_reactor_JNICALLBACK_state_changed_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackStateChanged", "(Ljava/lang/String;)V");
+	if (g_reactor_JNICALLBACK_state_changed_mid == NULL) return SEACATCC_RC_E_GENERIC;
 
 #ifdef __ANDROID__
 	static const char * platform = "and";
@@ -147,11 +151,13 @@ JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_init(JNIEnv * env, 
 	if (rc != SEACATCC_RC_OK) return rc;
 
 	// Register other hooks
-	rc = seacatcc_hook_register('E', JNICALLBACK_run_started);
+	rc = seacatcc_hook_register('E', JNICALLBACK_evloop_started);
 	assert(rc == SEACATCC_RC_OK);
 	rc = seacatcc_hook_register('R', JNICALLBACK_gwconn_reset);
 	assert(rc == SEACATCC_RC_OK);
 	rc = seacatcc_hook_register('C', JNICALLBACK_gwconn_connected);
+	assert(rc == SEACATCC_RC_OK);
+	rc = seacatcc_hook_register('S', JNICALLBACK_state_changed);
 	assert(rc == SEACATCC_RC_OK);
 
 	return rc;
@@ -388,7 +394,7 @@ double JNICALLBACK_evloop_heartbeat(double now)
 
 ////
 
-static void JNICALLBACK_run_started(void)
+static void JNICALLBACK_evloop_started(void)
 {
 	JNIEnv * g_env;
 	assert(g_java_vm != NULL);
@@ -408,7 +414,7 @@ static void JNICALLBACK_run_started(void)
 		return;
 	}
 
-	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_run_started_mid, NULL);
+	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_evloop_started_mid, NULL);
 
 	if (getEnvStat == JNI_EDETACHED)
 		(*g_java_vm)->DetachCurrentThread(g_java_vm);
@@ -462,6 +468,36 @@ static void JNICALLBACK_gwconn_connected(void)
 	}
 
 	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_gwconn_connected_mid, NULL);
+
+	if (getEnvStat == JNI_EDETACHED)
+		(*g_java_vm)->DetachCurrentThread(g_java_vm);
+}
+
+static void JNICALLBACK_state_changed(void)
+{
+	JNIEnv * g_env;
+	assert(g_java_vm != NULL);
+
+	int getEnvStat = (*g_java_vm)->GetEnv(g_java_vm, (void **)&g_env, JNI_VERSION_1_6);
+	if (getEnvStat == JNI_EDETACHED)
+	{
+		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
+		{
+			seacatcc_log_p('E', "AttachCurrentThread failed");
+			return;
+		}
+	}
+	else if (getEnvStat == JNI_EVERSION)
+	{
+		seacatcc_log_p('E', "version not supported");
+		return;
+	}
+
+	char state_buf[SEACATCC_STATE_BUF_SIZE];
+	seacatcc_get_state(state_buf);
+
+	jstring jstate_buf = (*g_env)->NewStringUTF(g_env, state_buf);
+	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_state_changed_mid, jstate_buf, NULL);
 
 	if (getEnvStat == JNI_EDETACHED)
 		(*g_java_vm)->DetachCurrentThread(g_java_vm);

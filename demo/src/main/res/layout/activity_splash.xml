@@ -41,4 +41,15 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="40dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/status_unknown"
+        android:id="@+id/statusTextView"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true" />
+
 </RelativeLayout>

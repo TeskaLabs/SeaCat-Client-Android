@@ -12,23 +12,23 @@ public class SeaCatService extends Service
 {
     public SeaCatService()
     {
-        Log.i("SeaCatService", "SeaCatService()");
+        Log.d(SeaCatClient.L, "SeaCatService()");
     }
 
     @Override
     public void onCreate()
     {
-        Log.i("SeaCatService", "onCreate()");
+        Log.d(SeaCatClient.L, "onCreate()");
         if (SeaCatClient.getReactor() != null)
         {
-            Log.e("SeaCatService", "Reactor is already created!");
+            Log.e(SeaCatClient.L, "Reactor is already created!");
             return;
         }
 
         try {
             SeaCatClient.setReactor(new Reactor(getApplicationContext()));
         } catch (Exception e) {
-            Log.e("SeaCatService", "Reactor shutdown failed:", e);
+            Log.e(SeaCatClient.L, "Reactor shutdown failed:", e);
         }
     }
 
@@ -39,21 +39,23 @@ public class SeaCatService extends Service
         //TODO: Prevent double starts
         SeaCatClient.getReactor().start();
 
-        // We want this service to continue running until it is explicitly
-        // stopped, so return sticky.
+        // We want this service to continue running until it is explicitly stopped, so return sticky.
         return START_STICKY;
     }
 
     @Override
     public void onDestroy()
     {
-        try {
-            SeaCatClient.getReactor().shutdown();
-        } catch (Exception e) {
-            Log.e("SeaCatService", "Reactor shutdown failed:", e);
+        Reactor reactor = SeaCatClient.getReactor();
+        if (reactor != null)
+        {
+            try {
+                reactor.shutdown();
+            } catch (Exception e) {
+                Log.e(SeaCatClient.L, "Reactor shutdown failed:", e);
+            }
+            SeaCatClient.setReactor(null);
         }
-
-        SeaCatClient.setReactor(null);
     }
 
 
