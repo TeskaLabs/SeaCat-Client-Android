@@ -93,7 +93,7 @@ public class SPDY
 		appendVLEString(buffer, host);
 
 		appendVLEString(buffer, method);
-		appendVLEString(buffer, url.getPath());
+		appendVLEString(buffer, url.getFile());
 		
 		for (int i = 0; i < headers.size(); i++)
 		{
