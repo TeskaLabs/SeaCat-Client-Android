@@ -11,8 +11,7 @@ public final class seacatcc
 	static public native int run();
 	static public native int shutdown();
 	static public native int yield(char what);
-	static public native int reset();
-	
+
 	static public native void ppkgen_worker();
 	
 	static public native void csrgen_worker(

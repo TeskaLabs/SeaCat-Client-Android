@@ -60,8 +60,8 @@ public final class SeaCatClient
 
     public static void reset() throws IOException
     {
-        int rc = seacatcc.reset();
-        RC.checkAndThrowIOException("seacatcc.reset", rc);
+        int rc = seacatcc.yield('r');
+        RC.checkAndThrowIOException("seacatcc.yield(reset)", rc);
     }
 
     ///
@@ -72,6 +72,12 @@ public final class SeaCatClient
         if (reactor != null) reactor.broadcastState();
     }
 
+    public static String getState()
+    {
+        Reactor reactor = getReactor();
+        if (reactor != null) return reactor.getState();
+        return "?????";
+    }
 
 	// disconnect;
 	// reset

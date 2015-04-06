@@ -27,6 +27,8 @@ public class SplashActivity extends ActionBarActivity
     private Runnable stateChecker;
 
     private TextView statusTextView = null;
+    private boolean readyToClose;
+    long displayTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,14 +40,25 @@ public class SplashActivity extends ActionBarActivity
 
         receiver = new SeaCatReceiver();
         handler = new Handler();
+        readyToClose = false;
 
         stateChecker = new Runnable()
         {
             @Override
             public void run()
             {
-                SeaCatClient.broadcastState(); // This triggers initial delivery of the actual state
-                handler.postDelayed(this, 1000);
+                if (readyToClose)
+                {
+                    if ((System.currentTimeMillis() - displayTime) > 3000)
+                    {
+                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                        finish();
+                        return;
+                    }
+                } else {
+                    SeaCatClient.broadcastState(); // This triggers initial delivery of the actual state
+                }
+                handler.postDelayed(this, 500);
             }
         };
 
@@ -59,20 +72,10 @@ public class SplashActivity extends ActionBarActivity
         intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
         registerReceiver(receiver, intentFilter);
 
+        displayTime = System.currentTimeMillis();
         super.onStart();
 
         stateChecker.run();
-
-/*
-        new Handler().post(new Runnable()
-        {
-            public void run() {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                finish();
-            }
-        }, 10 * 1000);
-*/
-
 
     }
 
@@ -88,6 +91,10 @@ public class SplashActivity extends ActionBarActivity
     private void onStateChanged(String state)
     {
         statusTextView.setText(state);
+        if ((state.charAt(3) == 'Y') && (state.charAt(4) == 'N') && (state.charAt(0) != 'f'))
+        {
+            readyToClose = true;
+        }
     }
 
 

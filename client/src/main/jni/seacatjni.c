@@ -523,12 +523,6 @@ JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_yield(JNIEnv * env,
 	return seacatcc_yield(what);
 }
 
-JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_reset(JNIEnv * env, jclass cls)
-{
-	return seacatcc_reset();
-}
-
-
 JNIEXPORT void JNICALL Java_mobi_seacat_client_core_seacatcc_ppkgen_1worker(JNIEnv * env, jclass cls)
 {
 	return seacatcc_ppkgen_worker();
