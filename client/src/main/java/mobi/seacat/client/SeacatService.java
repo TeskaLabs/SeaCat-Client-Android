@@ -12,13 +12,11 @@ public class SeaCatService extends Service
 {
     public SeaCatService()
     {
-        Log.d(SeaCatClient.L, "SeaCatService()");
     }
 
     @Override
     public void onCreate()
     {
-        Log.d(SeaCatClient.L, "onCreate()");
         if (SeaCatClient.getReactor() != null)
         {
             Log.e(SeaCatClient.L, "Reactor is already created!");
