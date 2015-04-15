@@ -34,8 +34,17 @@ public class SeaCatService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        //TODO: Prevent double starts
-        SeaCatClient.getReactor().start();
+        Reactor reactor = SeaCatClient.getReactor();
+
+        if (reactor != null)
+        {
+            if (!reactor.isStarted())
+                reactor.start();
+        }
+        else
+        {
+            Log.e(SeaCatClient.L, "Reactor is broken!");
+        }
 
         // We want this service to continue running until it is explicitly stopped, so return sticky.
         return START_STICKY;

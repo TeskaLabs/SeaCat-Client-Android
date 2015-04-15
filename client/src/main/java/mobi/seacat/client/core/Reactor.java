@@ -93,6 +93,8 @@ public class Reactor
 		this.sessionThread.start();
 	}
 
+    public boolean isStarted() { return this.sessionThread.isAlive(); }
+
 
 	public void shutdown() throws IOException
 	{
