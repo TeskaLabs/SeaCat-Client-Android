@@ -17,7 +17,6 @@ import java.util.TimerTask;
 
 import mobi.seacat.client.SeaCatClient;
 
-
 public class MainActivity extends ActionBarActivity
 {
 
