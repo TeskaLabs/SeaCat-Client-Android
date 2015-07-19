@@ -45,14 +45,6 @@ JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_yield
 
 /*
  * Class:     mobi_seacat_client_core_seacatcc
- * Method:    reset
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_reset
-  (JNIEnv *, jclass);
-
-/*
- * Class:     mobi_seacat_client_core_seacatcc
  * Method:    ppkgen_worker
  * Signature: ()V
  */
@@ -62,10 +54,10 @@ JNIEXPORT void JNICALL Java_mobi_seacat_client_core_seacatcc_ppkgen_1worker
 /*
  * Class:     mobi_seacat_client_core_seacatcc
  * Method:    csrgen_worker
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+ * Signature: ([Ljava/lang/String;)I
  */
-JNIEXPORT void JNICALL Java_mobi_seacat_client_core_seacatcc_csrgen_1worker
-  (JNIEnv *, jclass, jstring, jstring, jstring, jstring, jstring, jstring, jstring, jstring, jstring, jstring, jstring);
+JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_csrgen_1worker
+  (JNIEnv *, jclass, jobjectArray);
 
 /*
  * Class:     mobi_seacat_client_core_seacatcc
@@ -82,6 +74,14 @@ JNIEXPORT jstring JNICALL Java_mobi_seacat_client_core_seacatcc_cacert_1url
  */
 JNIEXPORT void JNICALL Java_mobi_seacat_client_core_seacatcc_cacert_1worker
   (JNIEnv *, jclass, jbyteArray);
+
+/*
+ * Class:     mobi_seacat_client_core_seacatcc
+ * Method:    time
+ * Signature: ()D
+ */
+JNIEXPORT jdouble JNICALL Java_mobi_seacat_client_core_seacatcc_time
+  (JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }

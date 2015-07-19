@@ -14,13 +14,7 @@ public final class seacatcc
 
 	static public native void ppkgen_worker();
 	
-	static public native void csrgen_worker(
-		String country, String state, String locality, String organization, String organization_unit,
-		String common_name,
-		String surname, String given_name,
-		String email,
-		String san_email, String san_uri
-	);
+	static public native int csrgen_worker(String[] params);
 
 	static public native String cacert_url();
 	static public native void cacert_worker(byte[] cacert);

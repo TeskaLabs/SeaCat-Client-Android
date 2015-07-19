@@ -529,45 +529,29 @@ JNIEXPORT void JNICALL Java_mobi_seacat_client_core_seacatcc_ppkgen_1worker(JNIE
 }
 
 
-JNIEXPORT void JNICALL Java_mobi_seacat_client_core_seacatcc_csrgen_1worker(JNIEnv * env, jclass cls, 
-	jstring country, jstring state, jstring locality, jstring organization, jstring organization_unit,
-	jstring common_name,
-	jstring surname, jstring given_name,
-	jstring email,
-	jstring san_email, jstring san_uri)
+JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_csrgen_1worker(JNIEnv * env, jclass cls, jobjectArray params)
 {
 
-	const char * countryChar = country != NULL ? (*env)->GetStringUTFChars(env, country, 0) : NULL;
-	const char * stateChar = (*env)->GetStringUTFChars(env, state, 0);
-	const char * localityChar = (*env)->GetStringUTFChars(env, locality, 0);
-	const char * organizationChar = (*env)->GetStringUTFChars(env, organization, 0);
-	const char * organizationUnitChar = (*env)->GetStringUTFChars(env, organization_unit, 0);
-	const char * commonNameChar = (*env)->GetStringUTFChars(env, common_name, 0);
-	const char * surnameChar = (*env)->GetStringUTFChars(env, surname, 0);
-	const char * givenNameChar = (*env)->GetStringUTFChars(env, given_name, 0);
-	const char * emailChar = (*env)->GetStringUTFChars(env, email, 0);
-	const char * sanEmailChar = san_email != NULL ? (*env)->GetStringUTFChars(env, san_email, 0) : NULL;
-	const char * sanUriChar = san_uri != NULL ? (*env)->GetStringUTFChars(env, san_uri, 0) : NULL;
+	int i, rc;
+	int paramCount = (*env)->GetArrayLength(env, params);
+	const char * csr_entries[paramCount+1];
 
-	seacatcc_csrgen_worker(
-		countryChar, stateChar, localityChar, organizationChar, organizationUnitChar,
-		commonNameChar,
-		surnameChar, givenNameChar,
-		emailChar,
-		sanEmailChar, sanUriChar
-	);
+	for (i=0; i<paramCount; i++)
+	{
+		jstring string = (jstring) (*env)->GetObjectArrayElement(env, params, i);
+		csr_entries[i] = (*env)->GetStringUTFChars(env, string, 0);
+	}
+	csr_entries[paramCount] = NULL;
 
-	if (sanUriChar != NULL) (*env)->ReleaseStringUTFChars(env, san_uri, sanUriChar);
-	if (sanEmailChar != NULL) (*env)->ReleaseStringUTFChars(env, san_email, sanEmailChar);
-	if (emailChar != NULL) (*env)->ReleaseStringUTFChars(env, email, emailChar);
-	if (givenNameChar != NULL) (*env)->ReleaseStringUTFChars(env, given_name, givenNameChar);
-	if (surnameChar != NULL) (*env)->ReleaseStringUTFChars(env, surname, surnameChar);
-	if (commonNameChar != NULL) (*env)->ReleaseStringUTFChars(env, common_name, commonNameChar);
-	if (organizationUnitChar != NULL) (*env)->ReleaseStringUTFChars(env, organization_unit, organizationUnitChar);
-	if (organizationChar != NULL) (*env)->ReleaseStringUTFChars(env, organization, organizationChar);
-	if (localityChar != NULL) (*env)->ReleaseStringUTFChars(env, locality, localityChar);
-	if (stateChar != NULL) (*env)->ReleaseStringUTFChars(env, state, stateChar);
-	if (countryChar != NULL) (*env)->ReleaseStringUTFChars(env, country, countryChar);
+	rc = seacatcc_csrgen_worker((char * const*)csr_entries);
+
+	for (i=0; i<paramCount; i++)
+	{
+		jstring string = (jstring) (*env)->GetObjectArrayElement(env, params, i);
+		(*env)->ReleaseStringUTFChars(env, string, csr_entries[i]);
+	}
+
+	return rc;
 }
 
 

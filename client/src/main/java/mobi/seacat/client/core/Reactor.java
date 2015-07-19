@@ -263,21 +263,20 @@ public class Reactor
 				{
 					public void run()
 					{
-                        //TODO: Get real values
-						seacatcc.csrgen_worker(
-							"CZ",
-							"CzechRepublic",
-							"Prague",
-							"Seal Teaks Ltd",
-							"SeaCat",
-							"client-java.test.Main",
-							"John",
-							"Doe",
-							"john.doe@example.com",
-							null,
-							null
-						);
-					} 
+						//TODO: Real values
+						String[] params = {
+							"C", "CZ",
+							"ST", "Czech-Republic",
+							"L", "Prague",
+							"O", "TeskaLabs",
+							"OU", "SeaCat",
+							"CN", "client-java.test.Main",
+							"SN", "John",
+							"GN", "Doe",
+							"emailAddress", "john.doe@example.com"
+						};
+						seacatcc.csrgen_worker(params);
+					}
 				});
 				break;
 
