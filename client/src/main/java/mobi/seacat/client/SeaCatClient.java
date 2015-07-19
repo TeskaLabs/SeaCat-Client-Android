@@ -1,6 +1,5 @@
 package mobi.seacat.client;
 
-import android.content.Context;
 import android.content.Intent;
 
 import java.io.IOException;
