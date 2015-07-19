@@ -83,6 +83,22 @@ public final class SeaCatClient
 
 	///
 
+    private static CSR csr = null;
+
+    public static CSR createCSR()
+    {
+        return new CSR();
+    }
+
+    public static void setCSR(CSR csr)
+    {
+        SeaCatClient.csr = csr;
+    }
+
+    public static CSR getCSR() { return SeaCatClient.csr; }
+
+    ///
+
     public static Intent createIntent(String action)
     {
         Intent Intent = new Intent(action);
