@@ -263,19 +263,20 @@ public class Reactor
 				{
 					public void run()
 					{
+
 						//TODO: Real values
-						String[] params = {
-							"C", "CZ",
-							"ST", "Czech-Republic",
-							"L", "Prague",
-							"O", "TeskaLabs",
-							"OU", "SeaCat",
-							"CN", "client-java.test.Main",
-							"SN", "John",
-							"GN", "Doe",
-							"emailAddress", "john.doe@example.com"
-						};
-						seacatcc.csrgen_worker(params);
+                        mobi.seacat.client.CSR csr = SeaCatClient.createCSR();
+                        csr.setCountry("CZ");
+                        csr.setState("Czech-Republic");
+                        csr.setLocality("Prague");
+                        csr.setOrganization("TeskaLabs");
+                        csr.setOrganizationUnit("SeaCat");
+                        csr.setCommonName("client-java.test.Main");
+                        csr.setGivenName("John");
+                        csr.setSurname("Doe");
+                        csr.setEmailAddress("john.doe@example.com");
+
+						seacatcc.csrgen_worker(csr.toStringArray());
 					}
 				});
 				break;
