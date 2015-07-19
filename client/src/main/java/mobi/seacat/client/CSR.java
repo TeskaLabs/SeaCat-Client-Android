@@ -6,14 +6,12 @@ public class CSR
     private String country = null;
     private String locality = null;
     private String organization = null;
-    private String organization_unit = null;
-    private String common_name = null;
+    private String organizationUnit = null;
+    private String commonName = null;
     private String title = null;
     private String surname = null;
-    private String given_name = null;
+    private String givenName = null;
     private String email = null;
-    private String san_email = null;
-    private String san_uri = null;
 
     public String getCountry() {
         return country;
@@ -48,19 +46,19 @@ public class CSR
     }
 
     public String getOrganizationUnit() {
-        return organization_unit;
+        return organizationUnit;
     }
 
     public void setOrganizationUnit(String organization_unit) {
-        this.organization_unit = organization_unit;
+        this.organizationUnit = organization_unit;
     }
 
     public String getCommonName() {
-        return common_name;
+        return commonName;
     }
 
     public void setCommonName(String common_name) {
-        this.common_name = common_name;
+        this.commonName = common_name;
     }
 
     public String getTitle() {
@@ -79,12 +77,12 @@ public class CSR
         this.surname = surname;
     }
 
-    public String getGiven_name() {
-        return given_name;
+    public String getGivenName() {
+        return givenName;
     }
 
-    public void setGiven_name(String given_name) {
-        this.given_name = given_name;
+    public void setGivenName(String given_name) {
+        this.givenName = given_name;
     }
 
     public String getEmail() {
@@ -95,23 +93,7 @@ public class CSR
         this.email = email;
     }
 
-    public String getSan_email() {
-        return san_email;
-    }
-
-    public void setSan_email(String san_email) {
-        this.san_email = san_email;
-    }
-
-    public String getSan_uri() {
-        return san_uri;
-    }
-
-    public void setSan_uri(String san_uri) {
-        this.san_uri = san_uri;
-    }
-
-    public CSR()
+    CSR()
     {
 
     }
