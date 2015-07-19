@@ -18,6 +18,7 @@ import android.widget.Toast;
 import java.io.IOException;
 
 import mobi.seacat.AndroidDemoApp.R;
+import mobi.seacat.client.CSR;
 import mobi.seacat.client.SeaCatClient;
 
 public class SplashActivity extends ActionBarActivity
@@ -62,6 +63,11 @@ public class SplashActivity extends ActionBarActivity
             }
         };
 
+        CSR csr = SeaCatClient.createCSR();
+        csr.setGivenName("Ales");
+        csr.setSurname("Teska");
+        csr.setCountry("UK");
+        SeaCatClient.setCSR(csr);
     }
 
     @Override
@@ -90,6 +96,8 @@ public class SplashActivity extends ActionBarActivity
 
     private void onStateChanged(String state)
     {
+
+
         statusTextView.setText(state);
         if ((state.charAt(3) == 'Y') && (state.charAt(4) == 'N') && (state.charAt(0) != 'f'))
         {
