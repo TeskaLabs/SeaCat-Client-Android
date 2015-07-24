@@ -1,8 +1,14 @@
 package mobi.seacat.client;
 
-import java.util.Iterator;
+import android.provider.Settings;
+import android.util.Log;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.UUID;
+
+import mobi.seacat.client.core.seacatcc;
 
 public class CSR
 {
@@ -123,6 +129,45 @@ public class CSR
 
     public void setEmailAddress(String emailAddress) {
         paramMap.put("emailAddress", emailAddress);
+    }
+
+
+    ///
+
+    static public Runnable createDefault()
+    {
+        return new Runnable()
+        {
+            public void run()
+            {
+                CSR csr = new CSR();
+
+                UUID deviceUuid = null;
+                final String androidId = Settings.Secure.getString(
+                        SeaCatService.instance.getApplicationContext().getContentResolver(),
+                        Settings.Secure.ANDROID_ID
+                );
+
+                if ((androidId != null) && (!"9774d56d682e549c".equals(androidId)))
+                {
+                    try {
+                        deviceUuid = UUID.nameUUIDFromBytes(androidId.getBytes("utf8"));
+                    } catch (UnsupportedEncodingException e)
+                    {   }
+                }
+
+                if (deviceUuid == null)
+                {
+                    Log.w(SeaCatClient.L, "Settings.Secure.ANDROID_ID get failed, using random UUID");
+                    deviceUuid = UUID.randomUUID();
+                }
+
+                csr.setCommonName(deviceUuid.toString().replaceAll("-", "") + "and");
+                csr.set("description", "TeskaLabs SeaCat Android");
+
+                seacatcc.csrgen_worker(csr.toStringArray());
+            }
+        };
     }
 
 }

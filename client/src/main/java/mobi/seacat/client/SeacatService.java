@@ -10,8 +10,11 @@ import mobi.seacat.client.core.Reactor;
 
 public class SeaCatService extends Service
 {
+    static SeaCatService instance = null;
+
     public SeaCatService()
     {
+        instance = this;
     }
 
     @Override

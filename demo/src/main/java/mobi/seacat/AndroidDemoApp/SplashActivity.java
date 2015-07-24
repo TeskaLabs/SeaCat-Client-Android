@@ -63,11 +63,13 @@ public class SplashActivity extends ActionBarActivity
             }
         };
 
+/*
         CSR csr = SeaCatClient.createCSR();
         csr.setGivenName("Ales");
         csr.setSurname("Teska");
         csr.setCountry("UK");
         SeaCatClient.setCSR(csr);
+*/
     }
 
     @Override

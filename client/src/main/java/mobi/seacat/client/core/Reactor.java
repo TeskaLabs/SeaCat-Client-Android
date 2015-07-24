@@ -259,26 +259,7 @@ public class Reactor
 
 
 			case 'C':
-				workerExecutor.execute(new Runnable()
-				{
-					public void run()
-					{
-
-						//TODO: Real values
-                        mobi.seacat.client.CSR csr = SeaCatClient.createCSR();
-                        csr.setCountry("CZ");
-                        csr.setState("Czech-Republic");
-                        csr.setLocality("Prague");
-                        csr.setOrganization("TeskaLabs");
-                        csr.setOrganizationUnit("SeaCat");
-                        csr.setCommonName("client-java.test.Main");
-                        csr.setGivenName("John");
-                        csr.setSurname("Doe");
-                        csr.setEmailAddress("john.doe@example.com");
-
-						seacatcc.csrgen_worker(csr.toStringArray());
-					}
-				});
+				workerExecutor.execute(mobi.seacat.client.CSR.createDefault());
 				break;
 
 				
