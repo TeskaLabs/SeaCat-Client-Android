@@ -20,6 +20,7 @@ public class CSR
 
     public CSR()
     {
+        this.set("description", "TeskaLabs SeaCat Android");
     }
 
     ///
@@ -179,7 +180,6 @@ public class CSR
                 CSR csr = new CSR();
 
                 csr.setUniqueCommonName();
-                csr.set("description", "TeskaLabs SeaCat Android");
 
                 try {
                     csr.submit();
