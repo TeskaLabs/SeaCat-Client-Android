@@ -41,7 +41,6 @@ public class Reactor
     final private Context context;
 
     final private Object stateLock = new Object();
-    private String state = null; // Latch that contain last reported state of SeaCat C-Core
 
 	///
 	
@@ -253,14 +252,16 @@ public class Reactor
 					public void run()
 					{
 						seacatcc.ppkgen_worker();
-					} 
+					}
 				});
 				break;
 
 
-			case 'C':
-				workerExecutor.execute(mobi.seacat.client.CSR.createDefault());
-				break;
+			case 'C': {
+                Runnable w = SeaCatClient.getCSRWorker();
+                if (w != null) workerExecutor.execute(w);
+                break;
+            }
 
 				
 			case 'R':
@@ -303,21 +304,13 @@ public class Reactor
 
     protected void JNICallbackStateChanged(String state)
     {
-        synchronized (stateLock) {
-            this.state = state;
-        }
-
-        Intent intent = SeaCatClient.createIntent(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
-        intent.putExtra(SeaCatClient.EXTRA_STATE, state);
-//        Log.d(SeaCatClient.L, "Broadcasting: " + intent);
-        context.sendBroadcast(intent);
+        broadcastState(state);
     }
 
-    public void broadcastState()
+    public void broadcastState(String state)
     {
         Intent intent = SeaCatClient.createIntent(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
-        intent.putExtra(SeaCatClient.EXTRA_STATE, getState());
-//        Log.d(SeaCatClient.L, "Broadcasting: " + intent);
+        intent.putExtra(SeaCatClient.EXTRA_STATE, seacatcc.state());
         context.sendBroadcast(intent);
     }
 
@@ -356,14 +349,4 @@ public class Reactor
 		
 		return consumer.receivedControlFrame(this, frame, frameVersionType, frameLength, frameFlags);
 	}
-
-    ///
-
-    public String getState()
-    {
-        synchronized (stateLock) {
-            return this.state;
-        }
-    }
-
 }

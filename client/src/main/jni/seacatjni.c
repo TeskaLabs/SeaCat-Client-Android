@@ -494,7 +494,7 @@ static void JNICALLBACK_state_changed(void)
 	}
 
 	char state_buf[SEACATCC_STATE_BUF_SIZE];
-	seacatcc_get_state(state_buf);
+	seacatcc_state(state_buf);
 
 	jstring jstate_buf = (*g_env)->NewStringUTF(g_env, state_buf);
 	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_state_changed_mid, jstate_buf, NULL);
@@ -557,7 +557,7 @@ JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_csrgen_1worker(JNIE
 
 JNIEXPORT jstring JNICALL Java_mobi_seacat_client_core_seacatcc_cacert_1url(JNIEnv * env, jclass cls)
 {
-	jstring result = (*env)->NewStringUTF(env, seacatcc_cacert_url()); 
+	jstring result = (*env)->NewStringUTF(env, seacatcc_cacert_url());
  	return result;
 }
 
@@ -574,4 +574,13 @@ JNIEXPORT void JNICALL Java_mobi_seacat_client_core_seacatcc_cacert_1worker(JNIE
 JNIEXPORT jdouble JNICALL Java_mobi_seacat_client_core_seacatcc_time(JNIEnv * env, jclass cls)
 {
 	return seacatcc_time();
+}
+
+JNIEXPORT jstring JNICALL Java_mobi_seacat_client_core_seacatcc_state(JNIEnv * env, jclass cls)
+{
+	char state_buf[SEACATCC_STATE_BUF_SIZE];
+	seacatcc_state(state_buf);
+
+	jstring result = (*env)->NewStringUTF(env, state_buf);
+ 	return result;
 }

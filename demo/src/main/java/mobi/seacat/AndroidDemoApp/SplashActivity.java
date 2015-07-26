@@ -17,8 +17,6 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
-import mobi.seacat.AndroidDemoApp.R;
-import mobi.seacat.client.CSR;
 import mobi.seacat.client.SeaCatClient;
 
 public class SplashActivity extends ActionBarActivity
@@ -30,6 +28,8 @@ public class SplashActivity extends ActionBarActivity
     private TextView statusTextView = null;
     private boolean readyToClose;
     long displayTime;
+
+    boolean CSRtrigger = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -63,13 +63,6 @@ public class SplashActivity extends ActionBarActivity
             }
         };
 
-/*
-        CSR csr = SeaCatClient.createCSR();
-        csr.setGivenName("Ales");
-        csr.setSurname("Teska");
-        csr.setCountry("UK");
-        SeaCatClient.setCSR(csr);
-*/
     }
 
     @Override
@@ -80,6 +73,7 @@ public class SplashActivity extends ActionBarActivity
         intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
         registerReceiver(receiver, intentFilter);
 
+        CSRtrigger = true;
         displayTime = System.currentTimeMillis();
         super.onStart();
 
@@ -98,12 +92,18 @@ public class SplashActivity extends ActionBarActivity
 
     private void onStateChanged(String state)
     {
-
-
         statusTextView.setText(state);
         if ((state.charAt(3) == 'Y') && (state.charAt(4) == 'N') && (state.charAt(0) != 'f'))
         {
             readyToClose = true;
+        }
+
+        else if ((state.charAt(5) == 'n') && (CSRtrigger))
+        {
+
+            CSRtrigger = false;
+            CSRDialog dialog = new CSRDialog(SplashActivity.this);
+            dialog.show();
         }
     }
 

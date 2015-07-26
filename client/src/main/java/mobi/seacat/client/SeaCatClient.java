@@ -29,6 +29,7 @@ public final class SeaCatClient
     ///
 
     static private Reactor reactor = null;
+    static private Runnable CSRWorker = mobi.seacat.client.CSR.createDefault();
 
     synchronized protected static void setReactor(Reactor reactor)
     {
@@ -68,17 +69,27 @@ public final class SeaCatClient
     public static void broadcastState()
     {
         Reactor reactor = getReactor();
-        if (reactor != null) reactor.broadcastState();
+        if (reactor != null) reactor.broadcastState(getState());
     }
 
     public static String getState()
     {
-        Reactor reactor = getReactor();
-        if (reactor != null) return reactor.getState();
-        return "?????";
+        return seacatcc.state();
     }
 
-	// disconnect;
+    ///
+
+    public static void setCSRWorker(Runnable CSRWorker)
+    {
+        SeaCatClient.CSRWorker = CSRWorker;
+    }
+
+    public static Runnable getCSRWorker()
+    {
+        return SeaCatClient.CSRWorker;
+    }
+
+    // disconnect;
 	// reset
 
     ///

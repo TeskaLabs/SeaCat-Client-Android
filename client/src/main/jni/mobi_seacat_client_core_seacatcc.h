@@ -45,6 +45,14 @@ JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_yield
 
 /*
  * Class:     mobi_seacat_client_core_seacatcc
+ * Method:    state
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_mobi_seacat_client_core_seacatcc_state
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     mobi_seacat_client_core_seacatcc
  * Method:    ppkgen_worker
  * Signature: ()V
  */

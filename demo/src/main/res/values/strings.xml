@@ -7,5 +7,6 @@
 
     <string name="action_reset_identity">Reset Identity</string>
     <string name="status_unknown">\?????</string>
+    <string name="emailaddress">Email Address</string>
 
 </resources>
