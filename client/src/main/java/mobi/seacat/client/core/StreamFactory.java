@@ -71,7 +71,7 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 		IStream stream = getStream(streamId);
 		if (stream == null)
 		{
-            Log.w(SeaCatClient.L, "receivedALX1_SYN_REPLY stream not found:" + streamId + " (can be closed already)");
+            Log.w(SeaCatClient.L, "receivedALX1_SYN_REPLY stream not found: " + streamId + " (can be closed already)");
 			frame.clear();
 			sendRST_STREAM(frame, reactor, streamId, SPDY.RST_STREAM_STATUS_INVALID_STREAM);
 			return false;
@@ -92,7 +92,7 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 		IStream stream = getStream(streamId);
 		if (stream == null)
 		{
-            Log.w(SeaCatClient.L, "receivedSPD3_RST_STREAM stream not found:" + streamId + " (can be closed already)");
+            Log.w(SeaCatClient.L, "receivedSPD3_RST_STREAM stream not found: " + streamId + " (can be closed already)");
             return true;
 		}
 
@@ -111,7 +111,7 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 		IStream stream = getStream(streamId);
 		if (stream == null)
 		{
-            Log.w(SeaCatClient.L, "receivedDataFrame stream not found:" + streamId + " (can be closed already)");
+            Log.w(SeaCatClient.L, "receivedDataFrame stream not found: " + streamId + " (can be closed already)");
 			frame.clear();
 			sendRST_STREAM(frame, reactor, streamId, SPDY.RST_STREAM_STATUS_INVALID_STREAM);
 			return false;
@@ -142,7 +142,7 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 				return receivedSPD3_RST_STREAM(reactor, frame, frameLength, frameFlags);
 
 			default:
-                Log.e(SeaCatClient.L, "StreamFactory.receivedControlFrame cannot handle frame:"+ frameVersionType);
+                Log.e(SeaCatClient.L, "StreamFactory.receivedControlFrame cannot handle frame: "+ frameVersionType);
 				return true;
 		}
 	}
