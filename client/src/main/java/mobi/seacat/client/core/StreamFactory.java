@@ -1,5 +1,7 @@
 package mobi.seacat.client.core;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -9,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import mobi.seacat.client.SeaCatClient;
 import mobi.seacat.client.intf.*;
 import mobi.seacat.client.util.IntegerCounter;
 
@@ -68,7 +71,7 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 		IStream stream = getStream(streamId);
 		if (stream == null)
 		{
-			System.err.println("WARNING: receivedALX1_SYN_REPLY stream not found:"+ streamId);
+            Log.w(SeaCatClient.L, "receivedALX1_SYN_REPLY stream not found:" + streamId + " (can be closed already)");
 			frame.clear();
 			sendRST_STREAM(frame, reactor, streamId, SPDY.RST_STREAM_STATUS_INVALID_STREAM);
 			return false;
@@ -89,8 +92,8 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 		IStream stream = getStream(streamId);
 		if (stream == null)
 		{
-			System.err.println("WARNING: receivedSPD3_RST_STREAM stream not found:"+ streamId);
-			return true;
+            Log.w(SeaCatClient.L, "receivedSPD3_RST_STREAM stream not found:" + streamId + " (can be closed already)");
+            return true;
 		}
 
 		boolean ret = stream.receivedSPD3_RST_STREAM(reactor, frame, frameLength, frameFlags);
@@ -108,7 +111,7 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 		IStream stream = getStream(streamId);
 		if (stream == null)
 		{
-			System.err.println("WARNING: receivedDataFrame stream not found:"+ streamId);
+            Log.w(SeaCatClient.L, "receivedDataFrame stream not found:" + streamId + " (can be closed already)");
 			frame.clear();
 			sendRST_STREAM(frame, reactor, streamId, SPDY.RST_STREAM_STATUS_INVALID_STREAM);
 			return false;
@@ -139,7 +142,7 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 				return receivedSPD3_RST_STREAM(reactor, frame, frameLength, frameFlags);
 
 			default:
-				System.err.println(String.format("ERROR: StreamFactory.receivedControlFrame cannot handle frame %x", frameVersionType));
+                Log.e(SeaCatClient.L, "StreamFactory.receivedControlFrame cannot handle frame:"+ frameVersionType);
 				return true;
 		}
 	}
