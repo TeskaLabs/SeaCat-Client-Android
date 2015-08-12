@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -58,7 +59,7 @@ public class MainActivity extends ActionBarActivity
             public void run() {
                 try
                 {
-                    GetTimerMethod();
+                    GetTimerMethod_GET();
                 }
 
                 catch (Exception e)
@@ -118,7 +119,7 @@ public class MainActivity extends ActionBarActivity
     }
 
 
-    private void GetTimerMethod() throws IOException
+    private void GetTimerMethod_GET() throws IOException
     {
         URL url = new URL(String.format("https://evalhost.seacat/?%s", getPackageName()));
         HttpURLConnection conn = SeaCatClient.open(url);
@@ -148,6 +149,46 @@ public class MainActivity extends ActionBarActivity
 
     }
 
+
+    private void GetTimerMethod_PUT() throws IOException
+    {
+        URL url = new URL(String.format("https://evalhost.seacat/put?%s", getPackageName()));
+        HttpURLConnection conn = SeaCatClient.open(url);
+
+        conn.setRequestMethod("PUT");
+        conn.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
+        conn.setDoOutput(true);
+
+        DataOutputStream outputStream = new DataOutputStream(conn.getOutputStream());
+        String data = "som3Data4nyFormat=seeThat??SeaCat";
+        outputStream.writeBytes(data);
+        outputStream.flush();
+        outputStream.close();
+
+        InputStream is = conn.getInputStream();
+        assert(is != null);
+
+
+        String line;
+        String result = "";
+        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        while ((line = rd.readLine()) != null)
+        {
+            result += line;
+        }
+        rd.close();
+        is.close();
+
+        final String output = result;
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                resultTextView.setText(output);
+            }
+        });
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
