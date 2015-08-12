@@ -44,7 +44,6 @@ public class OutboundStream extends java.io.OutputStream
 	{
 		assert(currentFrame != null);
 		assert(fin_flag == closed);
-
 		
 		if (conn.getStage() == Stage.INITIAL)
 		{
@@ -60,6 +59,7 @@ public class OutboundStream extends java.io.OutputStream
 		
 		currentFrame = null;		
 	}
+
 
 	public ByteBuffer pollFrame()
 	{
