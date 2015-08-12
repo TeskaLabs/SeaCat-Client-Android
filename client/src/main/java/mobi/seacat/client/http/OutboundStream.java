@@ -86,7 +86,11 @@ public class OutboundStream extends java.io.OutputStream
 		super.close();
 		if (closed) return; // Multiple calls to close() method are supported (and actually required)
 		
-		if (currentFrame == null) getCurrentFrame();
+		if (currentFrame == null)
+		{
+			// TODO: This means that sub-optimal flush()/close() cycle happened - we will have to send empty DATA frame with FIN_FLAG set
+			getCurrentFrame();
+		}
 		closed = true;
 		flushCurrentFrame(true);
 	}
@@ -95,7 +99,7 @@ public class OutboundStream extends java.io.OutputStream
 	public void flush() throws IOException
 	{
 		super.flush();
-		flushCurrentFrame(false);
+        if (currentFrame != null) flushCurrentFrame(false);
 	}
 
 

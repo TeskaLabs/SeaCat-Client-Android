@@ -118,6 +118,7 @@ public class SPDY
 
 	public static void buildDataFrameFlagLength(ByteBuffer buffer, boolean fin_flag)
 	{
+		assert buffer != null;
 		int flagLength = buffer.position() - HEADER_SIZE;
 		assert flagLength < 0x01000000;
 		flagLength |= (fin_flag ? FLAG_FIN : 0) << 24;
