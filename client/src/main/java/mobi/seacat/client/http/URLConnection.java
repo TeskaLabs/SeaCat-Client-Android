@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.Date;
@@ -108,9 +109,16 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	@Override
 	synchronized public OutputStream getOutputStream() throws IOException
 	{
+        if (!doOutput) {
+            throw new ProtocolException("cannot write to a URLConnection" + " if doOutput=false - call setDoOutput(true)");
+        }
+        if (method.equals("GET")) {
+            method = "POST"; // Backward compatibility
+        }
+
 		if (outboundStream == null)
 		{
-			if (stage.code >= Stage.HEADERS_READY.code) throw new IOException("Too late to open OutputStream");
+			if (stage.code >= Stage.HEADERS_READY.code) throw new ProtocolException("Cannot write output after reading input.");
 			outboundStream = new OutboundStream(this);
 		}
 		return outboundStream;	
@@ -385,6 +393,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	{
 		return requestHeaders.build();
 	}
+
 
 	///
 	
