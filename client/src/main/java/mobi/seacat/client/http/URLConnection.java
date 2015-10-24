@@ -81,6 +81,18 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
     {
         if (launched == false)
         {
+            if (outboundStream != null)
+            {
+                int contentLength = outboundStream.getContentLength();
+                if ((contentLength > 0) && (getRequestProperty("Content-length") == null))
+                {
+                    // If there is an outboundStream with data, we can determine Content-Length
+                    outboundStream.close();
+
+                    setRequestProperty("Content-length", "" + contentLength);
+                }
+            }
+
             launched = true;
             reactor.registerFrameProvider(this, true);
         }

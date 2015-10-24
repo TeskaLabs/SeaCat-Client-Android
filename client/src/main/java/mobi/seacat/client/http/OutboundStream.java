@@ -13,6 +13,7 @@ public class OutboundStream extends java.io.OutputStream
 	private BlockingQueue<ByteBuffer> frameQueue = new LinkedBlockingQueue<ByteBuffer>();
 	private ByteBuffer currentFrame = null;
 	private boolean closed = false;
+    private int contentLength = 0;
 
 	///
 	
@@ -44,20 +45,14 @@ public class OutboundStream extends java.io.OutputStream
 		assert(currentFrame != null);
 		assert(fin_flag == closed);
 
-        // Make sure that request is launched
-        if (!conn.isLaunched())
-        {
-            conn.launch();
-        }
-
         ByteBuffer aFrame = currentFrame;
         currentFrame = null;
 
 		SPDY.buildDataFrameFlagLength(aFrame, fin_flag);
 		
 		frameQueue.add(aFrame);
-		conn.reactor.registerFrameProvider(conn, true);
 
+        if (conn.isLaunched()) conn.reactor.registerFrameProvider(conn, true);
 	}
 
 
@@ -75,6 +70,7 @@ public class OutboundStream extends java.io.OutputStream
 
 		ByteBuffer frame = getCurrentFrame();
 		frame.put((byte)oneByte);
+        contentLength += 1;
 		
 		if (currentFrame.remaining() == 0) flushCurrentFrame(false);
 	}
@@ -88,7 +84,7 @@ public class OutboundStream extends java.io.OutputStream
 		
 		if (currentFrame == null)
 		{
-			// TODO: This means that sub-optimal flush()/close() cycle happened - we will have to send empty DATA frame with FIN_FLAG set
+            // TODO: This means that sub-optimal flush()/close() cycle happened - we will have to send empty DATA frame with FIN_FLAG set
 			getCurrentFrame();
 		}
 		closed = true;
@@ -98,7 +94,7 @@ public class OutboundStream extends java.io.OutputStream
 	@Override
 	public void flush() throws IOException
 	{
-		super.flush();
+        super.flush();
         if (currentFrame != null) flushCurrentFrame(false);
 	}
 
@@ -129,5 +125,6 @@ public class OutboundStream extends java.io.OutputStream
 	{
 		return frameQueue.isEmpty();
 	}
-	
+	public boolean isClosed() { return closed; }
+    public int getContentLength() { return contentLength; }
 }
