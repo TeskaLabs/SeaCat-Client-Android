@@ -6,7 +6,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import mobi.seacat.client.core.SPDY;
-import mobi.seacat.client.http.URLConnection.Stage;
 
 public class OutboundStream extends java.io.OutputStream
 {
@@ -44,20 +43,21 @@ public class OutboundStream extends java.io.OutputStream
 	{
 		assert(currentFrame != null);
 		assert(fin_flag == closed);
+
+        // Make sure that request is launched
+        if (!conn.isLaunched())
+        {
+            conn.launch();
+        }
+
+        ByteBuffer aFrame = currentFrame;
+        currentFrame = null;
+
+		SPDY.buildDataFrameFlagLength(aFrame, fin_flag);
 		
-		if (conn.getStage() == Stage.INITIAL)
-		{
-			conn.advance(Stage.HEADERS_READY);
-		} else {
-			conn.reactor.registerFrameProvider(conn, true);
-		}
-		
-		SPDY.buildDataFrameFlagLength(currentFrame, fin_flag);
-		
-		frameQueue.add(currentFrame);
+		frameQueue.add(aFrame);
 		conn.reactor.registerFrameProvider(conn, true);
-		
-		currentFrame = null;		
+
 	}
 
 

@@ -11,6 +11,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import mobi.seacat.client.core.Reactor;
 import mobi.seacat.client.core.SPDY;
@@ -26,23 +29,26 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	private Headers responseHeaders = null;
 	private final Headers.Builder requestHeaders = new Headers.Builder();
 
+    private boolean launched = false;
 	private int streamId = -1;
 	private int priority;
-	private Stage stage;
+	private OutboundNext outboundNext;
+
+    private boolean responseReady = false;
+    private Lock responseReadyLock = new ReentrantLock();
+    private Condition responseReadyCondition = responseReadyLock.newCondition();
 
 	///
 
-	public enum Stage
+	public enum OutboundNext
 	{
+		SYN_STREAM(1),
+		DATA(2),
+		FIN_FLAG(3);
 
-		INITIAL(1),
-		HEADERS_READY(2),
-		SENDING_BODY(3),
-		FIN_SENT(4);
-		
 		private final int code;
 
-		private Stage(int code)
+		private OutboundNext(int code)
 		{
 			this.code=code;
 		}
@@ -52,6 +58,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 			return code;
 		}
 	}
+
 	///
 	
 	public URLConnection(Reactor reactor, URL u, int priority)
@@ -59,40 +66,32 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 		super(u);
 		this.reactor = reactor;
 		this.priority = priority;
-		this.stage = Stage.INITIAL;
+		this.outboundNext = OutboundNext.SYN_STREAM;
 
-		this.inboundStream = new InboundStream(this);
+        this.inboundStream = new InboundStream(this);
 	}
 
-	
-	protected final void advance(Stage toStage)
-	{
-		if (this.stage.getCode() >= toStage.getCode()) return;
-		
-		else if ((this.stage == Stage.INITIAL) && (toStage == Stage.HEADERS_READY))
-		{
-			this.stage = toStage;
-			try {
-				reactor.registerFrameProvider(this, true);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+    ///
 
-		else if ((this.stage == Stage.HEADERS_READY) && (toStage == Stage.FIN_SENT))
-		{
-			this.stage = toStage;
-		}
-
-		else if ((this.stage == Stage.HEADERS_READY) && (toStage == Stage.SENDING_BODY))
-		{
-			this.stage = toStage;
-		}
-
-		else System.err.println("Incorrect stage advance " + this.stage + " -> "+ toStage);
+	/*
+	 * Triggers an actual request to the server ...
+	 *
+	 */
+	final void launch() throws IOException
+    {
+        if (launched == false)
+        {
+            launched = true;
+            reactor.registerFrameProvider(this, true);
+        }
 	}
-	
-	///
+
+    final boolean isLaunched()
+    {
+        return launched;
+    }
+
+    ///
 
 	/*
 	 * Return a response body
@@ -101,12 +100,44 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	@Override
 	public final InputStream getInputStream() throws IOException
 	{
-		advance(Stage.HEADERS_READY);
+		launch();
 		return this.inboundStream;
 	}
 
-	
-	@Override
+
+    /*
+     * Return a response status code
+     * This method triggers and actual request (if needed) and waits for response code from server.
+     *
+     */
+    @Override
+    public int getResponseCode() throws IOException
+    {
+        launch();
+        waitForResponse();
+        return super.getResponseCode();
+    }
+
+
+    protected void waitForResponse()
+    {
+        responseReadyLock.lock();
+        try
+        {
+            while (responseReady != true) {
+                try {
+                    responseReadyCondition.await();
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+        finally {
+            responseReadyLock.unlock();
+        }
+    }
+
+
+    @Override
 	synchronized public OutputStream getOutputStream() throws IOException
 	{
         if (!doOutput) {
@@ -118,7 +149,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 
 		if (outboundStream == null)
 		{
-			if (stage.code >= Stage.HEADERS_READY.code) throw new ProtocolException("Cannot write output after reading input.");
+			if (outboundNext.code > OutboundNext.SYN_STREAM.code) throw new ProtocolException("Cannot write output after reading input.");
 			outboundStream = new OutboundStream(this);
 		}
 		return outboundStream;	
@@ -138,32 +169,27 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 
 		assert(this.reactor == reactor);
 		
-		switch (this.stage)
+		switch (outboundNext)
 		{
-			case INITIAL:
-				System.out.println("buildFrame - INITIAL (not good)");
-				break;
-
-
-			case HEADERS_READY:
+			case SYN_STREAM:
 			{
 				frame = buildSYN_STREAM();
 				if (outboundStream != null)
 				{
 					assert((frame.getShort(4) & SPDY.FLAG_FIN) == 0);
 					keep = !outboundStream.isQueueEmpty();
-					advance(Stage.SENDING_BODY);
+                    outboundNext = OutboundNext.DATA;
 				}
 				else
 				{
 					assert((frame.getShort(4) & SPDY.FLAG_FIN) == SPDY.FLAG_FIN);
-					advance(Stage.FIN_SENT);
+                    outboundNext = OutboundNext.FIN_FLAG;
 				}
 				return new IFrameProvider.Result(frame, keep);
 			}
 
 
-			case SENDING_BODY:
+			case DATA:
 			{
 				assert(streamId > 0);
 				assert(outboundStream != null);
@@ -176,14 +202,14 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 					if ((frame.getShort(4) & SPDY.FLAG_FIN) == SPDY.FLAG_FIN)
 					{
 						assert(keep == false);
-						advance(Stage.FIN_SENT);
+                        outboundNext = OutboundNext.FIN_FLAG;
 					}
 				}
 				return new IFrameProvider.Result(frame, keep);
 			}
 
 			default:
-				System.err.println("Nothing to build - incorrect stage: " + this.stage);
+				System.err.println("Nothing to build - incorrect outboundNext: " + this.outboundNext);
 		}
 		
 		return new IFrameProvider.Result(null, false);
@@ -254,6 +280,16 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 			headerBuilder.add(k, v);
 		}
 		responseHeaders = headerBuilder.build();
+
+        responseReadyLock.lock();
+        try
+        {
+            responseReady = true;
+            responseReadyCondition.signalAll();
+        }
+        finally {
+            responseReadyLock.unlock();
+        }
 
 		if ((frameFlags & SPDY.FLAG_FIN) == SPDY.FLAG_FIN) inboundStream.close();
 		return true;
@@ -407,7 +443,5 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	public boolean usingProxy() { return true; }
 
 	public int getStreamId() { return streamId; }
-	protected Stage getStage() { return stage; }
-
 	
 }
