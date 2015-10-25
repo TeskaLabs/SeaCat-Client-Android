@@ -52,11 +52,6 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 		{
 			this.code=code;
 		}
-
-		public int getCode()
-		{
-			return code;
-		}
 	}
 
 	///
