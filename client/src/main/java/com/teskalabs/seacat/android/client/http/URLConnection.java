@@ -74,7 +74,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	 */
 	final void launch() throws IOException
     {
-        if (launched == false)
+        if (!launched)
         {
             if (outboundStream != null)
             {
