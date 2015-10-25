@@ -6,7 +6,7 @@
 
 #include <seacatcc.h>
 
-#include "mobi_seacat_client_core_seacatcc.h"
+#include "com_teskalabs_seacat_android_client_core_seacatcc.h"
 
 ///
 
@@ -85,7 +85,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 
 ////
 
-JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_init(JNIEnv * env, jclass cls, jstring applicationId, jstring varDir, jobject reactor)
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_init(JNIEnv * env, jclass cls, jstring applicationId, jstring varDir, jobject reactor)
 {
 	assert(g_reactor_obj == NULL);
 
@@ -506,30 +506,30 @@ static void JNICALLBACK_state_changed(void)
 ////
 
 
-JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_run(JNIEnv * env, jclass cls)
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_run(JNIEnv * env, jclass cls)
 {
 	return seacatcc_run();
 }
 
 
-JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_shutdown(JNIEnv * env, jclass cls)
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_shutdown(JNIEnv * env, jclass cls)
 {
 	return seacatcc_shutdown();
 }
 
-JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_yield(JNIEnv * env, jclass cls, jchar what)
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_yield(JNIEnv * env, jclass cls, jchar what)
 {
 	if (what > 0xFF) return SEACATCC_RC_E_GENERIC;
 	return seacatcc_yield(what);
 }
 
-JNIEXPORT void JNICALL Java_mobi_seacat_client_core_seacatcc_ppkgen_1worker(JNIEnv * env, jclass cls)
+JNIEXPORT void JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_ppkgen_1worker(JNIEnv * env, jclass cls)
 {
 	return seacatcc_ppkgen_worker();
 }
 
 
-JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_csrgen_1worker(JNIEnv * env, jclass cls, jobjectArray params)
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_csrgen_1worker(JNIEnv * env, jclass cls, jobjectArray params)
 {
 
 	int i, rc;
@@ -555,13 +555,13 @@ JNIEXPORT jint JNICALL Java_mobi_seacat_client_core_seacatcc_csrgen_1worker(JNIE
 }
 
 
-JNIEXPORT jstring JNICALL Java_mobi_seacat_client_core_seacatcc_cacert_1url(JNIEnv * env, jclass cls)
+JNIEXPORT jstring JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cacert_1url(JNIEnv * env, jclass cls)
 {
 	jstring result = (*env)->NewStringUTF(env, seacatcc_cacert_url());
  	return result;
 }
 
-JNIEXPORT void JNICALL Java_mobi_seacat_client_core_seacatcc_cacert_1worker(JNIEnv * env, jclass cls, jbyteArray cert)
+JNIEXPORT void JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cacert_1worker(JNIEnv * env, jclass cls, jbyteArray cert)
 {
 	int len = (*env)->GetArrayLength(env, cert);
     jbyte *ptr = (jbyte *)(*env)->GetByteArrayElements(env, cert, NULL);
@@ -571,12 +571,12 @@ JNIEXPORT void JNICALL Java_mobi_seacat_client_core_seacatcc_cacert_1worker(JNIE
     (*env)->ReleaseByteArrayElements(env, cert, ptr, 0);
 }
 
-JNIEXPORT jdouble JNICALL Java_mobi_seacat_client_core_seacatcc_time(JNIEnv * env, jclass cls)
+JNIEXPORT jdouble JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_time(JNIEnv * env, jclass cls)
 {
 	return seacatcc_time();
 }
 
-JNIEXPORT jstring JNICALL Java_mobi_seacat_client_core_seacatcc_state(JNIEnv * env, jclass cls)
+JNIEXPORT jstring JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_state(JNIEnv * env, jclass cls)
 {
 	char state_buf[SEACATCC_STATE_BUF_SIZE];
 	seacatcc_state(state_buf);
