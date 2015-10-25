@@ -59,7 +59,7 @@ public class MainActivity extends ActionBarActivity
             public void run() {
                 try
                 {
-                    GetTimerMethod_GET();
+                    GetTimerMethod_PUT();
                 }
 
                 catch (Exception e)
