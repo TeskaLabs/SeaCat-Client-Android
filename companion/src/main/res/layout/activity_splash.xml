@@ -4,32 +4,17 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.teskalabs.seacat.android.AndroidDemoApp.SplashActivity">
+    tools:context="com.teskalabs.seacat.android.companion.SplashActivity">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
         android:background="@drawable/seacat_logo"
-        android:scaleType="center"
         android:contentDescription="SeaCat Logo"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp" />
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="SeaCat Companion is launching ..."
-        android:id="@+id/textView"
-        android:layout_below="@+id/imageView"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="false"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:layout_above="@+id/imageView2" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -40,16 +25,5 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="40dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/status_unknown"
-        android:id="@+id/statusTextView"
-        android:layout_alignParentTop="false"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

@@ -1,1 +1,1 @@
-include ':demo', ':client'
+include ':demo', ':client', ':companion'

@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SeaCat Companion</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="status_unknown"></string>
+    <string name="estab_sec_con"></string>
+    <string name="action_reset_identity">Reset Identity</string>
+    <string name="main_form_desc">Please fill the folowing:</string>
+
+    <string name="string_gateway_label">Location of Gateway</string>
+</resources>
