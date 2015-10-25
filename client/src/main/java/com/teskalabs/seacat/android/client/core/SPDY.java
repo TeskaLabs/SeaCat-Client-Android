@@ -2,12 +2,9 @@ package com.teskalabs.seacat.android.client.core;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-//import java.net.URL;
 import java.nio.ByteBuffer;
 
 import com.teskalabs.seacat.android.client.http.Headers;
-
-//import mobi.seacat.client.okhttp.Headers;
 
 public class SPDY
 {
