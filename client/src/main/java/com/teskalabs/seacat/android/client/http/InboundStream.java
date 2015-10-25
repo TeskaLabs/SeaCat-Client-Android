@@ -1,6 +1,7 @@
 package com.teskalabs.seacat.android.client.http;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -16,7 +17,6 @@ public class InboundStream extends java.io.InputStream
 	private boolean closed = false;
 		
 	static private final ByteBuffer QUEUE_IS_CLOSED = ByteBuffer.allocate(0);
-	static private final int requestTimeout = 500000; // Milliseconds 
 
 	///
 	
@@ -42,7 +42,7 @@ public class InboundStream extends java.io.InputStream
 
 	///
 	
-	protected ByteBuffer getCurrentFrame() throws IOException
+	protected ByteBuffer getCurrentFrame() throws SocketTimeoutException
 	{
 		if (currentFrame != null)
 		{
@@ -55,17 +55,24 @@ public class InboundStream extends java.io.InputStream
 			return currentFrame;
 		}
 
+        long timeoutMillis = conn.getReadTimeout();
+        if (timeoutMillis == 0) timeoutMillis = 1000*60*3; // 3 minutes timeout
+        long cutOfTimeMillis = (System.nanoTime() / 1000000L) + timeoutMillis;
+
 		while (currentFrame == null)
 		{
 			try
 			{
-				currentFrame = frameQueue.poll(requestTimeout, TimeUnit.MILLISECONDS);
+                long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
+                if (awaitMillis <= 0) throw new SocketTimeoutException("Read timeout");
+
+				currentFrame = frameQueue.poll(awaitMillis, TimeUnit.MILLISECONDS);
 			}
 			catch (InterruptedException e) { continue ; }
 			
 			if (currentFrame == null)
 			{
-				throw new java.io.IOException("Request timeout");
+				throw new SocketTimeoutException("Read timeout");
 			}
 			
 			if (currentFrame == QUEUE_IS_CLOSED)
