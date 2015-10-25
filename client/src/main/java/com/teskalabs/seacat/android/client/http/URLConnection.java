@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.TreeMap;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.lang.System;
 
 import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.core.SPDY;
@@ -125,15 +127,25 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
         return super.getResponseCode();
     }
 
-
-    protected void waitForResponse()
+    /*
+     * Block and wait for response from server.
+     * Timeouts using SocketTimeoutException after getConnectTimeout() + getReadTimeout()
+     */
+    protected void waitForResponse() throws SocketTimeoutException
     {
+        long timeoutMillis = getConnectTimeout() + getReadTimeout();
+        if (timeoutMillis == 0) timeoutMillis = 1000*60*3; // 3 minutes timeout
+        long cutOfTimeMillis = (System.nanoTime() / 1000000L) + timeoutMillis;
+
         responseReadyLock.lock();
         try
         {
             while (responseReady != true) {
+                long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
+                if (awaitMillis <= 0) throw new SocketTimeoutException();
+
                 try {
-                    responseReadyCondition.await();
+                    responseReadyCondition.awaitNanos(awaitMillis * 1000000L);
                 } catch (InterruptedException e) {
                 }
             }
