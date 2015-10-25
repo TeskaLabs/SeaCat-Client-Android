@@ -133,7 +133,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
      */
     protected void waitForResponse() throws SocketTimeoutException
     {
-        long timeoutMillis = getConnectTimeout() + getReadTimeout();
+        long timeoutMillis = getConnectTimeout();
         if (timeoutMillis == 0) timeoutMillis = 1000*60*3; // 3 minutes timeout
         long cutOfTimeMillis = (System.nanoTime() / 1000000L) + timeoutMillis;
 
