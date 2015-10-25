@@ -142,7 +142,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
         {
             while (responseReady != true) {
                 long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
-                if (awaitMillis <= 0) throw new SocketTimeoutException();
+                if (awaitMillis <= 0) throw new SocketTimeoutException("Connect timeout");
 
                 try {
                     responseReadyCondition.awaitNanos(awaitMillis * 1000000L);
