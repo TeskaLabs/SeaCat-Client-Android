@@ -19,13 +19,32 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/string_appid_label"
+            android:id="@+id/textAppId"
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTextAppId"
+            android:layout_below="@+id/textAppId"
+            android:hint="com.example.appname"
+            android:lines="1"
+            android:inputType="text"
+            android:minLines="1"
+            android:singleLine="true" />
+
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/string_gateway_label"
             android:id="@+id/textGateway"
             />
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <EditText
@@ -35,7 +54,7 @@
                 android:layout_below="@+id/textGateway"
                 android:hint="IP Address"
                 android:minWidth="200dp"
-                android:lines="1"
+                android:layout_weight="1"
                 android:inputType="text"
                 android:minLines="1"
                 android:singleLine="true" />
@@ -48,19 +67,24 @@
                 android:id="@+id/editTextPort"
                 android:layout_below="@+id/editTextIP"
                 android:hint="Port"
-                android:maxWidth="30dp"
-                android:minWidth="30dp" />
+                android:maxWidth="40dp"
+                android:minWidth="40dp" />
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Apply"
-                android:id="@+id/buttonSave"
-                android:layout_below="@+id/editTextPort"
-                android:clickable="true"
-                android:onClick="buttonSaveOnClick"
-                style="@style/Base.TextAppearance.AppCompat.Button" />
+
         </LinearLayout>
+        <ToggleButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Apply"
+            android:id="@+id/buttonSave"
+            android:layout_below="@+id/editTextPort"
+            android:clickable="true"
+            android:onClick="buttonSaveOnClick"
+            style="@style/Base.TextAppearance.AppCompat.Button"
+            android:checked="false"
+            android:textOn="Enabled"
+            android:enabled="true"
+            android:textOff="Disabled" />
 
     </LinearLayout>
 

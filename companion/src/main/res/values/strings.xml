@@ -10,4 +10,6 @@
     <string name="main_form_desc">Please fill the folowing:</string>
 
     <string name="string_gateway_label">Location of Gateway</string>
+    <string name="string_appid_label">Application Id</string>
+
 </resources>
