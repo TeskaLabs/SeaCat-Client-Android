@@ -1,24 +1,24 @@
-SEACAT_CLIENT_CCORE_PATH := ${HOME}/Workspace/seacat/client-ccore
+SEACAT_CLIENT_CCORE_PATH := ./client-ccore
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := ssl
-LOCAL_SRC_FILES := $(SEACAT_CLIENT_CCORE_PATH)/openssl/android/$(TARGET_ARCH_ABI)/lib/libssl.a
+LOCAL_SRC_FILES := ./openssl/android/$(TARGET_ARCH_ABI)/lib/libssl.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := crypto
-LOCAL_SRC_FILES := $(SEACAT_CLIENT_CCORE_PATH)/openssl/android/$(TARGET_ARCH_ABI)/lib/libcrypto.a
+LOCAL_SRC_FILES := ./openssl/android/$(TARGET_ARCH_ABI)/lib/libcrypto.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := ccore
-LOCAL_SRC_FILES := $(SEACAT_CLIENT_CCORE_PATH)/android/libs/$(TARGET_ARCH_ABI)/libseacatcc.a
+LOCAL_SRC_FILES := ./client-ccore/android/libs/$(TARGET_ARCH_ABI)/libseacatcc.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_C_INCLUDES := $(SEACAT_CLIENT_CCORE_PATH)/src
+LOCAL_C_INCLUDES := ./client-ccore/include
 LOCAL_LDLIBS := -llog -lz
 LOCAL_MODULE    := seacatjni
 LOCAL_SRC_FILES := seacatjni.c logging.c
