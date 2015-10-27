@@ -1,25 +1,15 @@
 package com.teskalabs.seacat.android.companion;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.regex.Pattern;
 
 
@@ -32,11 +22,7 @@ public class MainActivity extends ActionBarActivity {
     public EditText editTextGatewayName;
     public CheckBox checkBoxEnabled;
 
-    private SharedPreferences sharedPref;
     private DiscoverConfStore discoverConfStore;
-
-    public Integer STATE_DISABLED       = 0;
-    public Integer STATE_ENABLED        = 1;
 
     protected String configFileName = "local-discover.conf";
     protected String configFilePath;
