@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends ActionBarActivity {
     public static final String TAG = "compainion.MainActivity";
-    public ToggleButton buttonSave;
     public EditText editTextIP;
     public EditText editTextPort;
     public EditText editTextAppId;
@@ -73,7 +72,6 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         configFilePath = getFilesDir()+"/"+configFileName;
 
-        buttonSave = (ToggleButton) findViewById(R.id.buttonSave);
         editTextIP = (EditText) findViewById(R.id.editTextIP);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
         editTextAppId = (EditText) findViewById(R.id.editTextAppId);
@@ -98,15 +96,17 @@ public class MainActivity extends ActionBarActivity {
 
     protected void updateStateLayout()
     {
-        if (getConfigState() == STATE_ENABLED)
+/*        if (getConfigState() == STATE_ENABLED)
             buttonSave.setChecked(true);
         else
             buttonSave.setChecked(false);
+*/
     }
 
     public void buttonSaveOnClick(View v)
     {
         // Temporarily disable button
+/*
         buttonSave.setEnabled(false);
 
         if (!buttonSave.isChecked())
@@ -120,7 +120,7 @@ public class MainActivity extends ActionBarActivity {
             buttonSave.setEnabled(true);
             return;
         }
-
+*/
         // Get Input Fields Values
         String strAppId = getValueAppId();
         String strIP = getValueIP();
@@ -146,13 +146,14 @@ public class MainActivity extends ActionBarActivity {
             editTextPort.setError("must be a valid port.");
         }
 
+/*
         if (!isValid)
         {
             buttonSave.setEnabled(true);
             buttonSave.setChecked(false);
             return;
         }
-
+*/
         // Write to seacat devel discover config file
         BufferedWriter out = null;
         try
@@ -168,8 +169,8 @@ public class MainActivity extends ActionBarActivity {
         catch (IOException e)
         {
             Log.e(TAG, "Error: " + e.getMessage());
-            buttonSave.setEnabled(true);
-            buttonSave.setChecked(false);
+            //buttonSave.setEnabled(true);
+            //buttonSave.setChecked(false);
             return;
         }
 
@@ -186,7 +187,7 @@ public class MainActivity extends ActionBarActivity {
                 Toast.LENGTH_SHORT)
                     .show();
 
-        buttonSave.setEnabled(true);
+        //buttonSave.setEnabled(true);
         return;
     }
 
