@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 . ./build.site
 
@@ -13,7 +13,7 @@ mkdir -p ../../../build/jni/classes
 ${JAVAC} -d ../../../build/jni/classes -classpath ~/Library/Android/sdk/platforms/android-10/android.jar:../java ../java/com/teskalabs/seacat/android/client/core/seacatcc.java
 
 # Prepare header file
-javah -d . -classpath ~/Library/Android/sdk//platforms/android-10/android.jar:../../../build/jni/classes com.teskalabs.seacat.android.client.core.seacatcc
+javah -d . -classpath ~/Library/Android/sdk/platforms/android-10/android.jar:../../../build/jni/classes com.teskalabs.seacat.android.client.core.seacatcc
 
 # Compile Android JNI
 ${ANDROID_NDK}/ndk-build
