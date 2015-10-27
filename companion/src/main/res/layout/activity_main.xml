@@ -19,14 +19,14 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/string_appid_label"
-            android:id="@+id/textAppId"
+            android:text="@string/string_gateway_name_label"
+            android:id="@+id/textGatewayName"
             />
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/editTextAppId"
-            android:layout_below="@+id/textAppId"
+            android:id="@+id/editTextGatewayName"
+            android:layout_below="@+id/textGatewayName"
             android:hint="com.example.appname"
             android:lines="1"
             android:inputType="text"
@@ -38,7 +38,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/string_gateway_label"
+            android:text="@string/string_gateway_location_label"
             android:id="@+id/textGateway"
             />
 
@@ -50,14 +50,15 @@
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/checkBox"
-                android:checked="false" />
+                android:id="@+id/checkBoxEnabled"
+                android:checked="false"
+                android:onClick="checkBoxEnabledOnClick" />
 
             <EditText
                 android:layout_width="159dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/editTextIP"
-                android:layout_below="@+id/textGateway"
+                android:layout_below="@+id/checkBoxEnabled"
                 android:hint="IP Address"
                 android:minWidth="200dp"
                 android:layout_weight="1"
@@ -83,7 +84,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Apply"
-            android:id="@+id/button" />
+            android:id="@+id/buttonSave"
+            android:onClick="buttonSaveOnClick" />
 
     </LinearLayout>
 

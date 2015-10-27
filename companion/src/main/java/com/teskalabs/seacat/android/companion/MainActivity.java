@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -24,27 +25,28 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends ActionBarActivity {
     public static final String TAG = "compainion.MainActivity";
+
+    public Button   buttonSave;
     public EditText editTextIP;
     public EditText editTextPort;
-    public EditText editTextAppId;
+    public EditText editTextGatewayName;
+    public CheckBox checkBoxEnabled;
 
     private SharedPreferences sharedPref;
-    public static final String PREF_APPID   = "com.teskalabs.seacat.android.companion.PREF_APPID";
-    public static final String PREF_IP      = "com.teskalabs.seacat.android.companion.PREF_IP";
-    public static final String PREF_PORT    = "com.teskalabs.seacat.android.companion.PREF_PORT";
+    private DiscoverConfStore discoverConfStore;
 
     public Integer STATE_DISABLED       = 0;
     public Integer STATE_ENABLED        = 1;
 
-    protected String configFileName = "seacat-devel-discover.conf";
+    protected String configFileName = "local-discover.conf";
     protected String configFilePath;
 
     private static final Pattern patternIP = Pattern.compile(
             "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
     private static final Pattern patternPort = Pattern.compile(
             "^\\d+$");
-    private static final Pattern patternAppId = Pattern.compile(
-            "^[a-z1-9A-Z\\-]+(?:(?:\\.)[a-z1-9A-Z\\-]+)+$");
+    private static final Pattern patternName = Pattern.compile(
+            "^[a-z1-9A-Z\\-\\.]+$");
 
 
     class StateWatcher implements TextWatcher {
@@ -53,15 +55,15 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) { }
         @Override
-        public void afterTextChanged(Editable s) {updateStateLayout();}
+        public void afterTextChanged(Editable s) { buttonSave.setEnabled(true);}
     }
 
 
     protected String getValueIP() { return editTextIP.getText().toString(); }
     protected String getValuePort() { return editTextPort.getText().toString(); }
-    protected String getValueAppId() { return editTextAppId.getText().toString(); }
+    protected String getValueGatewayName() { return editTextGatewayName.getText().toString(); }
 
-    private boolean validateAppId(String appId) { return patternAppId.matcher(appId).matches(); }
+    private boolean validateGatewayName(String appId) { return patternName.matcher(appId).matches(); }
     private boolean validateIP(String ip) { return patternIP.matcher(ip).matches(); }
     private boolean validatePort(String port) { return patternPort.matcher(port).matches(); }
 
@@ -72,14 +74,19 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         configFilePath = getFilesDir()+"/"+configFileName;
 
+        buttonSave = (Button) findViewById(R.id.buttonSave);
+        checkBoxEnabled = (CheckBox) findViewById(R.id.checkBoxEnabled);
         editTextIP = (EditText) findViewById(R.id.editTextIP);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
-        editTextAppId = (EditText) findViewById(R.id.editTextAppId);
+        editTextGatewayName = (EditText) findViewById(R.id.editTextGatewayName);
 
         StateWatcher sWatcher = new StateWatcher();
         editTextIP.addTextChangedListener(sWatcher);
         editTextPort.addTextChangedListener(sWatcher);
-        editTextAppId.addTextChangedListener(sWatcher);
+        editTextGatewayName.addTextChangedListener(sWatcher);
+        checkBoxEnabled.addTextChangedListener(sWatcher);
+
+        discoverConfStore = new DiscoverConfStore(getApplicationContext());
 
     }
 
@@ -87,125 +94,69 @@ public class MainActivity extends ActionBarActivity {
     protected void onResume()
     {
         super.onResume();
-        sharedPref = getPreferences(Context.MODE_PRIVATE);
-        editTextIP.setText(sharedPref.getString(PREF_IP, ""));
-        editTextPort.setText(sharedPref.getString(PREF_PORT, ""));
-        editTextAppId.setText(sharedPref.getString(PREF_APPID, ""));
-        updateStateLayout();
+        discoverConfStore.LoadFromPrefs(this);
+        editTextIP.setText(discoverConfStore.getIp());
+        editTextPort.setText(discoverConfStore.getPort());
+        editTextGatewayName.setText(discoverConfStore.getGatewayName());
+        checkBoxEnabled.setChecked(discoverConfStore.getGwEnabled());
+
+        buttonSave.setEnabled(false);
     }
 
-    protected void updateStateLayout()
+    public void checkBoxEnabledOnClick(View v)
     {
-/*        if (getConfigState() == STATE_ENABLED)
-            buttonSave.setChecked(true);
-        else
-            buttonSave.setChecked(false);
-*/
+        buttonSave.setEnabled(true);
     }
 
     public void buttonSaveOnClick(View v)
     {
-        // Temporarily disable button
-/*
-        buttonSave.setEnabled(false);
-
-        if (!buttonSave.isChecked())
+        if (!validateForm())
         {
-            // Disabling Gateway = remove file
-            File configFile = new File(configFilePath);
-            if (configFile.exists())
-                configFile.delete();
-            Toast.makeText(getApplicationContext(), "Gateway disabled", Toast.LENGTH_SHORT)
-                    .show();
-            buttonSave.setEnabled(true);
             return;
         }
-*/
-        // Get Input Fields Values
-        String strAppId = getValueAppId();
-        String strIP = getValueIP();
-        String strPort = getValuePort();
+        boolean previouslyEnabled = discoverConfStore.getGwEnabled();
+        discoverConfStore.setGatewayName(getValueGatewayName());
+        discoverConfStore.setIp(getValueIP());
+        discoverConfStore.setPort(getValuePort());
+        discoverConfStore.setGwEnabled(checkBoxEnabled.isChecked());
 
+        // Store
+        discoverConfStore.store(this);
+        discoverConfStore.storeToPrefs(this);
+
+        if (discoverConfStore.getGwEnabled())
+            Toast.makeText(getApplicationContext(), "Gateway enabled", Toast.LENGTH_SHORT)
+                    .show();
+        else if (!discoverConfStore.getGwEnabled() && previouslyEnabled)
+            Toast.makeText(getApplicationContext(), "Gateway disabled", Toast.LENGTH_SHORT)
+                    .show();
+
+        buttonSave.setEnabled(false);
+        return;
+    }
+
+    private boolean validateForm()
+    {
         boolean isValid = true;
         // Validate App ID
-        if (!validateAppId(strAppId))
+        if (!validateGatewayName(getValueGatewayName()))
         {
             isValid = false;
-            editTextAppId.setError("must be a valid app Id.");
+            editTextGatewayName.setError("must be a valid gateway name.");
         }
         // Validate IP
-        if (!validateIP(strIP))
+        if (!validateIP(getValueIP()))
         {
             isValid = false;
             editTextIP.setError("must be a valid IPv4 IP.");
         }
         // Validate port
-        if (!validatePort(strPort))
+        if (!validatePort(getValuePort()))
         {
             isValid = false;
             editTextPort.setError("must be a valid port.");
         }
-
-/*
-        if (!isValid)
-        {
-            buttonSave.setEnabled(true);
-            buttonSave.setChecked(false);
-            return;
-        }
-*/
-        // Write to seacat devel discover config file
-        BufferedWriter out = null;
-        try
-        {
-            FileWriter fstream = new FileWriter(configFilePath);
-            out = new BufferedWriter(fstream);
-            out.write("---\n");
-            out.write(strAppId+"\n");
-            out.write(strIP+"\n");
-            out.write(strPort+"\n");
-            out.close();
-        }
-        catch (IOException e)
-        {
-            Log.e(TAG, "Error: " + e.getMessage());
-            //buttonSave.setEnabled(true);
-            //buttonSave.setChecked(false);
-            return;
-        }
-
-        // Store to preferences
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(PREF_APPID, strAppId);
-        editor.putString(PREF_IP, strIP);
-        editor.putString(PREF_PORT, strPort);
-        editor.commit();
-
-        // Display message
-        Toast.makeText(getApplicationContext(),
-                "Gateway enabled."+strPort,
-                Toast.LENGTH_SHORT)
-                    .show();
-
-        //buttonSave.setEnabled(true);
-        return;
+        return isValid;
     }
 
-    public int getConfigState()
-    {
-        String prefAppId = sharedPref.getString(PREF_APPID, "");
-        String prefIP    = sharedPref.getString(PREF_IP, "");
-        String prefPort  = sharedPref.getString(PREF_PORT, "");
-        File fileConfig = new File(configFilePath);
-
-        if (!fileConfig.exists())
-            return STATE_DISABLED;
-
-        if (!prefAppId.equals(getValueAppId())
-                || !prefIP.equals(getValueIP())
-                || !prefPort.equals(getValuePort()))
-            return STATE_DISABLED;
-
-        return STATE_ENABLED;
-    }
 }
