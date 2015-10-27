@@ -10,3 +10,4 @@
 /client/src/main/libs/
 /client/src/main/obj/
 /demo/build
+client/src/main/jni/build.site

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-ANDROID_NDK=~/Library/Android/android-ndk-r10d
-JAVA_HOME=/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home
+. ./build.site
 
 JAVAC=javac
 
