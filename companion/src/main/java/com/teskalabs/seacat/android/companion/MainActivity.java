@@ -46,7 +46,7 @@ public class MainActivity extends ActionBarActivity {
     private static final Pattern patternPort = Pattern.compile(
             "^\\d+$");
     private static final Pattern patternName = Pattern.compile(
-            "^[a-z1-9A-Z\\-\\.]+$");
+            "^[a-z1-9A-Z\\-\\._]+$");
 
 
     class StateWatcher implements TextWatcher {
