@@ -8,8 +8,8 @@ android {
         applicationId "com.teskalabs.seacat.android.companion"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode 15040201
+        versionName "15.04-beta.1"
     }
 
     buildTypes {
