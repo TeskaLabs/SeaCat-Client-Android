@@ -21,7 +21,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="SeaCat Companion is launching ..."
+        android:text="Establishing secure connectivity."
         android:id="@+id/textView"
         android:layout_below="@+id/imageView"
         android:layout_alignParentLeft="false"
