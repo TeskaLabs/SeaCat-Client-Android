@@ -270,7 +270,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	@Override
 	public void reset()
 	{
-		outboundStream.reset();
+		if (outboundStream != null) outboundStream.reset();
 		inboundStream.reset();
 	}
 
