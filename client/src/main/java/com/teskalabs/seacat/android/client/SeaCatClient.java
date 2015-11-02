@@ -8,9 +8,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.teskalabs.seacat.android.client.core.Reactor;
+import com.teskalabs.seacat.android.client.hc.SeaCatHttpClient;
 import com.teskalabs.seacat.android.client.ping.Ping;
 import com.teskalabs.seacat.android.client.util.RC;
 import com.teskalabs.seacat.android.client.core.seacatcc;
+
+import org.apache.http.client.HttpClient;
+import org.apache.http.params.HttpParams;
 
 public final class SeaCatClient
 {
@@ -57,6 +61,21 @@ public final class SeaCatClient
 	{
 		return open(new URL(url));
 	}
+
+
+    /*
+     * Create org.apache.http.client.HttpClient hc.apache.org
+     */
+    public static HttpClient httpClient()
+    {
+        return new SeaCatHttpClient();
+    }
+
+    public static HttpClient httpClient(final HttpParams params)
+    {
+        return new SeaCatHttpClient(params);
+    }
+
 
     public static void reset() throws IOException
     {
