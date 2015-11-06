@@ -7,33 +7,55 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.core.SPDY;
+
+/*
+ * This class is used also by com.teskalabs.seacat.android.client.hc - so it is a bit universal
+ */
 
 public class InboundStream extends java.io.InputStream
 {
-	private final URLConnection conn;
+    private final Reactor reactor;
+    private int streamId = -1;
+
 	private final BlockingQueue<ByteBuffer> frameQueue = new LinkedBlockingQueue<ByteBuffer>();
 	private ByteBuffer currentFrame = null;
 	private boolean closed = false;
-		
+
+    int readTimeoutMillis = 3000;
+
 	static private final ByteBuffer QUEUE_IS_CLOSED = ByteBuffer.allocate(0);
 
 	///
 	
-	public InboundStream(URLConnection myConnection)
+	public InboundStream(Reactor reactor, int readTimeoutMillis)
 	{
 		super();
-		this.conn = myConnection;
+		this.reactor = reactor;
+        this.readTimeoutMillis = readTimeoutMillis;
 	}
 
 	///
-	
+
+    public void setStreamId(int streamId)
+    {
+        this.streamId = streamId;
+    }
+
+    public void setReadTimeout(int readTimeoutMillis)
+    {
+        this.readTimeoutMillis = readTimeoutMillis;
+    }
+
+    ///
+
 	public boolean inboundData(ByteBuffer frame)
 	{
 		if (closed)
 		{
 			// This stream is closed -> send RST_STREAM back
-			conn.reactor.streamFactory.sendRST_STREAM(frame, conn.reactor, conn.getStreamId(), SPDY.RST_STREAM_STATUS_STREAM_ALREADY_CLOSED);
+			reactor.streamFactory.sendRST_STREAM(frame, reactor, this.streamId, SPDY.RST_STREAM_STATUS_STREAM_ALREADY_CLOSED);
 			return false;
 		}
 		frameQueue.add(frame);
@@ -48,14 +70,14 @@ public class InboundStream extends java.io.InputStream
 		{
 			if (currentFrame.remaining() == 0)
 			{
-				conn.reactor.framePool.giveBack(currentFrame);
+				reactor.framePool.giveBack(currentFrame);
 				currentFrame = null;
 			}
 			
 			return currentFrame;
 		}
 
-        long timeoutMillis = conn.getReadTimeout();
+        long timeoutMillis = this.readTimeoutMillis;
         if (timeoutMillis == 0) timeoutMillis = 1000*60*3; // 3 minutes timeout
         long cutOfTimeMillis = (System.nanoTime() / 1000000L) + timeoutMillis;
 
@@ -129,12 +151,12 @@ public class InboundStream extends java.io.InputStream
 		while (frameQueue.size() > 1)
 		{
 			ByteBuffer frame = frameQueue.remove();
-			if (frame != QUEUE_IS_CLOSED) conn.reactor.framePool.giveBack(frame);
+			if (frame != QUEUE_IS_CLOSED) reactor.framePool.giveBack(frame);
 		}
 
 		if (currentFrame != null)
 		{
-			conn.reactor.framePool.giveBack(currentFrame);
+			reactor.framePool.giveBack(currentFrame);
 			currentFrame = null;
 		}
 

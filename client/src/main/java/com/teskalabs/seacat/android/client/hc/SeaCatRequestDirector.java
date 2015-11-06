@@ -48,7 +48,6 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -357,7 +356,7 @@ public class SeaCatRequestDirector implements RequestDirector
             } else {
                 // install an auto-release entity
                 HttpEntity entity = response.getEntity();
-                entity = new BasicManagedEntity(entity, null, false);
+                entity = new BasicManagedEntity(entity, managedConn, false);
                 response.setEntity(entity);
             }
 

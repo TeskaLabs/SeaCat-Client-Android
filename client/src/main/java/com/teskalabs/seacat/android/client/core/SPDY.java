@@ -68,8 +68,12 @@ public class SPDY
 		frame.putInt(statusCode);
 	}
 
+    public static void buildALX1SynStream(ByteBuffer buffer, int streamId, URL url, String method, Headers headers, boolean fin_flag, int priority)
+    {
+        buildALX1SynStream(buffer, streamId, url.getHost(), method, url.getFile(), headers, fin_flag, priority);
+    }
 
-	public static void buildALX1SynStream(ByteBuffer buffer, int streamId, URL url, String method, Headers headers, boolean fin_flag, int priority)
+	public static void buildALX1SynStream(ByteBuffer buffer, int streamId, String host, String method, String path, Headers headers, boolean fin_flag, int priority)
 	{
 		assert((streamId & 0x80000000) == 0);
 		
@@ -84,13 +88,11 @@ public class SPDY
 		assert buffer.position() == 18;
 
 		// Host (without .seacat)
-		String host = url.getHost();
 		final int lastPeriodPos = host.lastIndexOf('.');
 		if (lastPeriodPos > 0) host = host.substring(0, lastPeriodPos);
 		appendVLEString(buffer, host);
-
 		appendVLEString(buffer, method);
-		appendVLEString(buffer, url.getFile());
+		appendVLEString(buffer, path);
 		
 		for (int i = 0; i < headers.size(); i++)
 		{
@@ -99,6 +101,7 @@ public class SPDY
 			
 			String value = headers.value(i);
 			if (value == null) continue;
+            if (value.toLowerCase() == "host") continue;
 
 			//TODO: Do some filtering (if needed)
 			appendVLEString(buffer, header);

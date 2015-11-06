@@ -65,7 +65,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 		this.priority = priority;
 		this.outboundNext = OutboundNext.SYN_STREAM;
 
-        this.inboundStream = new InboundStream(this);
+        this.inboundStream = new InboundStream(reactor, getReadTimeout());
 	}
 
     ///
@@ -251,7 +251,8 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 		ByteBuffer frame = reactor.framePool.borrow("URLConnection.buildSYN_STREAM");
 
 		streamId = reactor.streamFactory.registerStream(this);
-	
+        inboundStream.setStreamId(streamId);
+
 		// Build SYN_STREAM frame
 		SPDY.buildALX1SynStream(frame, streamId, getURL(), getRequestMethod(), getRequestHeaders(), fin_flag, this.priority);
 	
@@ -461,6 +462,13 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	@Override
 	public boolean usingProxy() { return true; }
 
-	public int getStreamId() { return streamId; }
+    @Override
+    public void setReadTimeout(int timeoutMillis)
+    {
+        super.setReadTimeout(timeoutMillis);
+        this.inboundStream.setReadTimeout(getReadTimeout());
+    }
+
+    public int getStreamId() { return streamId; }
 	
 }
