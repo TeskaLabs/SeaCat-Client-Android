@@ -318,16 +318,8 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	@Override
 	synchronized public boolean receivedSPD3_RST_STREAM(Reactor reactor, ByteBuffer frame, int frameLength, byte frameFlags)
 	{
-		inboundStream.reset();
-		if (outboundStream != null)
-		{
-			try {
-				outboundStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return true;		
+		reset();
+		return true;
 	}
 
 	@Override
