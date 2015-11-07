@@ -5,7 +5,6 @@ import android.util.Log;
 import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.core.SPDY;
 import com.teskalabs.seacat.android.client.http.Headers;
-import com.teskalabs.seacat.android.client.http.HttpStatus;
 import com.teskalabs.seacat.android.client.http.InboundStream;
 import com.teskalabs.seacat.android.client.intf.IFrameProvider;
 import com.teskalabs.seacat.android.client.intf.IStream;
@@ -46,26 +45,29 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
 
     private int streamId = -1;
     protected HttpRequest request = null;
-    protected HttpResponse response = null;
     protected HttpContext context = null;
 
     protected final HttpRoute route;
     protected final HttpResponseFactory responseFactory;
-    protected final Object state;
+    protected Object state;
 
     protected InboundStream inboundStream = null;
 
     private int priority = 3; //TODO: There is no way how this changed
 
+    protected HttpResponse response = null;
     private boolean responseReady = false;
     private Lock responseReadyLock = new ReentrantLock();
     private Condition responseReadyCondition = responseReadyLock.newCondition();
 
+    private int socketTimeout = 3000; //Value in milliseconds
+    private boolean reusable = true; // Just to replicate original behaviour, no real meaning
+
     ///
 
-    public SeaCatClientConnection(HttpRoute route, HttpResponseFactory responseFactory, Object state)
+    public SeaCatClientConnection(HttpRoute route, HttpResponseFactory responseFactory, Reactor reactor, Object state)
     {
-        this.reactor = com.teskalabs.seacat.android.client.SeaCatClient.getReactor(); // TODO: Better way how to get this
+        this.reactor = reactor;
 
         this.route = route;
         this.responseFactory = responseFactory;
@@ -126,9 +128,26 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     /// ManagedClientConnection
 
     @Override
+    public void open(HttpRoute httpRoute, HttpContext httpContext, HttpParams httpParams) throws IOException
+    {
+        this.context = httpContext;
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        //TODO: This ...
+    }
+
+    @Override
+    public void shutdown() throws IOException
+    {
+        //TODO: This ...
+    }
+
+    @Override
     public void sendRequestHeader(HttpRequest httpRequest) throws HttpException, IOException
     {
-        Log.i("SeaCat", "SeaCatClientConnection / sendRequestHeader  "+ httpRequest);
         this.request = httpRequest;
         reactor.registerFrameProvider(this, true);
     }
@@ -137,21 +156,25 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     public void sendRequestEntity(HttpEntityEnclosingRequest httpEntityEnclosingRequest) throws HttpException, IOException
     {
         Log.i("SeaCat", "SeaCatClientConnection / sendRequestEntity");
+        //TODO: This ...
     }
 
     @Override
     public HttpResponse receiveResponseHeader() throws HttpException, IOException
     {
-        Log.i("SeaCat", "SeaCatClientConnection / receiveResponseHeader");
-
-        long timeoutMillis = 3000; //TODO: getConnectTimeout();
+        long timeoutMillis = getSocketTimeout();
         if (timeoutMillis == 0) timeoutMillis = 1000*60*3; // 3 minutes timeout
         long cutOfTimeMillis = (System.nanoTime() / 1000000L) + timeoutMillis;
+
+        HttpResponse resp = null;
 
         responseReadyLock.lock();
         try
         {
-            while (responseReady != true) {
+            while (this.response == null)
+            {
+                if (this.responseReady) throw new HttpException("Response already received");
+
                 long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
                 if (awaitMillis <= 0) throw new SocketTimeoutException("Connect timeout");
 
@@ -160,25 +183,33 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
                 } catch (InterruptedException e) {
                 }
             }
+
+            resp = this.response;
+            this.response = null;
+
         }
         finally {
             responseReadyLock.unlock();
         }
 
-        return this.response;
+        return resp;
     }
 
+
     @Override
-    public void receiveResponseEntity(HttpResponse httpResponse) throws HttpException, IOException
+    public void receiveResponseEntity(HttpResponse response) throws HttpException, IOException
     {
-        Log.i("SeaCat", "SeaCatClientConnection / receiveResponseEntity");
+        BasicHttpEntity entity = new BasicHttpEntity();
+        entity.setContent(inboundStream);
+        response.setEntity(entity);
     }
+
 
     @Override
     public void flush() throws IOException
     {
-
     }
+
 
     @Override
     public InetAddress getLocalAddress()
@@ -204,17 +235,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         return 0;
     }
 
-    @Override
-    public void close() throws IOException
-    {
 
-    }
-
-    @Override
-    public boolean isOpen()
-    {
-        return false;
-    }
 
     @Override
     public boolean isStale()
@@ -222,53 +243,39 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         return false;
     }
 
-    @Override
-    public void setSocketTimeout(int i)
-    {
 
+    @Override
+    public boolean isOpen()
+    {
+        return this.context != null;
     }
 
+
+    /**
+     * Sets the socket timeout value.
+     *
+     * @param timeout timeout value in milliseconds
+     */
+    @Override
+    public void setSocketTimeout(int timeout)
+    {
+        this.socketTimeout = timeout;
+    }
+
+
+    /**
+     * Returns the socket timeout value.
+     *
+     * @return positive value in milliseconds if a timeout is set,
+     * <code>0</code> if timeout is disabled or <code>-1</code> if
+     * timeout is undefined.
+     */
     @Override
     public int getSocketTimeout()
     {
-        return 0;
+        return this.socketTimeout;
     }
 
-    @Override
-    public void shutdown() throws IOException
-    {
-
-    }
-
-    @Override
-    public HttpConnectionMetrics getMetrics()
-    {
-        return null;
-    }
-
-    @Override
-    public boolean isSecure()
-    {
-        return true;
-    }
-
-    @Override
-    public HttpRoute getRoute()
-    {
-        return this.route;
-    }
-
-    @Override
-    public SSLSession getSSLSession()
-    {
-        return null;
-    }
-
-    @Override
-    public void open(HttpRoute httpRoute, HttpContext httpContext, HttpParams httpParams) throws IOException
-    {
-        this.context = context;
-    }
 
     @Override
     public void tunnelTarget(boolean b, HttpParams httpParams) throws IOException
@@ -291,24 +298,25 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     @Override
     public void markReusable()
     {
-
+        this.reusable = true;
     }
 
     @Override
     public void unmarkReusable()
     {
-
+        this.reusable = false;
     }
 
     @Override
     public boolean isMarkedReusable()
     {
-        return false;
+        return this.reusable;
     }
 
     @Override
     public void setState(Object o)
     {
+        this.state = o;
     }
 
     @Override
@@ -327,7 +335,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     @Override
     public void releaseConnection() throws IOException
     {
-
+        // NOP
     }
 
     @Override
@@ -336,10 +344,63 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
 
     }
 
+
+    /**
+     * Checks if response data is available from the connection. May wait for the specified time until some data becomes available.
+     * Note that some implementations may completely ignore the timeout parameter.
+     *
+     * @param timeout timeout value in milliseconds
+     */
     @Override
-    public boolean isResponseAvailable(int i) throws IOException
+    public boolean isResponseAvailable(int timeout) throws IOException
     {
-        return false;
+        if (timeout == 0) timeout = 1000*60*3; // 3 minutes timeout
+        long cutOfTimeMillis = (System.nanoTime() / 1000000L) + timeout;
+
+        responseReadyLock.lock();
+        try
+        {
+            while (this.responseReady == false)
+            {
+
+                long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
+                if (awaitMillis <= 0) return false;
+
+                try {
+                    responseReadyCondition.awaitNanos(awaitMillis * 1000000L);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+        finally {
+            responseReadyLock.unlock();
+        }
+        return responseReady;
+    }
+
+    @Override
+    public HttpConnectionMetrics getMetrics()
+    {
+        //TODO: This ...
+        return null;
+    }
+
+    @Override
+    public boolean isSecure()
+    {
+        return true;
+    }
+
+    @Override
+    public HttpRoute getRoute()
+    {
+        return this.route;
+    }
+
+    @Override
+    public SSLSession getSSLSession()
+    {
+        return null;
     }
 
     /// ClientConnectionRequest
@@ -361,7 +422,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     @Override
     public void reset()
     {
-        inboundStream.reset();
+        if (inboundStream != null) inboundStream.reset();
     }
 
     @Override
@@ -370,21 +431,30 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         Log.i("SeaCat", "SeaCatClientConnection / receivedALX1_SYN_REPLY");
 
         // Body
-        inboundStream = new InboundStream(reactor, 3000); //TODO: Real timeout
+        inboundStream = new InboundStream(reactor, getSocketTimeout());
         inboundStream.setStreamId(streamId);
-        BasicHttpEntity entity = new BasicHttpEntity();
-        entity.setContent(inboundStream);
 
         // Status
         int responseCode = frame.getShort();
-        ProtocolVersion pver = new ProtocolVersion("HTTP", 1, 1);
-        this.response = responseFactory.newHttpResponse(pver, responseCode, context);
-        this.response.setEntity(entity);
+        final ProtocolVersion pver = new ProtocolVersion("HTTP", 1, 1);
+        final HttpResponse resp = responseFactory.newHttpResponse(pver, responseCode, context);
+
+        // Reserved (unused) 16 bits
+        frame.getShort();
+
+        // Read headers
+        for(;frame.position() < frame.limit();)
+        {
+            String k = SPDY.parseVLEString(frame);
+            String v = SPDY.parseVLEString(frame);
+            resp.addHeader(k, v);
+        }
 
         responseReadyLock.lock();
         try
         {
             responseReady = true;
+            this.response = resp;
             responseReadyCondition.signalAll();
         }
         finally {
@@ -398,14 +468,14 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     @Override
     public boolean receivedSPD3_RST_STREAM(Reactor reactor, ByteBuffer frame, int frameLength, byte frameFlags)
     {
-        if (inboundStream != null) inboundStream.reset();
+        reset();
         return true;
     }
 
     @Override
     public boolean receivedDataFrame(Reactor reactor, ByteBuffer frame, int frameLength, byte frameFlags)
     {
-        if (inboundStream == null) return true; //TODO: Add warning that data are discarted
+        if (inboundStream == null) return true; //TODO: Add warning that data are discared
 
         boolean ret = inboundStream.inboundData(frame);
         if ((frameFlags & SPDY.FLAG_FIN) == SPDY.FLAG_FIN) inboundStream.close();

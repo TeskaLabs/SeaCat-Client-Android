@@ -1,5 +1,7 @@
 package com.teskalabs.seacat.android.client.hc;
 
+import com.teskalabs.seacat.android.client.core.Reactor;
+
 import org.apache.http.HttpResponseFactory;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.ClientConnectionRequest;
@@ -13,21 +15,22 @@ import org.apache.http.impl.DefaultHttpResponseFactory;
 
 import java.util.concurrent.TimeUnit;
 
-public class ClientConnManager  implements ClientConnectionManager
+public class SeaCatClientConnManager implements ClientConnectionManager
 {
-    final SchemeRegistry registry;
-    HttpResponseFactory responseFactory = new DefaultHttpResponseFactory();
+    final protected SchemeRegistry registry;
+    final protected HttpResponseFactory responseFactory = new DefaultHttpResponseFactory();
+    final protected Reactor reactor;
 
-    public ClientConnManager()
+
+    public SeaCatClientConnManager(Reactor reactor)
     {
+        this.reactor = reactor;
+
         registry = new SchemeRegistry();
         registry.register(
                 new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
         registry.register(
                 new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
-
-
-
     }
 
     @Override
@@ -39,7 +42,7 @@ public class ClientConnManager  implements ClientConnectionManager
     @Override
     public ClientConnectionRequest requestConnection(HttpRoute httpRoute, Object state)
     {
-        return new SeaCatClientConnection(httpRoute, responseFactory, state);
+        return new SeaCatClientConnection(httpRoute, responseFactory, this.reactor, state);
     }
 
     @Override

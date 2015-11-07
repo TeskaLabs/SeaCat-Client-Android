@@ -9,6 +9,7 @@ import java.net.URL;
 
 import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.hc.SeaCatHttpClient;
+import com.teskalabs.seacat.android.client.http.URLConnection;
 import com.teskalabs.seacat.android.client.ping.Ping;
 import com.teskalabs.seacat.android.client.util.RC;
 import com.teskalabs.seacat.android.client.core.seacatcc;
@@ -54,7 +55,7 @@ public final class SeaCatClient
 	
 	public static HttpURLConnection open(URL url) throws IOException
 	{
-		return new com.teskalabs.seacat.android.client.http.URLConnection(getReactor(), url, 3 /*priority*/);
+		return new URLConnection(getReactor(), url, 3 /*priority*/);
 	}
 
 	public static HttpURLConnection open(String url) throws IOException, MalformedURLException
@@ -68,12 +69,12 @@ public final class SeaCatClient
      */
     public static HttpClient httpClient()
     {
-        return new SeaCatHttpClient();
+        return new SeaCatHttpClient(getReactor());
     }
 
     public static HttpClient httpClient(final HttpParams params)
     {
-        return new SeaCatHttpClient(params);
+        return new SeaCatHttpClient(params, getReactor());
     }
 
 

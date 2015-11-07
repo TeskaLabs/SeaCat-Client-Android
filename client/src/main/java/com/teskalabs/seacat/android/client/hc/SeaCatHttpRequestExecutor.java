@@ -62,7 +62,7 @@ import org.apache.http.protocol.HttpProcessor;
  * 
  * @since 4.0
  */
-public class HttpRequestExecutor extends org.apache.http.protocol.HttpRequestExecutor
+public class SeaCatHttpRequestExecutor extends org.apache.http.protocol.HttpRequestExecutor
 {
     /**
      * Sends the request and obtain a response.

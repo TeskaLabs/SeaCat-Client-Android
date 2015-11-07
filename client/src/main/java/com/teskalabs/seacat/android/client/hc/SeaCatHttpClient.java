@@ -1,8 +1,6 @@
 package com.teskalabs.seacat.android.client.hc;
 
-import android.util.Log;
-
-import com.teskalabs.seacat.android.client.SeaCatClient;
+import com.teskalabs.seacat.android.client.core.Reactor;
 
 import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.client.AuthenticationHandler;
@@ -16,7 +14,6 @@ import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpProcessor;
 import org.apache.http.protocol.HttpRequestExecutor;
 
@@ -46,6 +43,8 @@ import org.apache.http.protocol.HttpRequestExecutor;
 
 public class SeaCatHttpClient extends DefaultHttpClient implements HttpClient
 {
+    final protected Reactor reactor;
+
     /**
      * Creates a new HTTP client from parameters and a connection manager.
      *
@@ -54,20 +53,26 @@ public class SeaCatHttpClient extends DefaultHttpClient implements HttpClient
      */
     public SeaCatHttpClient(
             final ClientConnectionManager conman,
-            final HttpParams params)
+            final HttpParams params,
+            Reactor reactor
+    )
     {
         super(conman, params);
+        this.reactor = reactor;
     }
 
 
-    public SeaCatHttpClient(final HttpParams params)
+    public SeaCatHttpClient(final HttpParams params, Reactor reactor)
     {
         super(null, params);
+        this.reactor = reactor;
     }
 
 
-    public SeaCatHttpClient(){
+    public SeaCatHttpClient(Reactor reactor)
+    {
         super(null, null);
+        this.reactor = reactor;
     }
 
     ///
@@ -75,8 +80,7 @@ public class SeaCatHttpClient extends DefaultHttpClient implements HttpClient
     @Override
     protected HttpRequestExecutor createRequestExecutor()
     {
-        Log.i(SeaCatClient.L, "SeaCatHttpClient / createRequestExecutor");
-        return new com.teskalabs.seacat.android.client.hc.HttpRequestExecutor();
+        return new SeaCatHttpRequestExecutor();
     }
 
     @Override
@@ -113,8 +117,6 @@ public class SeaCatHttpClient extends DefaultHttpClient implements HttpClient
     @Override
     protected ClientConnectionManager createClientConnectionManager()
     {
-        Log.i(SeaCatClient.L, "SeaCatHttpClient / createClientConnectionManager");
-
-        return new ClientConnManager();
+        return new SeaCatClientConnManager(reactor);
     }
 }
