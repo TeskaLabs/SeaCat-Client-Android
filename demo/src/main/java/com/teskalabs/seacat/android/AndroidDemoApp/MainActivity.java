@@ -2,6 +2,7 @@ package com.teskalabs.seacat.android.AndroidDemoApp;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -17,6 +18,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 public class MainActivity extends ActionBarActivity
 {
@@ -35,7 +43,6 @@ public class MainActivity extends ActionBarActivity
         resultTextView = (TextView) findViewById(R.id.resultTextView);
         pingTextView = (TextView) findViewById(R.id.pingTextView);
     }
-
 
     @Override
     protected void onStart()
@@ -59,7 +66,8 @@ public class MainActivity extends ActionBarActivity
             public void run() {
                 try
                 {
-                    GetTimerMethod_PUT();
+                    //GetTimerMethod_PUT();
+                    GetTimerMethod_HTTPClient_GET();
                 }
 
                 catch (Exception e)
@@ -189,6 +197,48 @@ public class MainActivity extends ActionBarActivity
         });
 
     }
+
+    protected void GetTimerMethod_HTTPClient_GET() throws IOException
+    {
+        Log.i("MainActivity", "GetTimerMethod_HTTPClient_GET - B");
+
+        try {
+            HttpClient httpclient = SeaCatClient.httpClient();
+            HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/put?%s", getPackageName()));
+
+            HttpResponse response = httpclient.execute(httpget);
+
+            Log.i("MainActivity", "Protocol version: " + response.getProtocolVersion());
+            Log.i("MainActivity", "Status code: " + response.getStatusLine().getStatusCode());
+            Log.i("MainActivity", "Reason phrase: " + response.getStatusLine().getReasonPhrase());
+
+            HttpEntity entity = response.getEntity();
+            final String output = EntityUtils.toString(entity);
+
+            Log.i("MainActivity", "GetTimerMethod_HTTPClient_GET - E");
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    resultTextView.setText(output);
+                }
+            });
+        }
+        catch (IOException e)
+        {
+            final String output = e.toString();
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    resultTextView.setText(output);
+                }
+            });
+
+        }
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
