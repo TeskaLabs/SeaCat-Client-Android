@@ -33,6 +33,7 @@ public class MainActivity extends ActionBarActivity
     private TextView pingTextView = null;
     private Timer pingTimer = null;
     private Timer getTimer = null;
+    private int counter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -66,13 +67,25 @@ public class MainActivity extends ActionBarActivity
             public void run() {
                 try
                 {
-                    //GetTimerMethod_PUT();
-                    GetTimerMethod_HTTPClient_GET();
+                    int what = counter % 3;
+                    counter += 1;
+
+                    if (what == 0) GetTimerMethod_GET();
+                    else if (what == 1) GetTimerMethod_PUT();
+                    else if (what == 2) GetTimerMethod_HTTPClient_GET();
                 }
 
                 catch (Exception e)
                 {
+                    final String output = e.toString();
                     e.printStackTrace();
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            resultTextView.setText(output);
+                        }
+                    });
                 }
             }
 
@@ -202,40 +215,26 @@ public class MainActivity extends ActionBarActivity
     {
         Log.i("MainActivity", "GetTimerMethod_HTTPClient_GET - B");
 
-        try {
-            HttpClient httpclient = SeaCatClient.httpClient();
-            HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/put?%s", getPackageName()));
+        HttpClient httpclient = SeaCatClient.httpClient();
+        HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/put?%s", getPackageName()));
 
-            HttpResponse response = httpclient.execute(httpget);
+        HttpResponse response = httpclient.execute(httpget);
 
-            Log.i("MainActivity", "Protocol version: " + response.getProtocolVersion());
-            Log.i("MainActivity", "Status code: " + response.getStatusLine().getStatusCode());
-            Log.i("MainActivity", "Reason phrase: " + response.getStatusLine().getReasonPhrase());
+        Log.i("MainActivity", "Protocol version: " + response.getProtocolVersion());
+        Log.i("MainActivity", "Status code: " + response.getStatusLine().getStatusCode());
+        Log.i("MainActivity", "Reason phrase: " + response.getStatusLine().getReasonPhrase());
 
-            HttpEntity entity = response.getEntity();
-            final String output = EntityUtils.toString(entity);
+        HttpEntity entity = response.getEntity();
+        final String output = EntityUtils.toString(entity);
 
-            Log.i("MainActivity", "GetTimerMethod_HTTPClient_GET - E");
+        Log.i("MainActivity", "GetTimerMethod_HTTPClient_GET - E");
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    resultTextView.setText(output);
-                }
-            });
-        }
-        catch (IOException e)
-        {
-            final String output = e.toString();
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    resultTextView.setText(output);
-                }
-            });
-
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                resultTextView.setText(output);
+            }
+        });
     }
 
 
