@@ -3,6 +3,7 @@ package com.teskalabs.seacat.android.client.hc;
 import android.util.Log;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
+import com.teskalabs.seacat.android.client.SeaCatInternals;
 
 import org.apache.http.ConnectionReuseStrategy;
 import org.apache.http.HttpEntity;
@@ -182,7 +183,7 @@ public class SeaCatRequestDirector implements RequestDirector
     @Override
     public HttpResponse execute(HttpHost target, HttpRequest request, HttpContext context) throws HttpException, IOException
     {
-        Log.i(SeaCatClient.L, "SeaCatRequestDirector:execute()");
+        Log.i(SeaCatInternals.L, "SeaCatRequestDirector:execute()");
 
         HttpRequest orig = request;
         RequestWrapper origWrapper = wrapRequest(orig);
@@ -230,9 +231,9 @@ public class SeaCatRequestDirector implements RequestDirector
                     if (HttpConnectionParams.isStaleCheckingEnabled(params))
                     {
                         // validate connection
-                        Log.d(SeaCatClient.L, "Stale connection check");
+                        Log.d(SeaCatInternals.L, "Stale connection check");
                         if (managedConn.isStale()) {
-                            Log.d(SeaCatClient.L, "Stale connection detected");
+                            Log.d(SeaCatInternals.L, "Stale connection detected");
                             managedConn.close();
                         }
                     }
@@ -298,16 +299,16 @@ public class SeaCatRequestDirector implements RequestDirector
                     }
 
                     try {
-                        Log.d(SeaCatClient.L, "Attempt " + execCount + " to execute request");
+                        Log.d(SeaCatInternals.L, "Attempt " + execCount + " to execute request");
                         response = requestExec.execute(wrapper, managedConn, context);
                         retrying = false;
 
                     } catch (IOException ex) {
-                        Log.d(SeaCatClient.L, "Closing the connection.");
+                        Log.d(SeaCatInternals.L, "Closing the connection.");
                         managedConn.close();
                         if (retryHandler.retryRequest(ex, execCount, context)) {
-                            Log.e(SeaCatClient.L,"Exception caught when processing request", ex);
-                            Log.i(SeaCatClient.L,"Retrying request");
+                            Log.e(SeaCatInternals.L,"Exception caught when processing request", ex);
+                            Log.i(SeaCatInternals.L,"Retrying request");
                         } else {
                             throw ex;
                         }
@@ -315,7 +316,7 @@ public class SeaCatRequestDirector implements RequestDirector
                         // If we have a direct route to the target host
                         // just re-open connection and re-try the request
                         if (route.getHopCount() == 1) {
-                            Log.d(SeaCatClient.L, "Reopening the direct connection.");
+                            Log.d(SeaCatInternals.L, "Reopening the direct connection.");
                             managedConn.open(route, context, params);
                         } else {
                             // otherwise give up
@@ -501,7 +502,7 @@ public class SeaCatRequestDirector implements RequestDirector
             HttpRoute newRoute = determineRoute(newTarget, wrapper, context);
             RoutedRequest newRequest = new RoutedRequest(wrapper, newRoute);
 
-            Log.d(SeaCatClient.L, "Redirecting to '" + uri + "' via " + newRoute);
+            Log.d(SeaCatInternals.L, "Redirecting to '" + uri + "' via " + newRoute);
 
             return newRequest;
         }
@@ -519,7 +520,7 @@ public class SeaCatRequestDirector implements RequestDirector
                     target = route.getTargetHost();
                 }
 
-                Log.d(SeaCatClient.L, "Target requested authentication");
+                Log.d(SeaCatInternals.L, "Target requested authentication");
 /*
                 Map<String, Header> challenges = this.targetAuthHandler.getChallenges(
                         response, context);

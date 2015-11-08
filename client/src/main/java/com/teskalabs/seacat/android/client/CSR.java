@@ -154,7 +154,7 @@ public class CSR
 
         if (deviceUuid == null)
         {
-            Log.w(SeaCatClient.L, "Settings.Secure.ANDROID_ID get failed, using random UUID");
+            Log.w(SeaCatInternals.L, "Settings.Secure.ANDROID_ID get failed, using random UUID");
             deviceUuid = UUID.randomUUID();
         }
 
@@ -184,7 +184,7 @@ public class CSR
                 try {
                     csr.submit();
                 } catch (IOException e) {
-                    Log.e(SeaCatClient.L, "Exception in CSR.createDefault:", e);
+                    Log.e(SeaCatInternals.L, "Exception in CSR.createDefault:", e);
                 }
             }
         };

@@ -22,14 +22,14 @@ public class SeaCatService extends Service
     {
         if (SeaCatClient.getReactor() != null)
         {
-            Log.e(SeaCatClient.L, "Reactor is already created!");
+            Log.e(SeaCatInternals.L, "Reactor is already created!");
             return;
         }
 
         try {
             SeaCatClient.setReactor(new Reactor(getApplicationContext()));
         } catch (Exception e) {
-            Log.e(SeaCatClient.L, "Reactor shutdown failed:", e);
+            Log.e(SeaCatInternals.L, "Reactor shutdown failed:", e);
         }
     }
 
@@ -46,7 +46,7 @@ public class SeaCatService extends Service
         }
         else
         {
-            Log.e(SeaCatClient.L, "Reactor is broken!");
+            Log.e(SeaCatInternals.L, "Reactor is broken!");
         }
 
         // We want this service to continue running until it is explicitly stopped, so return sticky.
@@ -62,7 +62,7 @@ public class SeaCatService extends Service
             try {
                 reactor.shutdown();
             } catch (Exception e) {
-                Log.e(SeaCatClient.L, "Reactor shutdown failed:", e);
+                Log.e(SeaCatInternals.L, "Reactor shutdown failed:", e);
             }
             SeaCatClient.setReactor(null);
         }

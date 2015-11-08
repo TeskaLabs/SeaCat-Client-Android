@@ -13,6 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
 
+import com.teskalabs.seacat.android.client.SeaCatInternals;
 import com.teskalabs.seacat.android.client.intf.*;
 import com.teskalabs.seacat.android.client.util.IntegerCounter;
 
@@ -72,7 +73,7 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 		IStream stream = getStream(streamId);
 		if (stream == null)
 		{
-            Log.w(SeaCatClient.L, "receivedALX1_SYN_REPLY stream not found: " + streamId + " (can be closed already)");
+            Log.w(SeaCatInternals.L, "receivedALX1_SYN_REPLY stream not found: " + streamId + " (can be closed already)");
 			frame.clear();
 			sendRST_STREAM(frame, reactor, streamId, SPDY.RST_STREAM_STATUS_INVALID_STREAM);
 			return false;
@@ -93,7 +94,7 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 		IStream stream = getStream(streamId);
 		if (stream == null)
 		{
-            Log.w(SeaCatClient.L, "receivedSPD3_RST_STREAM stream not found: " + streamId + " (can be closed already)");
+            Log.w(SeaCatInternals.L, "receivedSPD3_RST_STREAM stream not found: " + streamId + " (can be closed already)");
             return true;
 		}
 
@@ -112,7 +113,7 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 		IStream stream = getStream(streamId);
 		if (stream == null)
 		{
-            Log.w(SeaCatClient.L, "receivedDataFrame stream not found: " + streamId + " (can be closed already)");
+            Log.w(SeaCatInternals.L, "receivedDataFrame stream not found: " + streamId + " (can be closed already)");
 			frame.clear();
 			sendRST_STREAM(frame, reactor, streamId, SPDY.RST_STREAM_STATUS_INVALID_STREAM);
 			return false;
@@ -143,7 +144,7 @@ public class StreamFactory implements ICntlFrameConsumer, IFrameProvider
 				return receivedSPD3_RST_STREAM(reactor, frame, frameLength, frameFlags);
 
 			default:
-                Log.e(SeaCatClient.L, "StreamFactory.receivedControlFrame cannot handle frame: "+ frameVersionType);
+                Log.e(SeaCatInternals.L, "StreamFactory.receivedControlFrame cannot handle frame: "+ frameVersionType);
 				return true;
 		}
 	}

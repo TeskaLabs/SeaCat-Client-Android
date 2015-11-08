@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
-
+import com.teskalabs.seacat.android.client.SeaCatInternals;
 import com.teskalabs.seacat.android.client.intf.*;
 import com.teskalabs.seacat.android.client.ping.PingFactory;
 import com.teskalabs.seacat.android.client.util.RC;
@@ -123,7 +123,7 @@ public class Reactor
 	{
 		int rc = seacatcc.run();
 		if (rc != seacatcc.RC_OK)
-            Log.e(SeaCatClient.L, String.format("return code %d in %s",rc ,"seacatcc.run"));
+            Log.e(SeaCatInternals.L, String.format("return code %d in %s",rc ,"seacatcc.run"));
 	}
 	
 	///
@@ -142,7 +142,7 @@ public class Reactor
 		int rc = seacatcc.yield('W');
 		if ((rc > 7900) && (rc < 8000))
 		{
-            Log.w(SeaCatClient.L, String.format("return code %d in %s",rc ,"seacatcc.yield"));
+            Log.w(SeaCatInternals.L, String.format("return code %d in %s",rc ,"seacatcc.yield"));
 			rc = seacatcc.RC_OK;
         }
 		RC.checkAndThrowIOException("seacatcc.yield", rc);
@@ -180,7 +180,7 @@ public class Reactor
 		
 		catch (Exception e)
 		{
-            Log.e(SeaCatClient.L, "JNICallbackWriteReady:", e);
+            Log.e(SeaCatInternals.L, "JNICallbackWriteReady:", e);
 			return null;
 		}
 	}
@@ -195,7 +195,7 @@ public class Reactor
 		
 		catch (Exception e)
 		{
-            Log.e(SeaCatClient.L, "JNICallbackReadReady:", e);
+            Log.e(SeaCatInternals.L, "JNICallbackReadReady:", e);
 			return null;
 		}
 	}
@@ -226,7 +226,7 @@ public class Reactor
 		
 		catch (Exception e)
 		{
-            Log.e(SeaCatClient.L, "JNICallbackFrameReceived:", e);
+            Log.e(SeaCatInternals.L, "JNICallbackFrameReceived:", e);
 			giveBackFrame = true;
 		}
 		
@@ -271,7 +271,7 @@ public class Reactor
 				
 
 			default:
-                Log.w(SeaCatClient.L, "Unknown Worker Request: " + workerCode);
+                Log.w(SeaCatInternals.L, "Unknown Worker Request: " + workerCode);
 		}
 	}
 
@@ -288,19 +288,19 @@ public class Reactor
 
 	protected void JNICallbackEvLoopStarted()
 	{
-        context.sendBroadcast(SeaCatClient.createIntent(SeaCatClient.ACTION_SEACAT_EVLOOP_STARTED));
+        context.sendBroadcast(SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_EVLOOP_STARTED));
 	}
 
 	protected void JNICallbackGWConnConnected()
 	{
-        context.sendBroadcast(SeaCatClient.createIntent(SeaCatClient.ACTION_SEACAT_GWCONN_CONNECTED));
+        context.sendBroadcast(SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_GWCONN_CONNECTED));
 	}
 
     protected void JNICallbackGWConnReset()
     {
         pingFactory.reset();
         streamFactory.reset();
-        context.sendBroadcast(SeaCatClient.createIntent(SeaCatClient.ACTION_SEACAT_GWCONN_RESET));
+        context.sendBroadcast(SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_GWCONN_RESET));
     }
 
     protected void JNICallbackStateChanged(String state)
@@ -310,7 +310,7 @@ public class Reactor
 
     public void broadcastState(String state)
     {
-        Intent intent = SeaCatClient.createIntent(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
+        Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
         intent.putExtra(SeaCatClient.EXTRA_STATE, seacatcc.state());
         context.sendBroadcast(intent);
     }
@@ -327,7 +327,7 @@ public class Reactor
 
 		if (frameLength + SPDY.HEADER_SIZE != frame.limit())
 		{
-            Log.w(SeaCatClient.L, String.format("Incorrect frame received: %d %x %d %x - closing connection", frame.limit(), frameVersionType, frameLength, frameFlags));
+            Log.w(SeaCatInternals.L, String.format("Incorrect frame received: %d %x %d %x - closing connection", frame.limit(), frameVersionType, frameLength, frameFlags));
 
 			// Invalid frame received - shutdown a reactor (disconnect) ...
 			try
@@ -336,7 +336,7 @@ public class Reactor
 			}
 			catch (Exception e)
 			{
-                Log.e(SeaCatClient.L, "receivedControlFrame:", e);
+                Log.e(SeaCatInternals.L, "receivedControlFrame:", e);
 			}
 			return true;
 		}
@@ -344,7 +344,7 @@ public class Reactor
 		ICntlFrameConsumer consumer = cntlFrameConsumers.get(frameVersionType);
 		if (consumer == null)
 		{
-            Log.w(SeaCatClient.L, String.format("Unidentified Control frame received: %d %x %d %x", frame.limit(), frameVersionType, frameLength, frameFlags));
+            Log.w(SeaCatInternals.L, String.format("Unidentified Control frame received: %d %x %d %x", frame.limit(), frameVersionType, frameLength, frameFlags));
 			return true;			
 		}
 		
