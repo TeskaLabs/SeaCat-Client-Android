@@ -12,6 +12,8 @@ import java.util.UUID;
 import com.teskalabs.seacat.android.client.util.RC;
 import com.teskalabs.seacat.android.client.core.seacatcc;
 
+import org.json.JSONObject;
+
 public class CSR
 {
     private Map<String, String> paramMap = new HashMap<String, String>();
@@ -158,6 +160,18 @@ public class CSR
         }
 
         this.setCommonName(deviceUuid.toString().replaceAll("-", "") + "and");
+    }
+
+    ///
+
+    public void setData(String data)
+    {
+        this.set("description", data);
+    }
+
+    public void setJsonData(JSONObject jsonData)
+    {
+        this.setData(jsonData.toString());
     }
 
     ///

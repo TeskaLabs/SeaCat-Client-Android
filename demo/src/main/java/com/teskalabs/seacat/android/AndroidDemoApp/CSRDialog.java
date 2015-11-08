@@ -3,6 +3,7 @@ package com.teskalabs.seacat.android.AndroidDemoApp;
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -11,6 +12,9 @@ import android.widget.EditText;
 import java.io.IOException;
 
 import com.teskalabs.seacat.android.client.CSR;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class CSRDialog extends Dialog implements View.OnClickListener {
 
@@ -52,11 +56,22 @@ public class CSRDialog extends Dialog implements View.OnClickListener {
                 csr.setUniqueCommonName();
                 csr.setEmailAddress(emailAddressTV.getText().toString());
 
+                JSONObject object = new JSONObject();
+                try {
+                    object.put("name", "Jack Hack");
+                    object.put("score", new Integer(200));
+                    object.put("current", new Double(152.32));
+                    object.put("nickname", "Hacker");
+                } catch (JSONException e) {
+                    Log.e("CSRDialog", "Error building JSON", e);
+                    return;
+                }
+
                 try {
                     csr.submit();
                     dismiss();
                 } catch (IOException e) {
-                    // TODO: Show error and try again.
+                    Log.e("CSRDialog", "Submitting CSR", e);
                 }
                 break;
 
