@@ -20,7 +20,7 @@ public class CSR
 
     public CSR()
     {
-        this.set("description", "TeskaLabs SeaCat Android");
+        this.set("title", "TeskaLabs SeaCat Android");
     }
 
     ///
@@ -46,7 +46,6 @@ public class CSR
         {
             arr[pos++] = entry.getKey();
             arr[pos++] = entry.getValue();
-
         }
 
         return arr;
