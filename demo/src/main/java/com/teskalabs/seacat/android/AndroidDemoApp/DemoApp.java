@@ -1,10 +1,8 @@
 package com.teskalabs.seacat.android.AndroidDemoApp;
 
 import android.app.Application;
-import android.content.Intent;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
-import com.teskalabs.seacat.android.client.SeaCatService;
 
 public class DemoApp extends Application
 {
@@ -17,7 +15,6 @@ public class DemoApp extends Application
         // Enable SeaCat
         SeaCatClient.setCSRWorker(null); // Disable default CSR worker
         SeaCatClient.startService(getBaseContext());
-
     }
 
 }
