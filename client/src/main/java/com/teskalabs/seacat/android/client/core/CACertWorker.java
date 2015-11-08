@@ -1,5 +1,9 @@
 package com.teskalabs.seacat.android.client.core;
 
+import android.util.Log;
+
+import com.teskalabs.seacat.android.client.SeaCatInternals;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
@@ -26,10 +30,17 @@ public class CACertWorker implements Runnable
 				cert.write(contents, 0, bytesRead);               
 			}
 		}
-		
+
+        catch (java.net.UnknownHostException e)
+        {
+            Log.w(SeaCatInternals.L, "CA Certificate is not accessible for download: "+e);
+            return;
+        }
+
 		catch (Exception e)
 		{
-			e.printStackTrace();
+            Log.e(SeaCatInternals.L, "Exception when downloading CA certificate", e);
+            return;
 		}
 
 		seacatcc.cacert_worker(cert.toByteArray());
