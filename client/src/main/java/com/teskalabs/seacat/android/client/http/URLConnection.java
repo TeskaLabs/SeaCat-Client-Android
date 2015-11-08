@@ -34,7 +34,6 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
     private boolean launched = false;
 	private int streamId = -1;
 	private int priority;
-	private OutboundNext outboundNext;
 
     private boolean responseReady = false;
     private Lock responseReadyLock = new ReentrantLock();
@@ -42,28 +41,12 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 
 	///
 
-	public enum OutboundNext
-	{
-		SYN_STREAM(1),
-		DATA(2),
-		FIN_FLAG(3);
 
-		private final int code;
-
-		private OutboundNext(int code)
-		{
-			this.code=code;
-		}
-	}
-
-	///
-	
 	public URLConnection(Reactor reactor, URL u, int priority)
 	{
 		super(u);
 		this.reactor = reactor;
 		this.priority = priority;
-		this.outboundNext = OutboundNext.SYN_STREAM;
 
         this.inboundStream = new InboundStream(reactor, getReadTimeout());
 	}
@@ -168,8 +151,9 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 
 		if (outboundStream == null)
 		{
-			if (outboundNext.code > OutboundNext.SYN_STREAM.code) throw new ProtocolException("Cannot write output after reading input.");
-			outboundStream = new OutboundStream(this);
+			if (launched) throw new ProtocolException("Cannot write output after reading input.");
+			outboundStream = new OutboundStream(this.reactor, this.priority);
+            if (streamId != -1) outboundStream.setStreamId(streamId);
 		}
 		return outboundStream;	
 	}
@@ -180,86 +164,47 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	
 	///
 
+    // Build SYN_STREAM frame
 	@Override
 	synchronized public Result buildFrame(Reactor reactor) throws IOException
 	{
-		boolean keep = false;
-		ByteBuffer frame = null;
-
 		assert(this.reactor == reactor);
-		
-		switch (outboundNext)
-		{
-			case SYN_STREAM:
-			{
-				frame = buildSYN_STREAM();
-				if (outboundStream != null)
-				{
-					assert((frame.getShort(4) & SPDY.FLAG_FIN) == 0);
-					keep = !outboundStream.isQueueEmpty();
-                    outboundNext = OutboundNext.DATA;
-				}
-				else
-				{
-					assert((frame.getShort(4) & SPDY.FLAG_FIN) == SPDY.FLAG_FIN);
-                    outboundNext = OutboundNext.FIN_FLAG;
-				}
-				return new IFrameProvider.Result(frame, keep);
-			}
 
+        if (fixedContentLength > 0) addRequestProperty("Content-length", String.format("%d", fixedContentLength));
 
-			case DATA:
-			{
-				assert(streamId > 0);
-				assert(outboundStream != null);
+        //TODO: addRequestProperty("X-Seacat-Client", isAndroid ? "and" : "jav");
+        addRequestProperty("X-SC-Client", "and");
 
-				frame = outboundStream.pollFrame();
-				if (frame != null)
-				{
-					frame.putInt(0, streamId);
-					keep = !outboundStream.isQueueEmpty();				
-					if ((frame.getShort(4) & SPDY.FLAG_FIN) == SPDY.FLAG_FIN)
-					{
-						assert(keep == false);
-                        outboundNext = OutboundNext.FIN_FLAG;
-					}
-				}
-				return new IFrameProvider.Result(frame, keep);
-			}
+        // Add If-Modified-Since header
+        long ifModifiedSince = getIfModifiedSince();
+        if (ifModifiedSince != 0) addRequestProperty("If-Modified-Since", HttpDate.format(new Date(ifModifiedSince)));
 
-			default:
-				System.err.println("Nothing to build - incorrect outboundNext: " + this.outboundNext);
-		}
-		
-		return new IFrameProvider.Result(null, false);
-	}
+        boolean fin_flag = (outboundStream == null);
 
-	
-	private ByteBuffer buildSYN_STREAM() throws IOException
-	{	
-		if (fixedContentLength > 0) addRequestProperty("Content-length", String.format("%d", fixedContentLength));
+        ByteBuffer frame = reactor.framePool.borrow("URLConnection.buildSYN_STREAM");
 
-		//TODO: addRequestProperty("X-Seacat-Client", isAndroid ? "and" : "jav");
-		addRequestProperty("X-SC-Client", "and");
-
-		// Add If-Modified-Since header
-		long ifModifiedSince = getIfModifiedSince();
-		if (ifModifiedSince != 0) addRequestProperty("If-Modified-Since", HttpDate.format(new Date(ifModifiedSince)));
-		
-		boolean fin_flag = (outboundStream == null);
-
-		ByteBuffer frame = reactor.framePool.borrow("URLConnection.buildSYN_STREAM");
-
-		streamId = reactor.streamFactory.registerStream(this);
+        streamId = reactor.streamFactory.registerStream(this);
         inboundStream.setStreamId(streamId);
+        if (outboundStream != null) outboundStream.setStreamId(streamId);
 
-		// Build SYN_STREAM frame
-		SPDY.buildALX1SynStream(frame, streamId, getURL(), getRequestMethod(), getRequestHeaders(), fin_flag, this.priority);
-	
-		return frame;
+        // Build SYN_STREAM frame
+        SPDY.buildALX1SynStream(frame, streamId, getURL(), getRequestMethod(), getRequestHeaders(), fin_flag, this.priority);
+
+        // If there is outbound stream, launch that
+        if (outboundStream != null)
+        {
+            assert((frame.getShort(4) & SPDY.FLAG_FIN) == 0);
+            outboundStream.launch();
+        }
+        else
+        {
+            assert((frame.getShort(4) & SPDY.FLAG_FIN) == SPDY.FLAG_FIN);
+        }
+
+        return new IFrameProvider.Result(frame, false);
 	}
 
-	
+
 	@Override
 	public int getFrameProviderPriority()
 	{

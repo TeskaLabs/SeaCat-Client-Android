@@ -5,33 +5,52 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.core.SPDY;
+import com.teskalabs.seacat.android.client.intf.IFrameProvider;
 
-public class OutboundStream extends java.io.OutputStream
+public class OutboundStream extends java.io.OutputStream implements IFrameProvider
 {
-	private final URLConnection conn;
+    private final Reactor reactor;
+    private int streamId = -1;
+
+
 	private BlockingQueue<ByteBuffer> frameQueue = new LinkedBlockingQueue<ByteBuffer>();
 	private ByteBuffer currentFrame = null;
+
+    private boolean launched = false;
 	private boolean closed = false;
+
     private int contentLength = 0;
+    private int priority;
 
 	///
 	
-	public OutboundStream(URLConnection myConnection)
+	public OutboundStream(Reactor reactor, int priority)
 	{
 		super();
-		this.conn = myConnection;
+		this.reactor = reactor;
+        this.priority = priority;
 	}
 
 	///
-	
+
+    public void launch() throws IOException
+    {
+        if (launched) throw new IOException("OutputStream is already launched");
+
+        reactor.registerFrameProvider(this, true);
+    }
+
+    ///
+
 	synchronized private ByteBuffer getCurrentFrame() throws IOException
 	{
 		if (closed) throw new IOException("OutputStream is already closed"); 
 
 		if (currentFrame == null)
 		{			
-			currentFrame = conn.reactor.framePool.borrow("HttpOutputStream.getCurrentFrame");
+			currentFrame = reactor.framePool.borrow("HttpOutputStream.getCurrentFrame");
 			// Make sure that there is a space for DATA header
 			currentFrame.position(SPDY.HEADER_SIZE);
 		}
@@ -52,21 +71,16 @@ public class OutboundStream extends java.io.OutputStream
 		
 		frameQueue.add(aFrame);
 
-        if (conn.isLaunched()) conn.reactor.registerFrameProvider(conn, true);
+        if (launched) reactor.registerFrameProvider(this, true);
 	}
 
 
-	public ByteBuffer pollFrame()
-	{
-		return frameQueue.poll();
-	}
-	
-	///
+    ///
 
 	@Override
 	public void write(int oneByte) throws IOException
 	{
-		if (closed) new IOException("OutputStream is already closed");
+		if (closed) throw new IOException("OutputStream is already closed");
 
 		ByteBuffer frame = getCurrentFrame();
 		frame.put((byte)oneByte);
@@ -109,22 +123,51 @@ public class OutboundStream extends java.io.OutputStream
 		while (!frameQueue.isEmpty())
 		{
 			ByteBuffer frame = frameQueue.remove();
-			conn.reactor.framePool.giveBack(frame);
+			reactor.framePool.giveBack(frame);
 		}
 
 		if (currentFrame != null)
 		{
-			conn.reactor.framePool.giveBack(currentFrame);
+			reactor.framePool.giveBack(currentFrame);
 			currentFrame = null;
 		}
 	}
 	
 	///
 	
-	public boolean isQueueEmpty()
-	{
-		return frameQueue.isEmpty();
-	}
-	public boolean isClosed() { return closed; }
-    public int getContentLength() { return contentLength; }
+	public int getContentLength() { return contentLength; }
+
+    ///
+
+    @Override
+    public Result buildFrame(Reactor reactor) throws IOException
+    {
+        boolean keep = false;
+
+        assert(streamId > 0);
+
+        ByteBuffer frame = frameQueue.poll();
+        if (frame != null)
+        {
+            frame.putInt(0, streamId);
+            keep = !frameQueue.isEmpty();
+            if ((frame.getShort(4) & SPDY.FLAG_FIN) == SPDY.FLAG_FIN)
+            {
+                assert(keep == false);
+            }
+        }
+        return new IFrameProvider.Result(frame, keep);
+    }
+
+    @Override
+    public int getFrameProviderPriority()
+    {
+        return priority;
+    }
+
+    public void setStreamId(int streamId)
+    {
+        this.streamId = streamId;
+    }
+
 }

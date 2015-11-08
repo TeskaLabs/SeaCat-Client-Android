@@ -1,17 +1,20 @@
 package com.teskalabs.seacat.android.client.hc;
 
+import android.content.Entity;
 import android.util.Log;
 
 import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.core.SPDY;
 import com.teskalabs.seacat.android.client.http.Headers;
 import com.teskalabs.seacat.android.client.http.InboundStream;
+import com.teskalabs.seacat.android.client.http.OutboundStream;
 import com.teskalabs.seacat.android.client.intf.IFrameProvider;
 import com.teskalabs.seacat.android.client.intf.IStream;
 
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpConnectionMetrics;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -46,12 +49,14 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     private int streamId = -1;
     protected HttpRequest request = null;
     protected HttpContext context = null;
+    protected boolean readyToSYN_STREAM = false;
 
     protected final HttpRoute route;
     protected final HttpResponseFactory responseFactory;
     protected Object state;
 
     protected InboundStream inboundStream = null;
+    protected OutboundStream outboundStream = null;
 
     private int priority = 3; //TODO: There is no way how this changed
 
@@ -60,7 +65,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     private Lock responseReadyLock = new ReentrantLock();
     private Condition responseReadyCondition = responseReadyLock.newCondition();
 
-    private int socketTimeout = 3000; //Value in milliseconds
+    private int socketTimeout = 10000; //Value in milliseconds
     private boolean reusable = true; // Just to replicate original behaviour, no real meaning
 
     ///
@@ -79,22 +84,13 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     @Override
     public Result buildFrame(Reactor reactor) throws IOException
     {
-        boolean keep = false;
-        ByteBuffer frame = null;
-
-        frame = buildSYN_STREAM();
-        return new IFrameProvider.Result(frame, keep);
-    }
-
-    private ByteBuffer buildSYN_STREAM() throws IOException
-    {
         //if (fixedContentLength > 0) addRequestProperty("Content-length", String.format("%d", fixedContentLength));
 
         // Add If-Modified-Since header
         //long ifModifiedSince = getIfModifiedSince();
         //if (ifModifiedSince != 0) addRequestProperty("If-Modified-Since", HttpDate.format(new Date(ifModifiedSince)));
 
-        boolean fin_flag = true; //(outboundStream == null);
+        boolean fin_flag = (outboundStream == null);
 
         ByteBuffer frame = reactor.framePool.borrow("SeaCatClientConnection.buildSYN_STREAM");
 
@@ -116,7 +112,14 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         // Build SYN_STREAM frame
         SPDY.buildALX1SynStream(frame, streamId, host, requestLine.getMethod(), requestLine.getUri(), requestHeaders.build(), fin_flag, this.priority);
 
-        return frame;
+        // If there is an outbound stream, launch it
+        if (outboundStream != null)
+        {
+            outboundStream.setStreamId(streamId);
+            outboundStream.launch();
+        }
+
+        return new IFrameProvider.Result(frame, false);
     }
 
     @Override
@@ -148,16 +151,37 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     @Override
     public void sendRequestHeader(HttpRequest httpRequest) throws HttpException, IOException
     {
+        Log.i("SeaCat", "SeaCatClientConnection / sendRequestHeader");
+
         this.request = httpRequest;
-        reactor.registerFrameProvider(this, true);
+        this.readyToSYN_STREAM = true;
     }
 
     @Override
     public void sendRequestEntity(HttpEntityEnclosingRequest httpEntityEnclosingRequest) throws HttpException, IOException
     {
+        HttpEntity e = httpEntityEnclosingRequest.getEntity();
         Log.i("SeaCat", "SeaCatClientConnection / sendRequestEntity");
-        //TODO: This ...
+
+        outboundStream = new OutboundStream(this.reactor, this.priority);
+        e.writeTo(outboundStream);
+        outboundStream.close();
+
+        this.readyToSYN_STREAM = true;
     }
+
+
+    @Override
+    public void flush() throws IOException
+    {
+        // This a trick how to send header and SYN_STREAM
+        if (this.readyToSYN_STREAM)
+        {
+            reactor.registerFrameProvider(this, true);
+            this.readyToSYN_STREAM = false;
+        }
+    }
+
 
     @Override
     public HttpResponse receiveResponseHeader() throws HttpException, IOException
@@ -176,7 +200,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
                 if (this.responseReady) throw new HttpException("Response already received");
 
                 long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
-                if (awaitMillis <= 0) throw new SocketTimeoutException("Connect timeout");
+                if (awaitMillis <= 0) throw new SocketTimeoutException("Connect timeout: "+ awaitMillis);
 
                 try {
                     responseReadyCondition.awaitNanos(awaitMillis * 1000000L);
@@ -202,12 +226,6 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         BasicHttpEntity entity = new BasicHttpEntity();
         entity.setContent(inboundStream);
         response.setEntity(entity);
-    }
-
-
-    @Override
-    public void flush() throws IOException
-    {
     }
 
 

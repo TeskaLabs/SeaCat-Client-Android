@@ -155,9 +155,7 @@ public class SeaCatHttpRequestExecutor extends org.apache.http.protocol.HttpRequ
      *                  already established
      * @param context   the context for sending the request
      *
-     * @return  a terminal response received as part of an expect-continue
-     *          handshake, or
-     *          <code>null</code> if the expect-continue handshake is not used
+     * @return  always null
      *
      * @throws IOException in case of an I/O error.
      * @throws HttpException in case of HTTP protocol violation or a processing 
@@ -189,46 +187,15 @@ public class SeaCatHttpRequestExecutor extends org.apache.http.protocol.HttpRequ
         conn.sendRequestHeader(request);
         if (request instanceof HttpEntityEnclosingRequest)
         {
-            // Check for expect-continue handshake. We have to flush the
-            // headers and wait for an 100-continue response to handle it.
-            // If we get a different response, we must not send the entity.
-            boolean sendentity = true;
-            final ProtocolVersion ver =
-                request.getRequestLine().getProtocolVersion();
-            if (((HttpEntityEnclosingRequest) request).expectContinue() &&
-                !ver.lessEquals(HttpVersion.HTTP_1_0)) {
-
-                conn.flush();
-                // As suggested by RFC 2616 section 8.2.3, we don't wait for a
-                // 100-continue response forever. On timeout, send the entity.
-                int tms = request.getParams().getIntParameter(
-                        CoreProtocolPNames.WAIT_FOR_CONTINUE, 2000);
-                
-                if (conn.isResponseAvailable(tms)) {
-                    response = conn.receiveResponseHeader();
-                    if (canResponseHaveBody(request, response)) {
-                        conn.receiveResponseEntity(response);
-                    }
-                    int status = response.getStatusLine().getStatusCode();
-                    if (status < 200) {
-                        if (status != HttpStatus.SC_CONTINUE) {
-                            throw new ProtocolException(
-                                    "Unexpected response: " + response.getStatusLine());
-                        }
-                        // discard 100-continue
-                        response = null;
-                    } else {
-                        sendentity = false;
-                    }
-                }
-            }
-            if (sendentity) {
-                conn.sendRequestEntity((HttpEntityEnclosingRequest) request);
-            }
+            conn.sendRequestEntity((HttpEntityEnclosingRequest) request);
         }
+
         conn.flush();
+
+
         context.setAttribute(ExecutionContext.HTTP_REQ_SENT, Boolean.TRUE);
-        return response;
+
+        return null;
     } 
 
     /**
