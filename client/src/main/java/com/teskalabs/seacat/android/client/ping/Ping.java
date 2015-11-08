@@ -12,20 +12,16 @@ public class Ping
 		deadline = seacatcc.time() + 5.0;
 	}
 	
-	public void pong()
-	{
-	}
+	public void pong() {}
+	public void cancel() { }
 
-	public void cancel()
-	{
-	}
-
-	protected void setPingId(int pingId)
+	final protected void setPingId(int pingId)
 	{
 		this.pingId = pingId;
 	}
+    final public int getPingId() { return pingId; }
 
-	public boolean isExpired(double now)
+	final public boolean isExpired(double now)
 	{
 		return now >= deadline;
 	}
