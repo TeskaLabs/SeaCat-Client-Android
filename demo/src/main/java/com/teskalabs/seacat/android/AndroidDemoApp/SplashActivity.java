@@ -21,7 +21,7 @@ import com.teskalabs.seacat.android.client.SeaCatClient;
 
 public class SplashActivity extends ActionBarActivity
 {
-    private SeaCatReceiver receiver;
+    private BroadcastReceiver receiver;
     private Handler handler;
     private Runnable stateChecker;
 
@@ -39,7 +39,22 @@ public class SplashActivity extends ActionBarActivity
 
         statusTextView = (TextView) findViewById(R.id.statusTextView);
 
-        receiver = new SeaCatReceiver();
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.hasCategory(SeaCatClient.CATEGORY_SEACAT))
+                {
+                    String action = intent.getAction();
+                    if (action.equals(SeaCatClient.ACTION_SEACAT_STATE_CHANGED)) {
+                        SplashActivity.this.onStateChanged(intent.getStringExtra(SeaCatClient.EXTRA_STATE));
+                        return;
+                    }
+                }
+
+                Log.w(SplashActivity.class.getCanonicalName(), "Unexpected intent: "+intent);
+            }
+        };
+
         handler = new Handler();
         readyToClose = false;
 
@@ -68,6 +83,8 @@ public class SplashActivity extends ActionBarActivity
     @Override
     protected void onStart()
     {
+        super.onStart();
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
         intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
@@ -75,7 +92,6 @@ public class SplashActivity extends ActionBarActivity
 
         CSRtrigger = true;
         displayTime = System.currentTimeMillis();
-        super.onStart();
 
         stateChecker.run();
 
@@ -84,9 +100,10 @@ public class SplashActivity extends ActionBarActivity
     @Override
     protected void onStop()
     {
+        super.onStop();
+
         handler.removeCallbacks(stateChecker);
         unregisterReceiver(receiver);
-        super.onStop();
     }
 
 
@@ -106,28 +123,6 @@ public class SplashActivity extends ActionBarActivity
             dialog.show();
         }
     }
-
-
-    private class SeaCatReceiver extends BroadcastReceiver
-    {
-
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            if (intent.hasCategory(SeaCatClient.CATEGORY_SEACAT))
-            {
-                String action = intent.getAction();
-                if (action.equals(SeaCatClient.ACTION_SEACAT_STATE_CHANGED)) {
-                    SplashActivity.this.onStateChanged(intent.getStringExtra(SeaCatClient.EXTRA_STATE));
-                    return;
-                }
-            }
-
-            Log.w(SplashActivity.class.getCanonicalName(), "Unexpected intent: "+intent);
-        }
-
-    }
-
 
     // Menu
 
