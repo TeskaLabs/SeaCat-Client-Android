@@ -1,21 +1,10 @@
 package com.teskalabs.seacat.android.AndroidDemoApp;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
 
@@ -24,9 +13,18 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.protocol.HTTP;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends ActionBarActivity
 {
@@ -240,10 +238,7 @@ public class MainActivity extends ActionBarActivity
         HttpPut httpput = new HttpPut(String.format("https://evalhost.seacat/put?%s", getPackageName()));
 
         String data = "som3Data4nyFormat=seeThat??SeaCat";
-        final byte[] dataBytes = data.getBytes();
-        InputStream stream = new ByteArrayInputStream(dataBytes);
-
-        InputStreamEntity reqEntity = new InputStreamEntity(stream, dataBytes.length);
+        HttpEntity reqEntity = new StringEntity(data);
         httpput.setEntity(reqEntity);
 
         HttpResponse response = httpclient.execute(httpput);
