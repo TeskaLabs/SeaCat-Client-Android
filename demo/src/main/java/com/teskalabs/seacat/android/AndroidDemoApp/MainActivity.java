@@ -2,12 +2,12 @@ package com.teskalabs.seacat.android.AndroidDemoApp;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 public class MainActivity extends ActionBarActivity
@@ -70,9 +72,11 @@ public class MainActivity extends ActionBarActivity
                     int what = counter % 3;
                     counter += 1;
 
-                    if (what == 0) GetTimerMethod_GET();
-                    else if (what == 1) GetTimerMethod_PUT();
-                    else if (what == 2) GetTimerMethod_HTTPClient_GET();
+
+                    //if (what == 0) GetTimerMethod_GET();
+                    //else if (what == 1) GetTimerMethod_PUT();
+                    //else if (what == 2) GetTimerMethod_HTTPClient_GET();
+                    GetTimerMethod_HTTPClient_PUT();
                 }
 
                 catch (Exception e)
@@ -213,21 +217,13 @@ public class MainActivity extends ActionBarActivity
 
     protected void GetTimerMethod_HTTPClient_GET() throws IOException
     {
-        Log.i("MainActivity", "GetTimerMethod_HTTPClient_GET - B");
-
         HttpClient httpclient = SeaCatClient.httpClient();
-        HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/put?%s", getPackageName()));
+        HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/?%s", getPackageName()));
 
         HttpResponse response = httpclient.execute(httpget);
 
-        Log.i("MainActivity", "Protocol version: " + response.getProtocolVersion());
-        Log.i("MainActivity", "Status code: " + response.getStatusLine().getStatusCode());
-        Log.i("MainActivity", "Reason phrase: " + response.getStatusLine().getReasonPhrase());
-
         HttpEntity entity = response.getEntity();
         final String output = EntityUtils.toString(entity);
-
-        Log.i("MainActivity", "GetTimerMethod_HTTPClient_GET - E");
 
         runOnUiThread(new Runnable() {
             @Override
@@ -238,8 +234,34 @@ public class MainActivity extends ActionBarActivity
     }
 
 
+    protected void GetTimerMethod_HTTPClient_PUT() throws IOException
+    {
+        HttpClient httpclient = SeaCatClient.httpClient();
+        HttpPut httpput = new HttpPut(String.format("https://evalhost.seacat/put?%s", getPackageName()));
 
-    @Override
+        String data = "som3Data4nyFormat=seeThat??SeaCat";
+        final byte[] dataBytes = data.getBytes();
+        InputStream stream = new ByteArrayInputStream(dataBytes);
+
+        InputStreamEntity reqEntity = new InputStreamEntity(stream, dataBytes.length);
+        httpput.setEntity(reqEntity);
+
+        HttpResponse response = httpclient.execute(httpput);
+
+        HttpEntity entity = response.getEntity();
+        final String output = EntityUtils.toString(entity);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                resultTextView.setText(output);
+            }
+        });
+
+    }
+
+
+        @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         // Inflate the menu; this adds items to the action bar if it is present.
