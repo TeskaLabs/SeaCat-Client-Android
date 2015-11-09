@@ -1,6 +1,5 @@
 package com.teskalabs.seacat.android.client.hc;
 
-import android.content.Entity;
 import android.util.Log;
 
 import com.teskalabs.seacat.android.client.core.Reactor;
@@ -28,6 +27,8 @@ import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.conn.ManagedClientConnection;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.entity.ContentLengthStrategy;
+import org.apache.http.impl.entity.StrictContentLengthStrategy;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
@@ -57,6 +58,8 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
 
     protected InboundStream inboundStream = null;
     protected OutboundStream outboundStream = null;
+    private final ContentLengthStrategy lenStrategy;
+    protected long outboundStreamLength;
 
     private int priority = 3; //TODO: There is no way how this changed
 
@@ -77,6 +80,8 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         this.route = route;
         this.responseFactory = responseFactory;
         this.state = state;
+
+        this.lenStrategy = new StrictContentLengthStrategy();
     }
 
     /// IFrameProvider
@@ -92,7 +97,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
 
         boolean fin_flag = (outboundStream == null);
 
-        ByteBuffer frame = reactor.framePool.borrow("SeaCatClientConnection.buildSYN_STREAM");
+        ByteBuffer frame = reactor.framePool.borrow("SeaCatClientConnection.buildFrame");
 
         streamId = reactor.streamFactory.registerStream(this);
 
@@ -107,7 +112,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
             final Header header = iter.nextHeader();
             requestHeaders.add(header.getName(), header.getValue());
         }
-        requestHeaders.add("X-SC-OS", "and");
+        requestHeaders.add("X-SC-OS", "and"); // For Android
 
         // Build SYN_STREAM frame
         SPDY.buildALX1SynStream(frame, streamId, host, requestLine.getMethod(), requestLine.getUri(), requestHeaders.build(), fin_flag, this.priority);
@@ -162,6 +167,15 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     {
         HttpEntity e = httpEntityEnclosingRequest.getEntity();
         Log.i("SeaCat", "SeaCatClientConnection / sendRequestEntity");
+
+        outboundStreamLength = this.lenStrategy.determineLength(httpEntityEnclosingRequest);
+        if (outboundStreamLength == ContentLengthStrategy.CHUNKED) {
+            Log.i("SeaCat", "SeaCatClientConnection / sendRequestEntity -> CHUNKED");
+        } else if (outboundStreamLength == ContentLengthStrategy.IDENTITY) {
+            Log.i("SeaCat", "SeaCatClientConnection / sendRequestEntity -> IDENTITY");
+        } else {
+            Log.i("SeaCat", "SeaCatClientConnection / sendRequestEntity -> Content-Lenght:" + outboundStreamLength);
+        }
 
         outboundStream = new OutboundStream(this.reactor, this.priority);
         e.writeTo(outboundStream);
