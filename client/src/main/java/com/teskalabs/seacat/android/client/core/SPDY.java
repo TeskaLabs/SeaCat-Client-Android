@@ -1,10 +1,10 @@
 package com.teskalabs.seacat.android.client.core;
 
+import com.teskalabs.seacat.android.client.http.Headers;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-
-import com.teskalabs.seacat.android.client.http.Headers;
 
 public class SPDY
 {
@@ -93,20 +93,20 @@ public class SPDY
 		appendVLEString(buffer, host);
 		appendVLEString(buffer, method);
 		appendVLEString(buffer, path);
-		
+
 		for (int i = 0; i < headers.size(); i++)
 		{
 			String header = headers.name(i);
 			if (header == null) continue;
-			
+            if (header.equalsIgnoreCase("host")) continue;
+            if (header.equalsIgnoreCase("connection")) continue;
+
 			String value = headers.value(i);
 			if (value == null) continue;
-            if (value.toLowerCase() == "host") continue;
 
-			//TODO: Do some filtering (if needed)
 			appendVLEString(buffer, header);
 			appendVLEString(buffer, value);
-		}
+        }
 
 		// Update length entry
 		int flagLength = buffer.position() - HEADER_SIZE;
