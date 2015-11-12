@@ -13,10 +13,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,14 +69,14 @@ public class MainActivity extends ActionBarActivity
             public void run() {
                 try
                 {
-                    int what = counter % 3;
+                    int what = counter % 5;
                     counter += 1;
 
-
-                    //if (what == 0) GetTimerMethod_GET();
-                    //else if (what == 1) GetTimerMethod_PUT();
-                    //else if (what == 2) GetTimerMethod_HTTPClient_GET();
-                    GetTimerMethod_HTTPClient_PUT();
+                    if (what == 0) GetTimerMethod_GET();
+                    else if (what == 1) GetTimerMethod_PUT_ContentLenght();
+                    else if (what == 2) GetTimerMethod_HTTPClient_GET();
+                    else if (what == 3) GetTimerMethod_HTTPClient_PUT_chunked();
+                    else if (what == 4) GetTimerMethod_HTTPClient_PUT_ContentLenght();
                 }
 
                 catch (Exception e)
@@ -173,7 +175,7 @@ public class MainActivity extends ActionBarActivity
     }
 
 
-    private void GetTimerMethod_PUT() throws IOException
+    private void GetTimerMethod_PUT_ContentLenght() throws IOException
     {
         URL url = new URL(String.format("https://evalhost.seacat/put?%s", getPackageName()));
         HttpURLConnection conn = SeaCatClient.open(url);
@@ -210,7 +212,6 @@ public class MainActivity extends ActionBarActivity
                 resultTextView.setText(output);
             }
         });
-
     }
 
     protected void GetTimerMethod_HTTPClient_GET() throws IOException
@@ -232,7 +233,35 @@ public class MainActivity extends ActionBarActivity
     }
 
 
-    protected void GetTimerMethod_HTTPClient_PUT() throws IOException
+    protected void GetTimerMethod_HTTPClient_PUT_chunked() throws IOException
+    {
+        HttpClient httpclient = SeaCatClient.httpClient();
+        HttpPut httpput = new HttpPut(String.format("https://evalhost.seacat/put?%s", getPackageName()));
+
+        String data = "som3Data4nyFormat=seeThat??SeaCat";
+
+        //HttpEntity reqEntity = new StringEntity(data);
+
+        InputStream istream = new ByteArrayInputStream(data.getBytes());
+        HttpEntity reqEntity = new InputStreamEntity(istream, -1);
+        httpput.setEntity(reqEntity);
+
+        HttpResponse response = httpclient.execute(httpput);
+
+        HttpEntity entity = response.getEntity();
+        final String output = EntityUtils.toString(entity);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                resultTextView.setText(output);
+            }
+        });
+
+    }
+
+
+    protected void GetTimerMethod_HTTPClient_PUT_ContentLenght() throws IOException
     {
         HttpClient httpclient = SeaCatClient.httpClient();
         HttpPut httpput = new HttpPut(String.format("https://evalhost.seacat/put?%s", getPackageName()));
@@ -254,7 +283,6 @@ public class MainActivity extends ActionBarActivity
         });
 
     }
-
 
         @Override
     public boolean onCreateOptionsMenu(Menu menu)
