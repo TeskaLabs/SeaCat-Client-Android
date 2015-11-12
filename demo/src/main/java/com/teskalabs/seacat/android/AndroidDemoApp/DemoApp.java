@@ -14,7 +14,7 @@ public class DemoApp extends Application
 
         // Enable SeaCat
         SeaCatClient.setCSRWorker(null); // Disable default CSR worker
-        SeaCatClient.startService(getBaseContext());
+        SeaCatClient.initialize(getApplicationContext());
     }
 
 }

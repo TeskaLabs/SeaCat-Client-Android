@@ -24,14 +24,14 @@ import org.apache.http.params.HttpParams;
  * It consists exclusively of static methods that provide SeaCat functions.
  *
  * <p>SeaCat client needs to be initialised in <tt>Application</tt> class during <tt>onCreate()</tt> method
- * by calling <tt>SeaCatClient.startService()</tt>.<br>
+ * by calling <tt>SeaCatClient.initialize()</tt>.<br>
  * Here is the example of initialization:
  * <pre>
  * {@code
  * public class MyApplicaton extends Application {
  *      public void onCreate() {
  *          super.onCreate();
- *          SeaCatClient.startService(getBaseContext());
+ *          SeaCatClient.initialize(getApplicationContext());
  *     }
  * }
  * }
@@ -142,13 +142,13 @@ public final class SeaCatClient
     ///
 
     /**
-     * Start SeaCat Android service.<br/>
-     * SeaCat service has to be started otherwise SeaCat functionality is not delivered.<br/>
+     * Initialize SeaCat Android client.<br/>
+     * SeaCat client needs to be initialized prior any other function is called.<br/>
      * Please refer to example above.
      *
      * @param context Android <tt>Context</tt> in which service is started.
      */
-    public static void startService(Context context)
+    public static void initialize(Context context)
     {
         context.startService(new Intent(context, SeaCatService.class));
     }
