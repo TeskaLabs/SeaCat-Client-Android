@@ -455,6 +455,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     public void reset()
     {
         if (inboundStream != null) inboundStream.reset();
+        if (outboundStream != null) outboundStream.reset();
     }
 
     @Override
