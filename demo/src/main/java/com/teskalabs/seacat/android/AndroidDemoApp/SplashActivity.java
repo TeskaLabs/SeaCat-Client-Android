@@ -29,7 +29,7 @@ public class SplashActivity extends ActionBarActivity
     private boolean readyToClose;
     long displayTime;
 
-    boolean CSRtrigger = true;
+    CSRDialog csrDialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -49,6 +49,12 @@ public class SplashActivity extends ActionBarActivity
                         SplashActivity.this.onStateChanged(intent.getStringExtra(SeaCatClient.EXTRA_STATE));
                         return;
                     }
+
+                    if (action.equals(SeaCatClient.ACTION_SEACAT_CSR_NEEDED)) {
+                        SplashActivity.this.onCSRNeeded();
+                        return;
+                    }
+
                 }
 
                 Log.w(SplashActivity.class.getCanonicalName(), "Unexpected intent: "+intent);
@@ -80,6 +86,23 @@ public class SplashActivity extends ActionBarActivity
 
     }
 
+    private void onCSRNeeded()
+    {
+        // Ensure that CSR dialog is displayed only once
+        if (csrDialog != null) return;
+
+        csrDialog = new CSRDialog(SplashActivity.this) {
+            @Override
+            protected void onStop()
+            {
+                super.onStop();
+                SplashActivity.this.csrDialog = null;
+            }
+        };
+        csrDialog.show();
+    }
+
+
     @Override
     protected void onStart()
     {
@@ -87,10 +110,10 @@ public class SplashActivity extends ActionBarActivity
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
+        intentFilter.addAction(SeaCatClient.ACTION_SEACAT_CSR_NEEDED);
         intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
         registerReceiver(receiver, intentFilter);
 
-        CSRtrigger = true;
         displayTime = System.currentTimeMillis();
 
         stateChecker.run();
@@ -115,13 +138,16 @@ public class SplashActivity extends ActionBarActivity
             readyToClose = true;
         }
 
-        else if ((state.charAt(5) == 'n') && (CSRtrigger))
+        if ((state.charAt(1) == 'C') && (csrDialog == null))
         {
-
-            CSRtrigger = false;
-            CSRDialog dialog = new CSRDialog(SplashActivity.this);
-            dialog.show();
+            onCSRNeeded();
         }
+
+        else if ((state.charAt(1) != 'C') && (csrDialog != null))
+        {
+            csrDialog.dismiss();
+        }
+
     }
 
     // Menu

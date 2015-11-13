@@ -13,7 +13,6 @@ public class DemoApp extends Application
         super.onCreate();
 
         // Enable SeaCat
-        SeaCatClient.setCSRWorker(null); // Disable default CSR worker
         SeaCatClient.initialize(getApplicationContext());
     }
 

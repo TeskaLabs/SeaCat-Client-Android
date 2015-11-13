@@ -1,10 +1,12 @@
 package com.teskalabs.seacat.android.AndroidDemoApp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
 
@@ -301,7 +303,15 @@ public class MainActivity extends ActionBarActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_reset_identity) {
+            try {
+                SeaCatClient.reset();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(getApplicationContext(), "Identity reset!", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(MainActivity.this, SplashActivity.class));
+            finish();
             return true;
         }
 

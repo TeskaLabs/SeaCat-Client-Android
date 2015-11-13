@@ -259,8 +259,8 @@ public class Reactor
 
 
 			case 'C': {
-                Runnable w = SeaCatClient.getCSRWorker();
-                if (w != null) workerExecutor.execute(w);
+                Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_CSR_NEEDED);
+                context.sendBroadcast(intent);
                 break;
             }
 

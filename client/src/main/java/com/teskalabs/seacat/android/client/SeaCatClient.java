@@ -84,7 +84,6 @@ import org.apache.http.params.HttpParams;
 public final class SeaCatClient
 {
     static Reactor reactor = null;
-    static private Runnable CSRWorker = CSR.createDefault();
 
     /**
      * The <tt>Intent</tt> category for all Intents sent by SeaCat client.
@@ -114,6 +113,11 @@ public final class SeaCatClient
      * The <tt>Intent</tt> action used to inform that client disconnected from the gateway.
      */
     public final static String ACTION_SEACAT_GWCONN_RESET = "mobi.seacat.client.intent.action.GWCONN_RESET";
+
+    /**
+     * The <tt>Intent</tt> action used to inform that client needs to produce CSR.
+     */
+    public final static String ACTION_SEACAT_CSR_NEEDED = "mobi.seacat.client.intent.action.CSR_NEEDED";
 
     /**
      * The <tt>Intent</tt> action used to inform that client state changed.
@@ -312,53 +316,6 @@ public final class SeaCatClient
     }
 
     ///
-
-    /**
-     * Intercepts CSR (on-boarding) procedure and provide a <tt>Runnable</tt> that is called when new CSR is created.
-     *
-     * <p>
-     * <tt>Runnable</tt> is called when CSR needs to be built.
-     * </p>
-     *
-     * <p>
-     * Alternatively, set to <tt>null</tt> to stop SeaCat client at a CSR creating phase.
-     * Use <tt>getState()</tt> method or better <tt>BroadcastReceived</tt>to detect and react to this state.
-     * </p>
-     *
-     * <p>
-     * Example:
-     * <pre>
-     * {@code
-     * SeaCatClient.setCSRWorker(new Runnable() {
-     *      public void run() {
-     *          CSR csr = new CSR();
-     *          csr.setOrganization("MyCompany Ltd");
-     *          try {
-     *              csr.submit();
-     *          } catch (IOException e) {
-     *          }
-     *     }
-     * });
-     * }
-     * </pre>
-     * </p>
-     *
-     * @param CSRWorker is a <tt>Runnable</tt> that builds a new CSR class when needed.
-     */
-    public static void setCSRWorker(Runnable CSRWorker)
-    {
-        SeaCatClient.CSRWorker = CSRWorker;
-    }
-
-    /**
-     * Returns actual CSR worker.
-     *
-     * @return CSR worker Runnable
-     */
-    public static Runnable getCSRWorker()
-    {
-        return SeaCatClient.CSRWorker;
-    }
 
     //TODO: disconnect;
 
