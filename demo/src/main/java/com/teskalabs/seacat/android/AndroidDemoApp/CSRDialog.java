@@ -62,6 +62,7 @@ public class CSRDialog extends Dialog implements View.OnClickListener {
                     Log.e("CSRDialog", "Error building JSON", e);
                     return;
                 }
+                csr.setJsonData(object);
 
                 try {
                     csr.submit();
