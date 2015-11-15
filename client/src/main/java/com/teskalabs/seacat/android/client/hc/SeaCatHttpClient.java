@@ -119,4 +119,5 @@ public class SeaCatHttpClient extends DefaultHttpClient implements HttpClient
     {
         return new SeaCatClientConnManager(reactor);
     }
+
 }
