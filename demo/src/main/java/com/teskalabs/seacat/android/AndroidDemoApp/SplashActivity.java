@@ -26,10 +26,9 @@ public class SplashActivity extends ActionBarActivity
     private Runnable stateChecker;
 
     private TextView statusTextView = null;
-    private boolean readyToClose;
-    long displayTime;
 
     CSRDialog csrDialog = null;
+    boolean closing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -62,27 +61,65 @@ public class SplashActivity extends ActionBarActivity
         };
 
         handler = new Handler();
-        readyToClose = false;
 
         stateChecker = new Runnable()
         {
             @Override
             public void run()
             {
-                if (readyToClose)
-                {
-                    if ((System.currentTimeMillis() - displayTime) > 3000)
-                    {
-                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                        finish();
-                        return;
-                    }
-                } else {
-                    SeaCatClient.broadcastState(); // This triggers initial delivery of the actual state
-                }
+                SeaCatClient.broadcastState(); // This triggers initial delivery of the actual state
                 handler.postDelayed(this, 500);
             }
         };
+
+    }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
+        intentFilter.addAction(SeaCatClient.ACTION_SEACAT_CSR_NEEDED);
+        intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
+        registerReceiver(receiver, intentFilter);
+
+        closing = false;
+        stateChecker.run();
+
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+
+        handler.removeCallbacks(stateChecker);
+        unregisterReceiver(receiver);
+    }
+
+
+    private synchronized void onStateChanged(String state)
+    {
+        statusTextView.setText(state);
+        if ((state.charAt(3) == 'Y') && (state.charAt(4) == 'N') && (state.charAt(0) != 'f')) {
+            if (closing == false) {
+                closing = true;
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                finish();
+            }
+        }
+
+        if ((state.charAt(1) == 'C') && (csrDialog == null))
+        {
+            onCSRNeeded();
+        }
+
+        else if ((state.charAt(1) != 'C') && (csrDialog != null))
+        {
+            csrDialog.dismiss();
+        }
 
     }
 
@@ -100,54 +137,6 @@ public class SplashActivity extends ActionBarActivity
             }
         };
         csrDialog.show();
-    }
-
-
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
-        intentFilter.addAction(SeaCatClient.ACTION_SEACAT_CSR_NEEDED);
-        intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
-        registerReceiver(receiver, intentFilter);
-
-        displayTime = System.currentTimeMillis();
-
-        stateChecker.run();
-
-    }
-
-    @Override
-    protected void onStop()
-    {
-        super.onStop();
-
-        handler.removeCallbacks(stateChecker);
-        unregisterReceiver(receiver);
-    }
-
-
-    private void onStateChanged(String state)
-    {
-        statusTextView.setText(state);
-        if ((state.charAt(3) == 'Y') && (state.charAt(4) == 'N') && (state.charAt(0) != 'f'))
-        {
-            readyToClose = true;
-        }
-
-        if ((state.charAt(1) == 'C') && (csrDialog == null))
-        {
-            onCSRNeeded();
-        }
-
-        else if ((state.charAt(1) != 'C') && (csrDialog != null))
-        {
-            csrDialog.dismiss();
-        }
-
     }
 
     // Menu

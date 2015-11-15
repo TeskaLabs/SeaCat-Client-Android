@@ -17,6 +17,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
@@ -39,6 +42,8 @@ public class MainActivity extends ActionBarActivity
     private Timer getTimer = null;
     private int counter = 0;
 
+    private org.apache.http.client.CookieStore HTTPClient_cookieStore;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -53,6 +58,8 @@ public class MainActivity extends ActionBarActivity
     protected void onStart()
     {
         super.onStart();
+
+        HTTPClient_cookieStore = new BasicCookieStore();
 
         // Start ping timer
         if (pingTimer == null) pingTimer = new Timer();
@@ -71,14 +78,16 @@ public class MainActivity extends ActionBarActivity
             public void run() {
                 try
                 {
-                    int what = counter % 5;
+                    int what = counter % 2;
                     counter += 1;
 
-                    if (what == 0) GetTimerMethod_GET();
-                    else if (what == 1) GetTimerMethod_PUT_ContentLenght();
-                    else if (what == 2) GetTimerMethod_HTTPClient_GET();
-                    else if (what == 3) GetTimerMethod_HTTPClient_PUT_chunked();
-                    else if (what == 4) GetTimerMethod_HTTPClient_PUT_ContentLenght();
+                    GetTimerMethod_HTTPClient_GET();
+
+                    //if (what == 0) GetTimerMethod_GET();
+                    //else if (what == 1) GetTimerMethod_PUT_ContentLenght();
+                    //else if (what == 1) GetTimerMethod_HTTPClient_GET();
+                    //else if (what == 3) GetTimerMethod_HTTPClient_PUT_chunked();
+                    //else if (what == 4) GetTimerMethod_HTTPClient_PUT_ContentLenght();
                 }
 
                 catch (Exception e)
@@ -95,7 +104,7 @@ public class MainActivity extends ActionBarActivity
                 }
             }
 
-        }, 0, 1000);
+        }, 0, 3000);
 
     }
 
@@ -148,7 +157,7 @@ public class MainActivity extends ActionBarActivity
 
     private void GetTimerMethod_GET() throws IOException
     {
-        URL url = new URL(String.format("https://evalhost.seacat/?%s", getPackageName()));
+        URL url = new URL(String.format("https://evalhost.seacat/cookies?%s", getPackageName()));
         HttpURLConnection conn = SeaCatClient.open(url);
 
         InputStream is = conn.getInputStream();
@@ -218,8 +227,15 @@ public class MainActivity extends ActionBarActivity
 
     protected void GetTimerMethod_HTTPClient_GET() throws IOException
     {
-        HttpClient httpclient = SeaCatClient.httpClient();
-        HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/?%s", getPackageName()));
+        BasicClientCookie c = new BasicClientCookie("TestSet", "AHoj");
+        c.setDomain("evalhost.seacat");
+        c.setPath("/");
+        HTTPClient_cookieStore.addCookie(c);
+
+        DefaultHttpClient httpclient = (DefaultHttpClient) SeaCatClient.httpClient();
+        httpclient.setCookieStore(HTTPClient_cookieStore);
+
+        HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/cookies?%s", getPackageName()));
 
         HttpResponse response = httpclient.execute(httpget);
 
