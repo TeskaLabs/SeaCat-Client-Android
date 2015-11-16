@@ -86,24 +86,18 @@ public class InboundStream extends java.io.InputStream
 			try
 			{
                 long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
-                if (awaitMillis <= 0) throw new SocketTimeoutException("Read timeout");
+                if (awaitMillis <= 0) throw new SocketTimeoutException(String.format("Read timeout: %d", this.readTimeoutMillis));
 
 				currentFrame = frameQueue.poll(awaitMillis, TimeUnit.MILLISECONDS);
 			}
 			catch (InterruptedException e) { continue ; }
-			
-			if (currentFrame == null)
-			{
-				throw new SocketTimeoutException("Read timeout");
-			}
-			
+
 			if (currentFrame == QUEUE_IS_CLOSED)
 			{				
 				frameQueue.add(QUEUE_IS_CLOSED);
 				currentFrame = null;
+                break;
 			}
-
-			break;
 		}
 
 		return currentFrame;
