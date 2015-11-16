@@ -498,6 +498,8 @@ static void JNICALLBACK_state_changed(void)
 
 	jstring jstate_buf = (*g_env)->NewStringUTF(g_env, state_buf);
 	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_state_changed_mid, jstate_buf, NULL);
+	(*g_env)->DeleteLocalRef(g_env, jstate_buf);
+	jstate_buf= NULL;
 
 	if (getEnvStat == JNI_EDETACHED)
 		(*g_java_vm)->DetachCurrentThread(g_java_vm);
