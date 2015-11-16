@@ -214,7 +214,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
                 if (this.responseReady) throw new HttpException("Response already received");
 
                 long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
-                if (awaitMillis <= 0) throw new SocketTimeoutException("Connect timeout: "+ awaitMillis);
+                if (awaitMillis <= 0) throw new SocketTimeoutException(String.format("Connect timeout: %d", timeoutMillis));
 
                 try {
                     responseReadyCondition.awaitNanos(awaitMillis * 1000000L);
