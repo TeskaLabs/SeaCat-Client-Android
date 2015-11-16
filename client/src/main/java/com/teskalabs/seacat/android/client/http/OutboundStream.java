@@ -1,13 +1,13 @@
 package com.teskalabs.seacat.android.client.http;
 
+import com.teskalabs.seacat.android.client.core.Reactor;
+import com.teskalabs.seacat.android.client.core.SPDY;
+import com.teskalabs.seacat.android.client.intf.IFrameProvider;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import com.teskalabs.seacat.android.client.core.Reactor;
-import com.teskalabs.seacat.android.client.core.SPDY;
-import com.teskalabs.seacat.android.client.intf.IFrameProvider;
 
 public class OutboundStream extends java.io.OutputStream implements IFrameProvider
 {
