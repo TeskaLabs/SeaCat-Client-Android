@@ -302,7 +302,59 @@ public class MainActivity extends ActionBarActivity
 
     }
 
-        @Override
+
+    private void NoSeaCat_GET() throws IOException
+    {
+        URL url = new URL("http://eval.seacat.mobi/");
+        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+
+        InputStream is = conn.getInputStream();
+        assert(is != null);
+
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        int nRead;
+        byte[] data = new byte[16384];
+        while ((nRead = is.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+
+        final String output = new String(buffer.toByteArray());
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                resultTextView.setText(output);
+            }
+        });
+
+    }
+
+
+
+    private void NoSeaCat_HC_GET() throws IOException
+    {
+
+        DefaultHttpClient httpclient = new DefaultHttpClient();
+        httpclient.setCookieStore(HTTPClient_cookieStore);
+
+        HttpGet httpget = new HttpGet("http://eval.seacat.mobi/");
+
+        HttpResponse response = httpclient.execute(httpget);
+
+        HttpEntity entity = response.getEntity();
+        final String output = new String(EntityUtils.toByteArray(entity));
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                resultTextView.setText(output);
+            }
+        });
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         // Inflate the menu; this adds items to the action bar if it is present.
