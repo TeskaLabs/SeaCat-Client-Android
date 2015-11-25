@@ -68,13 +68,15 @@ public class InboundStream extends java.io.InputStream
 	{
 		if (currentFrame != null)
 		{
-			if (currentFrame.remaining() == 0)
+            if (currentFrame == QUEUE_IS_CLOSED) return null;
+
+            else if (currentFrame.remaining() == 0)
 			{
 				reactor.framePool.giveBack(currentFrame);
 				currentFrame = null;
 			}
-			
-			return currentFrame;
+
+			else return currentFrame;
 		}
 
         long timeoutMillis = this.readTimeoutMillis;
@@ -135,7 +137,7 @@ public class InboundStream extends java.io.InputStream
 	}
 
 	/*
-	 * Reset is call that closes this stream when error occured
+	 * Reset is call that closes this stream when error happens
 	 */
 	public void reset()
 	{
@@ -161,11 +163,18 @@ public class InboundStream extends java.io.InputStream
 
 	protected void finalize() throws Throwable
 	{
-	     try {
-	         close();        // close open files
-	     } finally {
-	         super.finalize();
-	     }
+        if (currentFrame != null)
+        {
+            reactor.framePool.giveBack(currentFrame);
+            currentFrame = null;
+        }
+
+        try {
+         close();        // close open files
+        } finally {
+         super.finalize();
+        }
+
 	 }
 	
 	

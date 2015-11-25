@@ -1,7 +1,5 @@
 package com.teskalabs.seacat.android.client.hc;
 
-import android.util.Log;
-
 import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.core.SPDY;
 import com.teskalabs.seacat.android.client.http.Headers;
@@ -156,8 +154,6 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     @Override
     public void sendRequestHeader(HttpRequest httpRequest) throws HttpException, IOException
     {
-        Log.i("SeaCat", "SeaCatClientConnection / sendRequestHeader");
-
         this.request = httpRequest;
         this.readyToSYN_STREAM = true;
     }
@@ -166,8 +162,8 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     public void sendRequestEntity(HttpEntityEnclosingRequest httpEntityEnclosingRequest) throws HttpException, IOException
     {
         HttpEntity e = httpEntityEnclosingRequest.getEntity();
-        Log.i("SeaCat", "SeaCatClientConnection / sendRequestEntity");
 
+/*
         outboundStreamLength = this.lenStrategy.determineLength(httpEntityEnclosingRequest);
         if (outboundStreamLength == ContentLengthStrategy.CHUNKED) {
             Log.i("SeaCat", "SeaCatClientConnection / sendRequestEntity -> CHUNKED");
@@ -176,7 +172,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         } else {
             Log.i("SeaCat", "SeaCatClientConnection / sendRequestEntity -> Content-Lenght:" + outboundStreamLength);
         }
-
+*/
         outboundStream = new OutboundStream(this.reactor, this.priority);
         e.writeTo(outboundStream);
         outboundStream.close();
@@ -461,8 +457,6 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     @Override
     public boolean receivedALX1_SYN_REPLY(Reactor reactor, ByteBuffer frame, int frameLength, byte frameFlags)
     {
-        Log.i("SeaCat", "SeaCatClientConnection / receivedALX1_SYN_REPLY");
-
         // Body
         inboundStream = new InboundStream(reactor, getSocketTimeout());
         inboundStream.setStreamId(streamId);

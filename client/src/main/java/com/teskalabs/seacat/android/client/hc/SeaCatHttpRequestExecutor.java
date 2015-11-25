@@ -27,11 +27,6 @@
 
 package com.teskalabs.seacat.android.client.hc;
 
-import android.util.Log;
-
-import java.io.IOException;
-import java.net.ProtocolException;
-
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -39,12 +34,11 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.HttpVersion;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpProcessor;
+
+import java.io.IOException;
 
 /**
  * HttpRequestExecutor is a client side HTTP protocol handler based on the 
@@ -177,8 +171,6 @@ public class SeaCatHttpRequestExecutor extends org.apache.http.protocol.HttpRequ
             throw new IllegalArgumentException("HTTP context may not be null");
         }
 
-        Log.i("SeaCat", "HttpRequestExecutor / doSendRequest");
-
         HttpResponse response = null;
 
         context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);
@@ -228,8 +220,6 @@ public class SeaCatHttpRequestExecutor extends org.apache.http.protocol.HttpRequ
         if (context == null) {
             throw new IllegalArgumentException("HTTP context may not be null");
         }
-
-        Log.i("SeaCat", "HttpRequestExecutor / doReceiveResponse");
 
         HttpResponse response = null;
         int statuscode = 0;

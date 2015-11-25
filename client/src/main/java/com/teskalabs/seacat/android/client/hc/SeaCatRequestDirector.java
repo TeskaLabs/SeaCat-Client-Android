@@ -183,8 +183,6 @@ public class SeaCatRequestDirector implements RequestDirector
     @Override
     public HttpResponse execute(HttpHost target, HttpRequest request, HttpContext context) throws HttpException, IOException
     {
-        Log.i(SeaCatInternals.L, "SeaCatRequestDirector:execute()");
-
         HttpRequest orig = request;
         RequestWrapper origWrapper = wrapRequest(orig);
         origWrapper.setParams(params);
@@ -231,9 +229,8 @@ public class SeaCatRequestDirector implements RequestDirector
                     if (HttpConnectionParams.isStaleCheckingEnabled(params))
                     {
                         // validate connection
-                        Log.d(SeaCatInternals.L, "Stale connection check");
                         if (managedConn.isStale()) {
-                            Log.d(SeaCatInternals.L, "Stale connection detected");
+                            Log.w(SeaCatInternals.L, "Stale connection detected");
                             managedConn.close();
                         }
                     }
@@ -299,12 +296,12 @@ public class SeaCatRequestDirector implements RequestDirector
                     }
 
                     try {
-                        Log.d(SeaCatInternals.L, "Attempt " + execCount + " to execute request");
+                        //Log.d(SeaCatInternals.L, "Attempt " + execCount + " to execute request");
                         response = requestExec.execute(wrapper, managedConn, context);
                         retrying = false;
 
                     } catch (IOException ex) {
-                        Log.d(SeaCatInternals.L, "Closing the connection.");
+                        //Log.d(SeaCatInternals.L, "Closing the connection.");
                         managedConn.close();
                         if (retryHandler.retryRequest(ex, execCount, context)) {
                             Log.e(SeaCatInternals.L,"Exception caught when processing request", ex);
@@ -316,7 +313,6 @@ public class SeaCatRequestDirector implements RequestDirector
                         // If we have a direct route to the target host
                         // just re-open connection and re-try the request
                         if (route.getHopCount() == 1) {
-                            Log.d(SeaCatInternals.L, "Reopening the direct connection.");
                             managedConn.open(route, context, params);
                         } else {
                             // otherwise give up
@@ -502,7 +498,7 @@ public class SeaCatRequestDirector implements RequestDirector
             HttpRoute newRoute = determineRoute(newTarget, wrapper, context);
             RoutedRequest newRequest = new RoutedRequest(wrapper, newRoute);
 
-            Log.d(SeaCatInternals.L, "Redirecting to '" + uri + "' via " + newRoute);
+            Log.w(SeaCatInternals.L, "Redirecting to '" + uri + "' via " + newRoute);
 
             return newRequest;
         }
@@ -520,7 +516,7 @@ public class SeaCatRequestDirector implements RequestDirector
                     target = route.getTargetHost();
                 }
 
-                Log.d(SeaCatInternals.L, "Target requested authentication");
+                Log.w(SeaCatInternals.L, "Target requested authentication");
 /*
                 Map<String, Header> challenges = this.targetAuthHandler.getChallenges(
                         response, context);
