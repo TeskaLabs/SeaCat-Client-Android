@@ -3,4 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
     <item android:id="@+id/action_reset_identity" android:title="Reset Identity"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_gw_disconnect" android:title="Disconnect"
+        android:orderInCategory="101" app:showAsAction="never" />
 </menu>

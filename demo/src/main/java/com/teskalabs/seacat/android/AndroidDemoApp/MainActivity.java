@@ -24,6 +24,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,11 +82,12 @@ public class MainActivity extends ActionBarActivity
                     int what = counter % 2;
                     counter += 1;
 
-                    GetTimerMethod_HTTPClient_GET();
+                    //if (what == 0) NoSeaCat_GET();
+                    //else if (what == 1) NoSeaCat_HC_GET();
 
-                    //if (what == 0) GetTimerMethod_GET();
+                    GetTimerMethod_GET();
                     //else if (what == 1) GetTimerMethod_PUT_ContentLenght();
-                    //else if (what == 1) GetTimerMethod_HTTPClient_GET();
+                    //else if (what == 2) GetTimerMethod_HTTPClient_GET();
                     //else if (what == 3) GetTimerMethod_HTTPClient_PUT_chunked();
                     //else if (what == 4) GetTimerMethod_HTTPClient_PUT_ContentLenght();
                 }
@@ -104,7 +106,7 @@ public class MainActivity extends ActionBarActivity
                 }
             }
 
-        }, 0, 3000);
+        }, 0, 1000);
 
     }
 
@@ -157,24 +159,22 @@ public class MainActivity extends ActionBarActivity
 
     private void GetTimerMethod_GET() throws IOException
     {
-        URL url = new URL(String.format("https://evalhost.seacat/cookies?%s", getPackageName()));
+        URL url = new URL(String.format("https://service.seacat/?%s", getPackageName()));
         HttpURLConnection conn = SeaCatClient.open(url);
 
         InputStream is = conn.getInputStream();
         assert(is != null);
 
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-        String line;
-        String result = "";
-        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        while ((line = rd.readLine()) != null)
-        {
-            result += line;
+        int nRead;
+        byte[] data = new byte[16384];
+        while ((nRead = is.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
         }
-        rd.close();
-        is.close();
+        buffer.flush();
 
-        final String output = result;
+        final String output = new String(buffer.toByteArray());
 
         runOnUiThread(new Runnable() {
             @Override
@@ -381,6 +381,14 @@ public class MainActivity extends ActionBarActivity
             startActivity(new Intent(MainActivity.this, SplashActivity.class));
             finish();
             return true;
+        }
+
+        if (id == R.id.action_gw_disconnect) {
+            try {
+                SeaCatClient.disconnect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return super.onOptionsItemSelected(item);
