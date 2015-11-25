@@ -72,6 +72,7 @@ public class MainActivity extends ActionBarActivity
 
         }, 0, 1000);
 
+
         // Start get timer
         if (getTimer == null) getTimer = new Timer();
         getTimer.schedule(new TimerTask() {
@@ -85,7 +86,9 @@ public class MainActivity extends ActionBarActivity
                     //if (what == 0) NoSeaCat_GET();
                     //else if (what == 1) NoSeaCat_HC_GET();
 
-                    GetTimerMethod_GET();
+                    if (what == 0) GetTimerMethod_GET();
+                    else if (what == 1) GetTimerMethod_HTTPClient_GET();
+
                     //else if (what == 1) GetTimerMethod_PUT_ContentLenght();
                     //else if (what == 2) GetTimerMethod_HTTPClient_GET();
                     //else if (what == 3) GetTimerMethod_HTTPClient_PUT_chunked();
@@ -105,7 +108,6 @@ public class MainActivity extends ActionBarActivity
                     });
                 }
             }
-
         }, 0, 1000);
 
     }
@@ -174,7 +176,7 @@ public class MainActivity extends ActionBarActivity
         }
         buffer.flush();
 
-        final String output = new String(buffer.toByteArray());
+        final String output = "GetTimerMethod_GET\r\n" + new String(buffer.toByteArray());
 
         runOnUiThread(new Runnable() {
             @Override
@@ -235,12 +237,12 @@ public class MainActivity extends ActionBarActivity
         DefaultHttpClient httpclient = (DefaultHttpClient) SeaCatClient.httpClient();
         httpclient.setCookieStore(HTTPClient_cookieStore);
 
-        HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/cookies?%s", getPackageName()));
+        HttpGet httpget = new HttpGet(String.format("https://service.seacat/?%s", getPackageName()));
 
         HttpResponse response = httpclient.execute(httpget);
 
         HttpEntity entity = response.getEntity();
-        final String output = EntityUtils.toString(entity);
+        final String output = "GetTimerMethod_HTTPClient_GET\r\n" + EntityUtils.toString(entity);
 
         runOnUiThread(new Runnable() {
             @Override
