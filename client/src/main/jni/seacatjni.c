@@ -586,3 +586,16 @@ JNIEXPORT jstring JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc
 	jstring result = (*env)->NewStringUTF(env, state_buf);
  	return result;
 }
+
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_set_1proxy_1server_1worker(JNIEnv * env, jclass cls, jstring proxy_host, jstring proxy_port)
+{
+	const char * proxyHostChar = (*env)->GetStringUTFChars(env, proxy_host, 0);
+	const char * proxyPortChar = (*env)->GetStringUTFChars(env, proxy_port, 0);
+
+	int rc = seacatcc_set_proxy_server_worker(proxyHostChar, proxyPortChar);
+
+	(*env)->ReleaseStringUTFChars(env, proxy_host, proxyHostChar);
+	(*env)->ReleaseStringUTFChars(env, proxy_port, proxyPortChar);
+
+	return rc;
+}

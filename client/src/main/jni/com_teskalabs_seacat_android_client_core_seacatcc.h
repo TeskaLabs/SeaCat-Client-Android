@@ -85,6 +85,14 @@ JNIEXPORT void JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_ca
 
 /*
  * Class:     com_teskalabs_seacat_android_client_core_seacatcc
+ * Method:    set_proxy_server_worker
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_set_1proxy_1server_1worker
+  (JNIEnv *, jclass, jstring, jstring);
+
+/*
+ * Class:     com_teskalabs_seacat_android_client_core_seacatcc
  * Method:    time
  * Signature: ()D
  */
