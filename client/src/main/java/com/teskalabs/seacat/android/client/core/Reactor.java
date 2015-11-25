@@ -282,7 +282,7 @@ public class Reactor
 		// It will very likely be called in shorter period too (as a result of heart beat triggered by other events)
 
 		pingFactory.heartBeat(now);
-		
+		framePool.heartBeat(now);
 		return 5.0; // Seconds
 	}
 
