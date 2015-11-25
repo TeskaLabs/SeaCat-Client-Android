@@ -59,6 +59,7 @@ public class Reactor
 		int rc = seacatcc.init(context.getPackageName(), vardir.getAbsolutePath(), this);
 		RC.checkAndThrowIOException("seacatcc.init", rc);
 
+        configureProxyServer();
 
 		// Setup frame provider priority queue
 		Comparator<IFrameProvider> frameProvidersComparator = new Comparator<IFrameProvider>()
@@ -94,7 +95,6 @@ public class Reactor
 	}
 
     public boolean isStarted() { return this.sessionThread.isAlive(); }
-
 
 	public void shutdown() throws IOException
 	{
@@ -350,4 +350,18 @@ public class Reactor
 		
 		return consumer.receivedControlFrame(this, frame, frameVersionType, frameLength, frameFlags);
 	}
+
+
+    public void configureProxyServer() throws IOException
+    {
+        // It includes also un-set
+        // TODO: Execute this code (proxy reconfiguration) on any network related change
+        String proxy_host = System.getProperty("https.proxyHost", "");
+        String proxy_port = System.getProperty("https.proxyPort", "");
+        //String proxy_user = System.getProperty("https.proxyUser", "");
+        //String proxy_password = System.getProperty("https.proxyPassword", "");
+        int rc = seacatcc.set_proxy_server_worker(proxy_host, proxy_port);
+        RC.checkAndThrowIOException("seacatcc.set_proxy_server_worker", rc);
+    }
+
 }
