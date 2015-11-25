@@ -135,7 +135,7 @@ public class InboundStream extends java.io.InputStream
 	}
 
 	/*
-	 * Reset is call that closes this stream when error occures
+	 * Reset is call that closes this stream when error occured
 	 */
 	public void reset()
 	{
