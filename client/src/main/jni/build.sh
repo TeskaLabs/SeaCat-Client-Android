@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+# To transfer fresh changes from SeaCat C-Core run this:
+# rm -rvf seacat-ccore/libs/ && cp -vr ~/Workspace/seacat/client-ccore/android/libs/ ./seacat-ccore/libs && ./build.sh
+#
+
 . ./build.site
 
 JAVAC=javac
