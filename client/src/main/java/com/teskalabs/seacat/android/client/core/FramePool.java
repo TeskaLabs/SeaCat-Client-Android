@@ -1,5 +1,7 @@
 package com.teskalabs.seacat.android.client.core;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Stack;
@@ -93,4 +95,12 @@ public class FramePool
 		return totalCount.get();
 	}
 
+    protected double before = 0;
+    public void heartBeat(double now) {
+        if (now > (before + 5))
+        {
+            before = now;
+            Log.d("SeaCat", "FramePool stats / size:"+size()+", capacity:"+capacity());
+        }
+    }
 }
