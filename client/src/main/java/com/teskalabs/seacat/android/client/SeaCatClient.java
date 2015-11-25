@@ -317,7 +317,22 @@ public final class SeaCatClient
 
     ///
 
-    //TODO: disconnect;
+    /**
+     * Disconnect from SeaCat gateway.
+     *
+     * <p>
+     * Instruct SeaCat client to close a connection to the SeaCat gateway.
+     * There is only little need to call this function directly, SeaCat client control connection automatically.
+     * </p>
+     *
+     * @throws IOException if generic IO error occurred.
+     */
+
+    public static void disconnect() throws IOException
+    {
+        int rc = seacatcc.yield('d');
+        RC.checkAndThrowIOException("seacatcc.yield(disconnect)", rc);
+    }
 
     /**
      * Resets the identity of the SeaCat client.
