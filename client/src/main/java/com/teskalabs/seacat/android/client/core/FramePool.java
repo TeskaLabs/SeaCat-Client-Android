@@ -27,7 +27,7 @@ public class FramePool
 		Preferences prefs = Preferences.userNodeForPackage(FramePool.class);
 
 		this.lowWaterMark = prefs.getInt(LOW_WATER_MARK, 16);
-		this.highWaterMark = prefs.getInt(HIGH_WATER_MARK, 128);
+		this.highWaterMark = prefs.getInt(HIGH_WATER_MARK, 40960);
 		this.frameSize = prefs.getInt(FRAME_SIZE, 16*1024);
 	}
 
