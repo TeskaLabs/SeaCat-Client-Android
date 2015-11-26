@@ -4,11 +4,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.teskalabs.seacat.android.client.SeaCatClient;
+import com.teskalabs.seacat.android.client.SeaCatInternals;
+import com.teskalabs.seacat.android.client.intf.ICntlFrameConsumer;
+import com.teskalabs.seacat.android.client.intf.IFrameProvider;
+import com.teskalabs.seacat.android.client.ping.PingFactory;
+import com.teskalabs.seacat.android.client.util.RC;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
@@ -16,12 +23,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import com.teskalabs.seacat.android.client.SeaCatClient;
-import com.teskalabs.seacat.android.client.SeaCatInternals;
-import com.teskalabs.seacat.android.client.intf.*;
-import com.teskalabs.seacat.android.client.ping.PingFactory;
-import com.teskalabs.seacat.android.client.util.RC;
 
 //TODO: Replace print by Android logging (done in this file, check others)
 
@@ -257,8 +258,12 @@ public class Reactor
 
 
 			case 'C': {
+                Runnable CSRWorker = SeaCatInternals.getCSRWorker();
+                if (CSRWorker != null) CSRWorker.run();
+
                 Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_CSR_NEEDED);
                 context.sendBroadcast(intent);
+
                 break;
             }
 
@@ -363,5 +368,4 @@ public class Reactor
         int rc = seacatcc.set_proxy_server_worker(proxy_host, proxy_port);
         RC.checkAndThrowIOException("seacatcc.set_proxy_server_worker", rc);
     }
-
 }

@@ -154,6 +154,14 @@ public final class SeaCatClient
      */
     public static void initialize(Context context)
     {
+        setCSRWorker(CSR.createDefault());
+        context.startService(new Intent(context, SeaCatService.class));
+    }
+
+
+    public static void initialize(Context context, Runnable CSRworker)
+    {
+        setCSRWorker(CSRworker);
         context.startService(new Intent(context, SeaCatService.class));
     }
 
@@ -350,6 +358,13 @@ public final class SeaCatClient
         RC.checkAndThrowIOException("seacatcc.yield(reset)", rc);
     }
 
+
+    ///
+
+    public static void setCSRWorker(Runnable csrWorker)
+    {
+        SeaCatInternals.setCSRWorker(csrWorker);
+    }
 
     ///
 

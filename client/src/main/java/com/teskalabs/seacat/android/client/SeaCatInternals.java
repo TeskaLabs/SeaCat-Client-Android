@@ -18,4 +18,16 @@ public class SeaCatInternals
         return Intent;
     }
 
+    private static Runnable CSRWorker = null;
+
+    public static void setCSRWorker(Runnable csrWorker)
+    {
+        CSRWorker = csrWorker;
+    }
+
+    public static Runnable getCSRWorker()
+    {
+        return CSRWorker;
+    }
+
 }
