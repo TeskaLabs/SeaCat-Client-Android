@@ -41,8 +41,6 @@ public class Reactor
 
     final private Context context;
 
-    final private Object stateLock = new Object();
-
 	///
 	
 	public Reactor(Context context) throws IOException
