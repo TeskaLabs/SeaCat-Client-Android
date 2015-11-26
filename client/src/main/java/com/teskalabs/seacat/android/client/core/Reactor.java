@@ -303,6 +303,8 @@ public class Reactor
 
     protected void JNICallbackStateChanged(String state)
     {
+        //TODO: Optionally enable/disable logging of this activity
+        Log.d(SeaCatInternals.L, "State changed to "+state);
         broadcastState(state);
     }
 
