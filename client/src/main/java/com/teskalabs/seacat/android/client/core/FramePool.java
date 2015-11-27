@@ -95,14 +95,12 @@ public class FramePool
 		return totalCount.get();
 	}
 
-    //protected double before = 0;
+    protected double before = 0;
     public void heartBeat(double now) {
-/*
         if (now > (before + 5))
         {
             before = now;
             Log.d("SeaCat", "FramePool stats / size:"+size()+", capacity:"+capacity());
         }
-*/
     }
 }
