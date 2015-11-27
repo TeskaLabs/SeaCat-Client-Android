@@ -303,6 +303,8 @@ public class SeaCatRequestDirector implements RequestDirector
                     } catch (IOException ex) {
                         //Log.d(SeaCatInternals.L, "Closing the connection.");
                         managedConn.close();
+                        throw ex;
+/*
                         if (retryHandler.retryRequest(ex, execCount, context)) {
                             Log.e(SeaCatInternals.L,"Exception caught when processing request", ex);
                             Log.i(SeaCatInternals.L,"Retrying request");
@@ -318,7 +320,7 @@ public class SeaCatRequestDirector implements RequestDirector
                             // otherwise give up
                             retrying = false;
                         }
-
+*/
                     }
 
                 }
