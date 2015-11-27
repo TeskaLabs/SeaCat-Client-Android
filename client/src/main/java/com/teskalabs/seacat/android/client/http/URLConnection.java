@@ -153,7 +153,6 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 		{
 			if (launched) throw new ProtocolException("Cannot write output after reading input.");
 			outboundStream = new OutboundStream(this.reactor, this.priority);
-            if (streamId != -1) outboundStream.setStreamId(streamId);
 		}
 		return outboundStream;	
 	}
@@ -185,7 +184,6 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 
         streamId = reactor.streamFactory.registerStream(this);
         inboundStream.setStreamId(streamId);
-        if (outboundStream != null) outboundStream.setStreamId(streamId);
 
         // Build SYN_STREAM frame
         SPDY.buildALX1SynStream(frame, streamId, getURL(), getRequestMethod(), getRequestHeaders(), fin_flag, this.priority);
@@ -194,7 +192,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
         if (outboundStream != null)
         {
             assert((frame.getShort(4) & SPDY.FLAG_FIN) == 0);
-            outboundStream.launch();
+            outboundStream.launch(streamId);
         }
         else
         {

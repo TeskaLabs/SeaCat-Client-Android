@@ -5,4 +5,7 @@
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/action_gw_disconnect" android:title="Disconnect"
         android:orderInCategory="101" app:showAsAction="never" />
+    <item android:id="@+id/action_long_request" android:title="Long request"
+        android:orderInCategory="102" app:showAsAction="never" />
+
 </menu>

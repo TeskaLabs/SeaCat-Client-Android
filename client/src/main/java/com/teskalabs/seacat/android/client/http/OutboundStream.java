@@ -5,24 +5,27 @@ import com.teskalabs.seacat.android.client.core.SPDY;
 import com.teskalabs.seacat.android.client.intf.IFrameProvider;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class OutboundStream extends java.io.OutputStream implements IFrameProvider
 {
     private final Reactor reactor;
     private int streamId = -1;
 
-
-	private BlockingQueue<ByteBuffer> frameQueue = new LinkedBlockingQueue<ByteBuffer>();
+    // TODO: frameQueue can contain large number of frames that could be missing in FramePool (and it will produce exception saying 'No more available frames in the pool.')
+	private BlockingQueue<ByteBuffer> frameQueue = new LinkedBlockingQueue<ByteBuffer>(128);
 	private ByteBuffer currentFrame = null;
 
-    private boolean launched = false;
 	private boolean closed = false;
 
     private int contentLength = 0;
     private int priority;
+
+    int writeTimeoutMillis = 30*1000;
 
 	///
 	
@@ -35,10 +38,10 @@ public class OutboundStream extends java.io.OutputStream implements IFrameProvid
 
 	///
 
-    public void launch() throws IOException
+    public void launch(int streamId) throws IOException
     {
-        if (launched) throw new IOException("OutputStream is already launched");
-
+        if (this.streamId != -1) throw new IOException("OutputStream is already launched");
+        this.streamId = streamId;
         reactor.registerFrameProvider(this, true);
     }
 
@@ -68,10 +71,23 @@ public class OutboundStream extends java.io.OutputStream implements IFrameProvid
         currentFrame = null;
 
 		SPDY.buildDataFrameFlagLength(aFrame, fin_flag);
-		
-		frameQueue.add(aFrame);
 
-        if (launched) reactor.registerFrameProvider(this, true);
+        long timeoutMillis = this.writeTimeoutMillis;
+        if (timeoutMillis == 0) timeoutMillis = 1000*60*3; // 3 minutes timeout
+        long cutOfTimeMillis = (System.nanoTime() / 1000000L) + timeoutMillis;
+
+        boolean res = false;
+        while (res == false) {
+
+            long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
+            if (awaitMillis <= 0) throw new SocketTimeoutException(String.format("Write timeout: %d", this.writeTimeoutMillis));
+
+            try {
+                res = frameQueue.offer(aFrame, awaitMillis, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) { continue; }
+        }
+
+        if (this.streamId != -1) reactor.registerFrameProvider(this, true);
 	}
 
 
@@ -83,10 +99,11 @@ public class OutboundStream extends java.io.OutputStream implements IFrameProvid
 		if (closed) throw new IOException("OutputStream is already closed");
 
 		ByteBuffer frame = getCurrentFrame();
+        if (frame == null) throw new IOException("Frame not available");
 		frame.put((byte)oneByte);
         contentLength += 1;
 		
-		if (currentFrame.remaining() == 0) flushCurrentFrame(false);
+		if (frame.remaining() == 0) flushCurrentFrame(false);
 	}
 
 
@@ -163,11 +180,6 @@ public class OutboundStream extends java.io.OutputStream implements IFrameProvid
     public int getFrameProviderPriority()
     {
         return priority;
-    }
-
-    public void setStreamId(int streamId)
-    {
-        this.streamId = streamId;
     }
 
 }

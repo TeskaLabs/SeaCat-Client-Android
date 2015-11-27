@@ -25,8 +25,6 @@ import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.conn.ManagedClientConnection;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.entity.ContentLengthStrategy;
-import org.apache.http.impl.entity.StrictContentLengthStrategy;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
@@ -45,10 +43,12 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
 {
     protected final Reactor reactor;
 
-    private int streamId = -1;
     protected HttpRequest request = null;
     protected HttpContext context = null;
-    protected boolean readyToSYN_STREAM = false;
+
+    private int streamId = -1;
+    private Lock streamIdLock = new ReentrantLock();
+    private Condition streamIdCondition = streamIdLock.newCondition();
 
     protected final HttpRoute route;
     protected final HttpResponseFactory responseFactory;
@@ -56,17 +56,15 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
 
     protected InboundStream inboundStream = null;
     protected OutboundStream outboundStream = null;
-    private final ContentLengthStrategy lenStrategy;
-    protected long outboundStreamLength;
 
+    private boolean alive = true;
     private int priority = 3; //TODO: There is no way how this changed
 
     protected HttpResponse response = null;
-    private boolean responseReady = false;
     private Lock responseReadyLock = new ReentrantLock();
     private Condition responseReadyCondition = responseReadyLock.newCondition();
 
-    private int socketTimeout = 10000; //Value in milliseconds
+    private int socketTimeout = 5*60*1000; //Value in milliseconds
     private boolean reusable = true; // Just to replicate original behaviour, no real meaning
 
     ///
@@ -78,8 +76,6 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         this.route = route;
         this.responseFactory = responseFactory;
         this.state = state;
-
-        this.lenStrategy = new StrictContentLengthStrategy();
     }
 
     /// IFrameProvider
@@ -97,7 +93,15 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
 
         ByteBuffer frame = reactor.framePool.borrow("SeaCatClientConnection.buildFrame");
 
-        streamId = reactor.streamFactory.registerStream(this);
+        streamIdLock.lock();
+        try
+        {
+            streamId = reactor.streamFactory.registerStream(this);
+            streamIdCondition.signalAll();
+        }
+        finally {
+            streamIdLock.unlock();
+        }
 
         RequestLine requestLine = request.getRequestLine();
         Headers.Builder requestHeaders = new Headers.Builder();
@@ -115,14 +119,34 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         // Build SYN_STREAM frame
         SPDY.buildALX1SynStream(frame, streamId, host, requestLine.getMethod(), requestLine.getUri(), requestHeaders.build(), fin_flag, this.priority);
 
-        // If there is an outbound stream, launch it
-        if (outboundStream != null)
-        {
-            outboundStream.setStreamId(streamId);
-            outboundStream.launch();
-        }
-
         return new IFrameProvider.Result(frame, false);
+    }
+
+
+    public void waitForStreamId() throws IOException
+    {
+        long timeoutMillis = getSocketTimeout();
+        if (timeoutMillis == 0) timeoutMillis = 1000*60*3; // 3 minutes timeout
+        long cutOfTimeMillis = (System.nanoTime() / 1000000L) + timeoutMillis;
+
+        streamIdLock.lock();
+        try
+        {
+            while (this.streamId == -1)
+            {
+                long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
+                if (awaitMillis <= 0) throw new SocketTimeoutException(String.format("Connect timeout: %d", timeoutMillis));
+
+                try {
+                    streamIdCondition.awaitNanos(awaitMillis * 1000000L);
+                } catch (InterruptedException e) {
+                }
+            }
+
+        }
+        finally {
+            streamIdLock.unlock();
+        }
     }
 
     @Override
@@ -155,7 +179,14 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     public void sendRequestHeader(HttpRequest httpRequest) throws HttpException, IOException
     {
         this.request = httpRequest;
-        this.readyToSYN_STREAM = true;
+
+        // Very important step, it detects if there will be a body (or RequestEntity)
+        // This is also used in FIN_FLAG detection in buildFrame() method
+        if (httpRequest instanceof HttpEntityEnclosingRequest) {
+            outboundStream = new OutboundStream(this.reactor, this.priority);
+        }
+
+        reactor.registerFrameProvider(this, true);
     }
 
     @Override
@@ -173,23 +204,17 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
             Log.i("SeaCat", "SeaCatClientConnection / sendRequestEntity -> Content-Lenght:" + outboundStreamLength);
         }
 */
-        outboundStream = new OutboundStream(this.reactor, this.priority);
+        waitForStreamId();
+        outboundStream.launch(streamId);
         e.writeTo(outboundStream);
         outboundStream.close();
-
-        this.readyToSYN_STREAM = true;
     }
 
 
     @Override
     public void flush() throws IOException
     {
-        // This a trick how to send header and SYN_STREAM
-        if (this.readyToSYN_STREAM)
-        {
-            reactor.registerFrameProvider(this, true);
-            this.readyToSYN_STREAM = false;
-        }
+        //TODO: What to do ?
     }
 
 
@@ -207,7 +232,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         {
             while (this.response == null)
             {
-                if (this.responseReady) throw new HttpException("Response already received");
+                if (!this.alive) throw new HttpException("Request has been canceled.");
 
                 long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
                 if (awaitMillis <= 0) throw new SocketTimeoutException(String.format("Connect timeout: %d", timeoutMillis));
@@ -388,8 +413,9 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         responseReadyLock.lock();
         try
         {
-            while (this.responseReady == false)
+            while (this.response == null)
             {
+                if (!this.alive) return false;
 
                 long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
                 if (awaitMillis <= 0) return false;
@@ -403,7 +429,8 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         finally {
             responseReadyLock.unlock();
         }
-        return responseReady;
+
+        return (this.response != null);
     }
 
     @Override
@@ -450,6 +477,17 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
     @Override
     public void reset()
     {
+
+        responseReadyLock.lock();
+        try
+        {
+            alive = false;
+            responseReadyCondition.signalAll();
+        }
+        finally {
+            responseReadyLock.unlock();
+        }
+
         if (inboundStream != null) inboundStream.reset();
         if (outboundStream != null) outboundStream.reset();
     }
@@ -480,7 +518,6 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
         responseReadyLock.lock();
         try
         {
-            responseReady = true;
             this.response = resp;
             responseReadyCondition.signalAll();
         }
