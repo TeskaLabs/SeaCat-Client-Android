@@ -50,7 +50,7 @@ public class SplashActivity extends ActionBarActivity
                     }
 
                     if (action.equals(SeaCatClient.ACTION_SEACAT_CSR_NEEDED)) {
-                        SplashActivity.this.onCSRNeeded();
+                        //SplashActivity.this.onCSRNeeded();
                         return;
                     }
 
