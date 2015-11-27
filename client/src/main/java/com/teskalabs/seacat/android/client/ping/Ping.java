@@ -9,7 +9,7 @@ public class Ping
 
 	protected Ping()
 	{
-		deadline = seacatcc.time() + 5.0;
+		deadline = seacatcc.time() + 60.0;
 	}
 	
 	public void pong() {}
