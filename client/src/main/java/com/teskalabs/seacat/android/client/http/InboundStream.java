@@ -23,7 +23,7 @@ public class InboundStream extends java.io.InputStream
 	private ByteBuffer currentFrame = null;
 	private boolean closed = false;
 
-    int readTimeoutMillis = 3000;
+    int readTimeoutMillis = 30*1000;
 
 	static private final ByteBuffer QUEUE_IS_CLOSED = ByteBuffer.allocate(0);
 
