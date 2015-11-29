@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # To transfer fresh changes from SeaCat C-Core run this:
-# rm -rvf seacat-ccore/libs/ && cp -vr ~/Workspace/seacat/client-ccore/android/libs/ ./seacat-ccore/libs && ./build.sh
+# rm -rvf seacat-ccore/libs sseacat-ccore/include && cp -vr ~/Workspace/seacat/client-ccore/build-android/ ./seacat-ccore/ && ./build.sh
 #
 
 . ./build.site
