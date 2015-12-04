@@ -48,7 +48,7 @@ public class Reactor
 	{
         this.context = context;
 
-		this.sessionThread = new Thread(new Runnable() { public void run() { Reactor.run(); }});
+		this.sessionThread = new Thread(new Runnable() { public void run() { Reactor._run(); }});
 		this.sessionThread.setName("SeaCatReactorThread");
 		this.sessionThread.setDaemon(true);
 		this.workerExecutor = new ThreadPoolExecutor(0, 1000, 5, TimeUnit.SECONDS, workerQueue);
@@ -118,7 +118,7 @@ public class Reactor
 	}
 
 
-	private static void run()
+	private static void _run()
 	{
 		int rc = seacatcc.run();
 		if (rc != seacatcc.RC_OK)
