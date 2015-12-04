@@ -44,7 +44,7 @@ Workers:
 
 // Workers (functions to be launched in 'other' thread than reactor)
 void seacatcc_ppkgen_worker(void);
-int seacatcc_csrgen_worker(char * const csr_entries[]);
+int seacatcc_csrgen_worker(const char * csr_entries[]);
 void seacatcc_cacert_worker(const char * cacert, uint16_t cacert_len);
 
 
@@ -120,6 +120,7 @@ double seacatcc_time(void);
 #define SEACATCC_RC_E_EVLOOP_ALREADY_RUNNING (-9902)
 #define SEACATCC_RC_E_FRAME_TOO_SMALL (-9903)
 #define SEACATCC_RC_E_INCORRECT_STATE (-9904)
+#define SEACATCC_RC_E_NO_FRAMES (-9905)
 
 #define SEACATCC_RC_E_DISCOVER_INVALID_SRV (-9921)
 //Following error code means that there is no license (resp. related DNS SVR entry)

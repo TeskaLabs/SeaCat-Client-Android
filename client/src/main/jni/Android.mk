@@ -13,11 +13,11 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := ccore
-LOCAL_SRC_FILES := ./seacat-ccore/$(TARGET_ARCH_ABI)/libseacatcc.a
+LOCAL_SRC_FILES := ./seacat-ccore/libs/$(TARGET_ARCH_ABI)/libseacatcc.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_C_INCLUDES := ./seacat-ccore
+LOCAL_C_INCLUDES := ./seacat-ccore/include
 LOCAL_LDLIBS := -llog -lz
 LOCAL_MODULE    := seacatjni
 LOCAL_SRC_FILES := seacatjni.c logging.c
