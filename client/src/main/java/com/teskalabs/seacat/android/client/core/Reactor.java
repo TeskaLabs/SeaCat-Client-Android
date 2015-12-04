@@ -259,7 +259,7 @@ public class Reactor
 
 			case 'C': {
                 Runnable CSRWorker = SeaCatInternals.getCSRWorker();
-                if (CSRWorker != null) CSRWorker.run();
+                if (CSRWorker != null) workerExecutor.execute(CSRWorker);
 
                 Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_CSR_NEEDED);
                 context.sendBroadcast(intent);
