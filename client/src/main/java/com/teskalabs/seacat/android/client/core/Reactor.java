@@ -274,7 +274,7 @@ public class Reactor
 				
 
 			default:
-                Log.w(SeaCatInternals.L, "Unknown Worker Request: " + workerCode);
+                Log.w(SeaCatInternals.L, "Unknown worker requested: " + workerCode);
 		}
 	}
 
