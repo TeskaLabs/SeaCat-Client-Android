@@ -243,6 +243,7 @@ static void JNICALLBACK_read_ready(void ** data, uint16_t * data_len)
 		jint pos = (*g_env)->CallIntMethod(g_env, g_read_buffer_obj, g_buffer_position_mid, NULL);
 		jlong capacity = (*g_env)->GetDirectBufferCapacity(g_env, g_read_buffer_obj);
 
+		//TODO: Position should be always 0 - check it
 		*data = trg_data + pos;
 		*data_len = capacity - pos;
 	}
@@ -545,7 +546,7 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cs
 	}
 	csr_entries[paramCount] = NULL;
 
-	rc = seacatcc_csrgen_worker((char * const*)csr_entries);
+	rc = seacatcc_csrgen_worker(csr_entries);
 
 	for (i=0; i<paramCount; i++)
 	{
