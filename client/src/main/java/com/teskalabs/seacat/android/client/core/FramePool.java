@@ -13,14 +13,14 @@ public class FramePool
 	final private Stack<ByteBuffer> stack = new Stack<ByteBuffer>();
 	final private int lowWaterMark;
 	final private int highWaterMark;
-	final private int frameSize;
+	final private int frameCapacity;
 
 	final private AtomicInteger totalCount = new AtomicInteger(0);
 	
 	// Preference keys for this package
     private static final String LOW_WATER_MARK = "lowWaterMark";
     private static final String HIGH_WATER_MARK = "highWaterMark";
-    private static final String FRAME_SIZE = "frameSize";
+    private static final String FRAME_CAPACITY = "frameCapacity";
    
 	public FramePool()
 	{
@@ -28,7 +28,7 @@ public class FramePool
 
 		this.lowWaterMark = prefs.getInt(LOW_WATER_MARK, 16);
 		this.highWaterMark = prefs.getInt(HIGH_WATER_MARK, 40960);
-		this.frameSize = prefs.getInt(FRAME_SIZE, 16*1024);
+		this.frameCapacity = prefs.getInt(FRAME_CAPACITY, 16*1024);
 	}
 
 	
@@ -76,7 +76,7 @@ public class FramePool
 	private synchronized ByteBuffer createByteBuffer()
 	{
 		totalCount.incrementAndGet();
-		ByteBuffer frame = ByteBuffer.allocateDirect(frameSize);
+		ByteBuffer frame = ByteBuffer.allocateDirect(frameCapacity);
 		return frame;
 	}
 
@@ -97,10 +97,12 @@ public class FramePool
 
     protected double before = 0;
     public void heartBeat(double now) {
+/*
         if (now > (before + 5))
         {
             before = now;
             Log.d("SeaCat", "FramePool stats / size:"+size()+", capacity:"+capacity());
         }
+*/
     }
 }
