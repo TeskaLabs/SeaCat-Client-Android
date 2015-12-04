@@ -68,7 +68,7 @@ public class MainActivity extends ActionBarActivity
         pingTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                PingTimerMethod();
+                sendPing();
             }
 
         }, 0, 1000);
@@ -124,7 +124,7 @@ public class MainActivity extends ActionBarActivity
     }
 
 
-    private void PingTimerMethod()
+    private void sendPing()
     {
         try {
             SeaCatClient.ping(new com.teskalabs.seacat.android.client.ping.Ping() {
