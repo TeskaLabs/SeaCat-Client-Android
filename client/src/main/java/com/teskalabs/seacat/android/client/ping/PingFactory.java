@@ -1,5 +1,7 @@
 package com.teskalabs.seacat.android.client.ping;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -8,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.teskalabs.seacat.android.client.SeaCatInternals;
 import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.core.SPDY;
 import com.teskalabs.seacat.android.client.intf.*;
@@ -24,7 +27,7 @@ public class PingFactory implements ICntlFrameConsumer, IFrameProvider
 	synchronized public void ping(Reactor reactor, Ping ping) throws IOException
 	{
 		outboundPingQueue.add(ping);	
-		reactor.registerFrameProvider(this, true);		
+		reactor.registerFrameProvider(this, true);
 	}
 
 
@@ -109,7 +112,7 @@ public class PingFactory implements ICntlFrameConsumer, IFrameProvider
 			// Pong frame received ...
 			Ping ping = waitingPingDict.remove(pingId);
 			if (ping != null) ping.pong();
-			else System.err.println("SeaCat: received pong with unknown id: "+pingId);
+			else Log.w(SeaCatInternals.L, "received pong with unknown id: " + pingId);
 			
 		}
 	
@@ -120,7 +123,7 @@ public class PingFactory implements ICntlFrameConsumer, IFrameProvider
 			try {
 				reactor.registerFrameProvider(this, true);
 			} catch (Exception e) {
-				// We can ignore error in this case, right?
+				// We can ignore error in this case
 			}
 
 		}
