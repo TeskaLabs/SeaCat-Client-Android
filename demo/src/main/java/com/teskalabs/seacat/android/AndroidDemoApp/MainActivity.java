@@ -80,17 +80,18 @@ public class MainActivity extends ActionBarActivity
             public void run() {
                 try
                 {
-                    int what = counter % 5;
+                    int what = counter % 4;
                     counter += 1;
 
                     //if (what == 0) NoSeaCat_GET();
                     //else if (what == 1) NoSeaCat_HC_GET();
 
                     if (what == 0) GetTimerMethod_GET();
-                    else if (what == 1) GetTimerMethod_HTTPClient_PUT_chunked();
-                    else if (what == 2) GetTimerMethod_PUT_ContentLenght();
-                    else if (what == 3) GetTimerMethod_HTTPClient_GET();
-                    else if (what == 4) GetTimerMethod_HTTPClient_PUT_ContentLenght();
+                    else if (what == 1) GetTimerMethod_PUT_ContentLenght();
+                    else if (what == 2) GetTimerMethod_HTTPClient_GET();
+                    else if (what == 3) GetTimerMethod_HTTPClient_PUT_ContentLenght();
+                    //else if (what == 4) GetTimerMethod_HTTPClient_PUT_chunked();
+
                 }
 
                 catch (Exception e)
@@ -159,7 +160,7 @@ public class MainActivity extends ActionBarActivity
 
     private void GetTimerMethod_GET() throws IOException
     {
-        URL url = new URL(String.format("https://evalhost.seacat/?%s", getPackageName()));
+        URL url = new URL(String.format("https://testhost.seacat/fortune"));
         HttpURLConnection conn = SeaCatClient.open(url);
 
         InputStream is = conn.getInputStream();
@@ -196,8 +197,8 @@ public class MainActivity extends ActionBarActivity
         conn.setDoOutput(true);
 
         DataOutputStream outputStream = new DataOutputStream(conn.getOutputStream());
-        String data = "som3Data4nyFormat=seeThat??SeaCat";
-        outputStream.writeBytes(data);
+        String outdata = "som3Data4nyFormat=seeThat??SeaCat";
+        outputStream.writeBytes(outdata);
         outputStream.flush();
         outputStream.close();
 
@@ -205,17 +206,16 @@ public class MainActivity extends ActionBarActivity
         assert(is != null);
 
 
-        String line;
-        String result = "";
-        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        while ((line = rd.readLine()) != null)
-        {
-            result += line;
-        }
-        rd.close();
-        is.close();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-        final String output = result;
+        int nRead;
+        byte[] data = new byte[16384];
+        while ((nRead = is.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+
+        final String output = new String(buffer.toByteArray());
 
         runOnUiThread(new Runnable() {
             @Override
@@ -235,7 +235,7 @@ public class MainActivity extends ActionBarActivity
         DefaultHttpClient httpclient = (DefaultHttpClient) SeaCatClient.httpClient();
         httpclient.setCookieStore(HTTPClient_cookieStore);
 
-        HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/?%s", getPackageName()));
+        HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/fortune?%s", getPackageName()));
 
         HttpResponse response = httpclient.execute(httpget);
 
