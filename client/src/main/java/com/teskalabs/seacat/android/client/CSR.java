@@ -22,7 +22,7 @@ public class CSR
 
     public CSR()
     {
-        this.set("title", "TeskaLabs SeaCat Android");
+        this.setUniqueCommonName();
     }
 
     ///
@@ -191,8 +191,6 @@ public class CSR
             public void run()
             {
                 CSR csr = new CSR();
-
-                csr.setUniqueCommonName();
 
                 try {
                     csr.submit();
