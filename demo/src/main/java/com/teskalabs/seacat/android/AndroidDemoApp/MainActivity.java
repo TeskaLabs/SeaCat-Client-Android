@@ -78,34 +78,35 @@ public class MainActivity extends ActionBarActivity
         getTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                try
-                {
-                    int what = counter % 4;
-                    counter += 1;
+            try
+            {
+                int what = counter % 4;
+                counter += 1;
 
-                    //if (what == 0) NoSeaCat_GET();
-                    //else if (what == 1) NoSeaCat_HC_GET();
+                GetTimerMethod_HTTPClient_GET();
 
-                    if (what == 0) GetTimerMethod_GET();
-                    else if (what == 1) GetTimerMethod_PUT_ContentLenght();
-                    else if (what == 2) GetTimerMethod_HTTPClient_GET();
-                    else if (what == 3) GetTimerMethod_HTTPClient_PUT_ContentLenght();
-                    //else if (what == 4) GetTimerMethod_HTTPClient_PUT_chunked();
+                //if (what == 0) NoSeaCat_GET();
+                //else if (what == 1) NoSeaCat_HC_GET();
 
-                }
+                //if (what == 0) GetTimerMethod_GET();
+                //else if (what == 1) GetTimerMethod_PUT_ContentLenght();
+                //else if (what == 2) GetTimerMethod_HTTPClient_GET();
+                //else if (what == 3) GetTimerMethod_HTTPClient_PUT_ContentLenght();
+                //else if (what == 4) GetTimerMethod_HTTPClient_PUT_chunked();
+            }
 
-                catch (Exception e)
-                {
-                    final String output = e.toString();
-                    Log.e("XXX", "Exception: ", e);
+            catch (Exception e)
+            {
+                final String output = e.toString();
+                Log.e("XXX", "Exception: ", e);
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            resultTextView.setText(output);
-                        }
-                    });
-                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        resultTextView.setText(output);
+                    }
+                });
+            }
             }
         }, 0, 1000);
 
@@ -235,12 +236,15 @@ public class MainActivity extends ActionBarActivity
         DefaultHttpClient httpclient = (DefaultHttpClient) SeaCatClient.httpClient();
         httpclient.setCookieStore(HTTPClient_cookieStore);
 
-        HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/fortune?%s", getPackageName()));
+        //HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/fortune?%s", getPackageName()));
+        HttpGet httpget = new HttpGet("https://service.seacat/apk/FreshApCz-22.apk");
+
 
         HttpResponse response = httpclient.execute(httpget);
 
         HttpEntity entity = response.getEntity();
-        final String output = "GetTimerMethod_HTTPClient_GET\r\n" + EntityUtils.toString(entity);
+        byte[] x = EntityUtils.toByteArray(entity);
+        final String output = "GetTimerMethod_HTTPClient_GET\r\nReceived bytes:" + x.length;
 
         runOnUiThread(new Runnable() {
             @Override
