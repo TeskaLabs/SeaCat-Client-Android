@@ -16,8 +16,8 @@ public class OutboundStream extends java.io.OutputStream implements IFrameProvid
     private final Reactor reactor;
     private int streamId = -1;
 
-    // TODO: frameQueue can contain large number of frames that could be missing in FramePool (and it will produce exception saying 'No more available frames in the pool.')
-	private BlockingQueue<ByteBuffer> frameQueue = new LinkedBlockingQueue<ByteBuffer>(128);
+    // TODO: Allow parametrization of LinkedBlockingQueue capacity
+	private BlockingQueue<ByteBuffer> frameQueue = new LinkedBlockingQueue<ByteBuffer>();
 	private ByteBuffer currentFrame = null;
 
 	private boolean closed = false;

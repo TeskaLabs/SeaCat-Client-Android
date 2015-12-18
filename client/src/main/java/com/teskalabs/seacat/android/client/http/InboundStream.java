@@ -19,7 +19,8 @@ public class InboundStream extends java.io.InputStream
     private final Reactor reactor;
     private int streamId = -1;
 
-	private final BlockingQueue<ByteBuffer> frameQueue = new LinkedBlockingQueue<ByteBuffer>(128);
+    // TODO: Allow parametrization of LinkedBlockingQueue capacity
+	private final BlockingQueue<ByteBuffer> frameQueue = new LinkedBlockingQueue<ByteBuffer>();
 	private ByteBuffer currentFrame = null;
 	private boolean closed = false;
 
