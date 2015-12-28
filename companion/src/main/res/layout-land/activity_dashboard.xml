@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/row1"
+        android:paddingTop="50dp"
+        android:paddingBottom="20dp">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="66">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButtonProfiles"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/parabolic4"
+                style="@style/Dashboard.Button"
+                android:clickable="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/dashboard_profiles"
+                android:id="@+id/textViewProfiles"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/imageButtonProfiles"
+                style="@style/Dashboard.ButtonLabel" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="66">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButtonDiagnostics"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/analytics2"
+                style="@style/Dashboard.Button" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/dashboard_diagnostics"
+                android:id="@+id/textViewDiag"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/imageButtonDiagnostics"
+                style="@style/Dashboard.ButtonLabel" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="66">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButtonHttpClient"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/smartphone88"
+                style="@style/Dashboard.Button" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/dashboard_http_client"
+                android:id="@+id/textViewHttpClient"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/imageButtonHttpClient"
+                style="@style/Dashboard.ButtonLabel" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView2"
+        android:background="@drawable/teskalabs_logo"
+        android:contentDescription="TeskaLabs Logo"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp" />
+</RelativeLayout>

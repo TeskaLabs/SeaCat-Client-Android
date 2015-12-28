@@ -29,7 +29,7 @@ public class SplashActivity extends ActionBarActivity
             @Override
             public void run()
             {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                startActivity(new Intent(SplashActivity.this, HttpClientActivity.class));
                 finish();
                 return;
             }

@@ -13,8 +13,8 @@ import android.widget.Toast;
 import java.util.regex.Pattern;
 
 
-public class MainActivity extends ActionBarActivity {
-    public static final String TAG = "compainion.MainActivity";
+public class LocalDiscoverActivity extends ActionBarActivity {
+    public static final String TAG = "compainion.LocalDiscoverActivity";
 
     public Button   buttonSave;
     public EditText editTextIP;
@@ -57,7 +57,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_local_discover);
         configFilePath = getFilesDir()+"/"+configFileName;
 
         buttonSave = (Button) findViewById(R.id.buttonSave);

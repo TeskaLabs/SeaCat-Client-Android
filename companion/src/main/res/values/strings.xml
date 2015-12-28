@@ -9,5 +9,20 @@
 
     <string name="string_gateway_location_label">Location of Gateway</string>
     <string name="string_gateway_name_label">Gateway Name</string>
+    <string name="title_activity_http_client">HttpClientActivity</string>
+
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+    <string name="title_activity_dashboard">DashboardActivity</string>
+
+    <string name="dashboard_profiles">Profiles</string>
+    <string name="dashboard_http_client">Http Client</string>
+    <string name="dashboard_diagnostics">Diagnostics</string>
 
 </resources>

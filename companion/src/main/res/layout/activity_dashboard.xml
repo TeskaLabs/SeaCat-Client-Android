@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.teskalabs.seacat.android.companion.DashboardActivity">
+    <!-- icons: <div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a>, <a href="http://www.flaticon.com/authors/scott-de-jonge" title="Scott de Jonge">Scott de Jonge</a>, <a href="http://www.flaticon.com/authors/simpleicon" title="SimpleIcon">SimpleIcon</a>, <a href="http://www.flaticon.com/authors/graphicsbay" title="GraphicsBay">GraphicsBay</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a>             is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a></div> -->
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="100"
+        android:id="@+id/row1"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="50">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButtonProfiles"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/parabolic4"
+                android:clickable="true"
+                style="@style/Dashboard.Button" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/dashboard_profiles"
+                android:id="@+id/textViewProfiles"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/imageButtonProfiles"
+                style="@style/Dashboard.ButtonLabel"
+                android:textSize="10pt"
+                android:labelFor="@id/imageButtonProfiles" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="50">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButtonHttpClient"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/smartphone88"
+                style="@style/Dashboard.Button" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/dashboard_http_client"
+                android:id="@+id/textViewHttpClient"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/imageButtonHttpClient"
+                style="@style/Dashboard.ButtonLabel"
+                android:labelFor="@id/imageButtonHttpClient" />
+        </RelativeLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/row1"
+        android:weightSum="100"
+        android:id="@+id/row2"
+        android:paddingTop="15dp"
+        android:paddingBottom="20dp">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="100">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageButtonDiagnostics"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/analytics2"
+                style="@style/Dashboard.Button" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/dashboard_diagnostics"
+                android:id="@+id/textViewDiag"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/imageButtonDiagnostics"
+                style="@style/Dashboard.ButtonLabel"
+                android:labelFor="@id/imageButtonDiagnostics" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView2"
+        android:background="@drawable/teskalabs_logo"
+        android:contentDescription="TeskaLabs Logo"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp" />
+
+</RelativeLayout>
