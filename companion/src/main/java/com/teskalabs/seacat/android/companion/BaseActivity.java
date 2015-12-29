@@ -17,6 +17,7 @@ public class BaseActivity extends ActionBarActivity {
 
     protected boolean isHome=false;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,18 +34,14 @@ public class BaseActivity extends ActionBarActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
         mDrawerList.setAdapter(new DrawerNavAdapter(this, R.layout.drawer_nav_item, drawerNavItems));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
-
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            switch(position)
-            {
+            switch(position) {
                 case 0:
                     if (isHome)
                         break;
@@ -67,8 +64,6 @@ public class BaseActivity extends ActionBarActivity {
             mDrawerLayout.closeDrawer(mDrawerList);
             if (!isHome)
                 finish();
-
         }
-
     }
 }

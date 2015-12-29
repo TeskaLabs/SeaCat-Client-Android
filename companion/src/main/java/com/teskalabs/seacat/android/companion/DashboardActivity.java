@@ -1,13 +1,19 @@
 package com.teskalabs.seacat.android.companion;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.ImageButton;
 
 public class DashboardActivity extends BaseActivity {
 
     ImageButton buttonProfiles, buttonDiagnostics, buttonHttpClient;
+
+    protected SharedPreferences sharedPref;
+    private String PREF_LEARNED_DRAW="_PREF_LEARNED_DRAW";
 
 
     @Override
@@ -25,6 +31,12 @@ public class DashboardActivity extends BaseActivity {
         buttonProfiles.setOnClickListener(buttonProfilesOnClick);
         buttonDiagnostics.setOnClickListener(buttonDiagnosticsOnClick);
         buttonHttpClient.setOnClickListener(buttonHttpClientOnClick);
+
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        if (!sharedPref.getBoolean(PREF_LEARNED_DRAW, false))
+            mDrawerLayout.openDrawer(mDrawerList);
+        mDrawerLayout.setDrawerListener(new BaseDrawerListener());
+
     }
 
     View.OnClickListener buttonProfilesOnClick = new View.OnClickListener() {
@@ -45,5 +57,24 @@ public class DashboardActivity extends BaseActivity {
             return;
         }
     };
+
+    private class BaseDrawerListener implements DrawerLayout.DrawerListener {
+        @Override
+        public void onDrawerOpened(View drawerView) {
+            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean(PREF_LEARNED_DRAW, true);
+            editor.commit();
+        }
+        @Override
+        public void onDrawerClosed(View drawerView) {
+        }
+        @Override
+        public void onDrawerSlide(View drawerView, float slideOffset) {
+        }
+        @Override
+        public void onDrawerStateChanged(int newState) {
+        }
+    }
 
 }
