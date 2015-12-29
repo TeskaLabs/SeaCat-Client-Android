@@ -8,11 +8,14 @@ import android.view.View;
 import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class BaseActivity extends ActionBarActivity {
     protected ViewStub contentStub;
     protected DrawerLayout mDrawerLayout;
     protected ListView mDrawerList;
+
+    protected boolean isHome=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,12 +24,12 @@ public class BaseActivity extends ActionBarActivity {
         contentStub = (ViewStub) findViewById(R.id.content_stub);
 
         // Drawer navigation
-        DrawerNavItem[] drawerNavItems = new DrawerNavItem[4];
+        DrawerNavItem[] drawerNavItems = new DrawerNavItem[3];
 
         drawerNavItems[0] = new DrawerNavItem(-1, "Dashboard");
         drawerNavItems[1] = new DrawerNavItem(R.drawable.parabolic4, "Profiles");
         drawerNavItems[2] = new DrawerNavItem(R.drawable.smartphone88, "Http Client");
-        drawerNavItems[3] = new DrawerNavItem(R.drawable.analytics2, "Diagnostics");
+        //drawerNavItems[3] = new DrawerNavItem(R.drawable.analytics2, "Diagnostics");
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -39,23 +42,31 @@ public class BaseActivity extends ActionBarActivity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
             switch(position)
             {
                 case 0:
-                    startActivity(new Intent(BaseActivity.this, DashboardActivity.class));
-                    finish();
+                    if (isHome)
+                        break;
+                    Intent intent = new Intent(BaseActivity.this, DashboardActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                     break;
                 case 1:
                     startActivity(new Intent(BaseActivity.this, LocalDiscoverActivity.class));
-                    finish();
                     break;
                 case 2:
                     startActivity(new Intent(BaseActivity.this, HttpClientActivity.class));
-                    finish();
                     break;
                 case 3:
-                    break;
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                    Toast.makeText(getApplicationContext(), "TODO", Toast.LENGTH_SHORT)
+                            .show();
+                    return;
             }
+            mDrawerLayout.closeDrawer(mDrawerList);
+            if (!isHome)
+                finish();
 
         }
 

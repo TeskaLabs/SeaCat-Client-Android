@@ -9,11 +9,14 @@ public class DashboardActivity extends BaseActivity {
 
     ImageButton buttonProfiles, buttonDiagnostics, buttonHttpClient;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         contentStub.setLayoutResource(R.layout.activity_dashboard);
         contentStub.inflate();
+        // Inform base activity that this is the dashboard
+        isHome = true;
 
         buttonProfiles = (ImageButton) findViewById(R.id.imageButtonProfiles);
         buttonDiagnostics = (ImageButton) findViewById(R.id.imageButtonDiagnostics);
