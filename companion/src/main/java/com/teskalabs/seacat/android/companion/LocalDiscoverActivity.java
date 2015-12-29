@@ -1,6 +1,5 @@
 package com.teskalabs.seacat.android.companion;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,7 +12,7 @@ import android.widget.Toast;
 import java.util.regex.Pattern;
 
 
-public class LocalDiscoverActivity extends ActionBarActivity {
+public class LocalDiscoverActivity extends BaseActivity {
     public static final String TAG = "compainion.LocalDiscoverActivity";
 
     public Button   buttonSave;
@@ -57,7 +56,9 @@ public class LocalDiscoverActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_local_discover);
+        contentStub.setLayoutResource(R.layout.activity_local_discover);
+        contentStub.inflate();
+
         configFilePath = getFilesDir()+"/"+configFileName;
 
         buttonSave = (Button) findViewById(R.id.buttonSave);

@@ -2,19 +2,18 @@ package com.teskalabs.seacat.android.companion;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
-public class DashboardActivity extends ActionBarActivity {
+public class DashboardActivity extends BaseActivity {
 
     ImageButton buttonProfiles, buttonDiagnostics, buttonHttpClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard);
+        contentStub.setLayoutResource(R.layout.activity_dashboard);
+        contentStub.inflate();
 
         buttonProfiles = (ImageButton) findViewById(R.id.imageButtonProfiles);
         buttonDiagnostics = (ImageButton) findViewById(R.id.imageButtonDiagnostics);

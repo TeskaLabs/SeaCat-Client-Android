@@ -1,4 +1,11 @@
 <resources>
+    <string-array name="drawer_nav_items_array">
+        <item>Dashboard</item>
+        <item>Profiles</item>
+        <item>Http Client</item>
+        <item>Diagnostics</item>
+    </string-array>
+
     <string name="app_name">SeaCat Mate</string>
     <string name="app_label">TeskaLabs SeaCat Mate</string>
 
@@ -24,5 +31,6 @@
     <string name="dashboard_profiles">Profiles</string>
     <string name="dashboard_http_client">Http Client</string>
     <string name="dashboard_diagnostics">Diagnostics</string>
+    <string name="title_activity_base">BaseActivity</string>
 
 </resources>

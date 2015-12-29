@@ -10,6 +10,7 @@
     <style name="Dashboard.Button">
         <item name="android:padding">25dp</item>
         <item name="android:background">#061728</item>
+
         <item name="android:tint">#FFFFFF</item>
     </style>
     <style name="Dashboard.ButtonLabel">
