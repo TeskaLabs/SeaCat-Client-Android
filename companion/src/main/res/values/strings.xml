@@ -6,9 +6,16 @@
         <item>Diagnostics</item>
     </string-array>
 
+    <string name="key">Key</string>
+    <string name="value">Value</string>
+    <string name="name">Name</string>
+    <string name="remove">Remove</string>
+
     <string name="app_name">SeaCat Mate</string>
     <string name="app_label">TeskaLabs SeaCat Mate</string>
-    <string name="http_client_reuquest">Request</string>
+    <string name="http_client_request">Request</string>
+    <string name="http_client_headers">Headers</string>
+    <string name="http_client_body">Body</string>
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_splash">SplashActivity</string>

@@ -1,22 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/spinnerMethod"
-        android:layout_below="@+id/textGatewayName"
-        android:inputType="textFilter|textMultiLine"
-        />
-    <EditText
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/editTextGatewayName"
-        android:hint="com.example.appname"
-        android:lines="1"
-        android:inputType="text"
-        android:minLines="1"
-        android:singleLine="true" />
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:showDividers="end"
+    android:paddingBottom="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/textHeaderName"
+                android:inputType="textFilter|textMultiLine"
+                android:text="@string/name"
+                android:textSize="9pt"
+                android:width="70dp"
+                android:gravity="center_vertical" />
+            <EditText
+                android:layout_height="wrap_content"
+                android:id="@+id/headerName"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:inputType="textFilter|textMultiLine"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/textHeaderValue"
+                android:inputType="textFilter|textMultiLine"
+                android:text="@string/value"
+                android:textSize="9pt"
+                android:width="70dp"
+                android:gravity="center_vertical"
+                />
+            <EditText
+                android:layout_height="wrap_content"
+                android:id="@+id/headerValue"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:inputType="textFilter|textMultiLine"
+                />
+        </LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/remove"/>
+
 </LinearLayout>
