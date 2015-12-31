@@ -9,6 +9,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.teskalabs.seacat.android.companion.Base.BaseActivity;
+
 import java.util.regex.Pattern;
 
 

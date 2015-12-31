@@ -8,6 +8,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.teskalabs.seacat.android.companion.Base.BaseActivity;
+
 public class DashboardActivity extends BaseActivity {
 
     ImageButton buttonProfiles, buttonDiagnostics, buttonHttpClient;

@@ -13,19 +13,50 @@ tools:context="com.teskalabs.seacat.android.companion.DashboardActivity">
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/string_gateway_name_label"
-        android:id="@+id/textGatewayName"
+        android:text="@string/http_client_reuquest"
+        android:id="@+id/textUrl"
         />
-    <EditText
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editTextGatewayName"
-        android:layout_below="@+id/textGatewayName"
-        android:hint="com.example.appname"
-        android:lines="1"
-        android:inputType="text"
-        android:minLines="1"
-        android:singleLine="true" />
+        android:layout_below="@+id/textUrl"
+        android:id="@+id/layoutUrl">
+        <Spinner
+
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/spinnerMethod"
+            android:layout_below="@+id/textGatewayName"
+            android:spinnerMode="dropdown" />
+        <EditText
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTextGatewayName"
+            android:hint="com.example.appname"
+            android:lines="1"
+            android:inputType="text"
+            android:minLines="1"
+            android:singleLine="true" />
+    </LinearLayout>
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/http_client_reuquest"
+        android:id="@+id/textHeaders"
+        android:layout_below="@+id/layoutUrl"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textHeaders">
+        <ViewStub android:id="@+id/http_headers_stub"
+            android:inflatedId="@+id/subTree"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -1,4 +1,4 @@
-package com.teskalabs.seacat.android.companion;
+package com.teskalabs.seacat.android.companion.Base;
 
 public class DrawerNavItem
 {

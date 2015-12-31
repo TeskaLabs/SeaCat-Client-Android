@@ -1,4 +1,4 @@
-package com.teskalabs.seacat.android.companion;
+package com.teskalabs.seacat.android.companion.Base;
 
 
 import android.app.Activity;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 import android.view.View;
 import android.view.ViewGroup;
 
-
+import com.teskalabs.seacat.android.companion.R;
 
 
 public class DrawerNavAdapter extends ArrayAdapter<DrawerNavItem> {

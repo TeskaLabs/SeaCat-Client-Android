@@ -1,4 +1,4 @@
-package com.teskalabs.seacat.android.companion;
+package com.teskalabs.seacat.android.companion.Base;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,11 @@ import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.teskalabs.seacat.android.companion.DashboardActivity;
+import com.teskalabs.seacat.android.companion.HttpClientActivity;
+import com.teskalabs.seacat.android.companion.LocalDiscoverActivity;
+import com.teskalabs.seacat.android.companion.R;
 
 public class BaseActivity extends ActionBarActivity {
     protected ViewStub contentStub;

@@ -31,7 +31,7 @@
             android:label="@string/title_activity_http_client" >
         </activity>
         <activity
-            android:name=".BaseActivity"
+            android:name=".Base.BaseActivity"
             android:label="@string/title_activity_base" >
         </activity>
     </application>
