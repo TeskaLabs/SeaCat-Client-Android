@@ -114,7 +114,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
             final Header header = iter.nextHeader();
             requestHeaders.add(header.getName(), header.getValue());
         }
-        requestHeaders.add("X-SC-OS", "and"); // For Android
+        requestHeaders.add("X-SC-SDK", "and"); // For Android
 
         // Build SYN_STREAM frame
         SPDY.buildALX1SynStream(frame, streamId, host, requestLine.getMethod(), requestLine.getUri(), requestHeaders.build(), fin_flag, this.priority);
