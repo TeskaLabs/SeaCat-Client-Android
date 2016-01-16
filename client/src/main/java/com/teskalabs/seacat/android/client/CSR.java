@@ -22,7 +22,6 @@ public class CSR
 
     public CSR()
     {
-        this.setUniqueCommonName();
     }
 
     ///
@@ -190,7 +189,11 @@ public class CSR
         {
             public void run()
             {
+
                 CSR csr = new CSR();
+
+                csr.setUniqueCommonName();
+                if (SeaCatInternals.applicationId != null) csr.set("dnQualifier", SeaCatInternals.applicationId);
 
                 try {
                     csr.submit();
