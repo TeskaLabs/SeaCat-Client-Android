@@ -13,7 +13,7 @@ public class DemoApp extends Application
         super.onCreate();
 
         // Enable SeaCat
-        SeaCatClient.initialize(getApplicationContext());
+        SeaCatClient.initialize(getApplicationContext(), "foobar2");
     }
 
 }
