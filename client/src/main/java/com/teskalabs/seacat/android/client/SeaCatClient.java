@@ -154,8 +154,6 @@ public final class SeaCatClient
      */
     public static void initialize(Context context)
     {
-        SeaCatInternals.applicationId = context.getPackageName();
-
         setCSRWorker(CSR.createDefault());
         context.startService(new Intent(context, SeaCatService.class));
     }

@@ -30,5 +30,4 @@ public class SeaCatInternals
         return CSRWorker;
     }
 
-    public static String applicationId = null;
 }
