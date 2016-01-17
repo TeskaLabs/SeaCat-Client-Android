@@ -7,7 +7,7 @@ public final class seacatcc
         System.loadLibrary("seacatjni");
     }
 
-    static public native int init(String applicationId, String varDirectory, Reactor reactor);
+    static public native int init(String applicationId, String applicationIdSuffix, String varDirectory, Reactor reactor);
     static public native int run();
     static public native int shutdown();
     static public native int yield(char what);

@@ -55,7 +55,7 @@ public class Reactor
 
         java.io.File vardir = context.getDir("seacat", Context.MODE_PRIVATE);
 
-		int rc = seacatcc.init(context.getPackageName(), vardir.getAbsolutePath(), this);
+		int rc = seacatcc.init(context.getPackageName(), null, vardir.getAbsolutePath(), this);
 		RC.checkAndThrowIOException("seacatcc.init", rc);
 
         configureProxyServer();

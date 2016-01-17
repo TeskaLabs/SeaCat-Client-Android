@@ -7,6 +7,7 @@
 
 int seacatcc_init(
 	const char * application_id,
+	const char * application_id_suffix,
 	const char * platform,
 	const char * var_directory,
 	void (* hook_write_ready)(void ** data, uint16_t * data_len),

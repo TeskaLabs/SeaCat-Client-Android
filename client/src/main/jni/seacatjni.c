@@ -85,11 +85,12 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 
 ////
 
-JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_init(JNIEnv * env, jclass cls, jstring applicationId, jstring varDir, jobject reactor)
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_init(JNIEnv * env, jclass cls, jstring applicationId, jstring applicationIdSuffix, jstring varDir, jobject reactor)
 {
 	assert(g_reactor_obj == NULL);
 
 	const char * appIdChar = (*env)->GetStringUTFChars(env, applicationId, 0);
+	const char * appIdSuffixChar = (applicationIdSuffix != NULL) ? (*env)->GetStringUTFChars(env, applicationIdSuffix, 0) : NULL;
 	const char * varDirChar = (*env)->GetStringUTFChars(env, varDir, 0);
 
 	// convert local to global reference (local will die after this method call)
@@ -136,7 +137,7 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_in
 	static const char * platform = "jav";
 #endif
 
-	int rc = seacatcc_init(appIdChar, platform, varDirChar,
+	int rc = seacatcc_init(appIdChar, appIdSuffixChar, platform, varDirChar,
 		JNICALLBACK_write_ready,
 		JNICALLBACK_read_ready,
 		JNICALLBACK_frame_received,
@@ -146,6 +147,7 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_in
 	);
 
 	(*env)->ReleaseStringUTFChars(env, varDir, varDirChar);
+	if (appIdSuffixChar != NULL) (*env)->ReleaseStringUTFChars(env, applicationIdSuffix, appIdSuffixChar);
 	(*env)->ReleaseStringUTFChars(env, applicationId, appIdChar);
 
 	if (rc != SEACATCC_RC_OK) return rc;

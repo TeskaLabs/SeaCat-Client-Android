@@ -14,10 +14,10 @@ extern "C" {
 /*
  * Class:     com_teskalabs_seacat_android_client_core_seacatcc
  * Method:    init
- * Signature: (Ljava/lang/String;Ljava/lang/String;Lcom/teskalabs/seacat/android/client/core/Reactor;)I
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/teskalabs/seacat/android/client/core/Reactor;)I
  */
 JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_init
-  (JNIEnv *, jclass, jstring, jstring, jobject);
+  (JNIEnv *, jclass, jstring, jstring, jstring, jobject);
 
 /*
  * Class:     com_teskalabs_seacat_android_client_core_seacatcc
