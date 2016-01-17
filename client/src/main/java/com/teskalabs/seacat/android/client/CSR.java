@@ -134,9 +134,20 @@ public class CSR
         paramMap.put("emailAddress", emailAddress);
     }
 
+
+
+    public String getUniqueIdentifier() {
+        return paramMap.get("UID");
+    }
+
+    public void setUniqueIdentifier(String uniqueIdentifier) {
+        paramMap.put("UID", uniqueIdentifier);
+    }
+
+
     ///
 
-    public void setUniqueCommonName()
+    public void setUniqueIdentifier()
     {
         UUID deviceUuid = null;
         final String androidId = Settings.Secure.getString(
@@ -158,7 +169,7 @@ public class CSR
             deviceUuid = UUID.randomUUID();
         }
 
-        this.setCommonName(deviceUuid.toString().replaceAll("-", "") + "and");
+        this.setUniqueIdentifier(deviceUuid.toString().replaceAll("-", ""));
     }
 
     ///
@@ -192,8 +203,7 @@ public class CSR
 
                 CSR csr = new CSR();
 
-                csr.setUniqueCommonName();
-                if (SeaCatInternals.applicationId != null) csr.set("dnQualifier", SeaCatInternals.applicationId);
+                csr.setUniqueIdentifier();
 
                 try {
                     csr.submit();
