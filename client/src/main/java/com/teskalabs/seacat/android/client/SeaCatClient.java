@@ -154,13 +154,22 @@ public final class SeaCatClient
      */
     public static void initialize(Context context)
     {
-        setCSRWorker(CSR.createDefault());
-        context.startService(new Intent(context, SeaCatService.class));
+        SeaCatClient.initialize(context, CSR.createDefault(), null);
     }
 
+    public static void initialize(Context context, String applicationIdSuffix)
+    {
+        SeaCatClient.initialize(context, CSR.createDefault(), applicationIdSuffix);
+    }
 
     public static void initialize(Context context, Runnable CSRworker)
     {
+        SeaCatClient.initialize(context, CSRworker, null);
+    }
+
+    public static void initialize(Context context, Runnable CSRworker, String applicationIdSuffix)
+    {
+        SeaCatInternals.applicationIdSuffix = applicationIdSuffix;
         setCSRWorker(CSRworker);
         context.startService(new Intent(context, SeaCatService.class));
     }

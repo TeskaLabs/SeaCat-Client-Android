@@ -44,7 +44,7 @@ public class Reactor
 
 	///
 	
-	public Reactor(Context context) throws IOException
+	public Reactor(Context context, String applicationIdSuffix) throws IOException
 	{
         this.context = context;
 
@@ -55,7 +55,7 @@ public class Reactor
 
         java.io.File vardir = context.getDir("seacat", Context.MODE_PRIVATE);
 
-		int rc = seacatcc.init(context.getPackageName(), null, vardir.getAbsolutePath(), this);
+		int rc = seacatcc.init(context.getPackageName(), applicationIdSuffix, vardir.getAbsolutePath(), this);
 		RC.checkAndThrowIOException("seacatcc.init", rc);
 
         configureProxyServer();

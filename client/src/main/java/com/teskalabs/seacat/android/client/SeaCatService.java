@@ -27,7 +27,7 @@ public class SeaCatService extends Service
         }
 
         try {
-            SeaCatClient.setReactor(new Reactor(getApplicationContext()));
+            SeaCatClient.setReactor(new Reactor(getApplicationContext(), SeaCatInternals.applicationIdSuffix));
         } catch (Exception e) {
             Log.e(SeaCatInternals.L, "Reactor shutdown failed:", e);
         }

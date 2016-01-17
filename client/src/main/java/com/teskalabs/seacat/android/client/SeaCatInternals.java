@@ -30,4 +30,5 @@ public class SeaCatInternals
         return CSRWorker;
     }
 
+    public static String applicationIdSuffix = null;
 }
