@@ -161,7 +161,7 @@ public class MainActivity extends ActionBarActivity
 
     private void GetTimerMethod_GET() throws IOException
     {
-        URL url = new URL(String.format("https://testhost.seacat/fortune"));
+        URL url = new URL(String.format("https://evalhost.seacat/fortune"));
         HttpURLConnection conn = SeaCatClient.open(url);
 
         InputStream is = conn.getInputStream();
