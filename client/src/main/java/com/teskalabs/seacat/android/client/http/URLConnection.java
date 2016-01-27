@@ -21,7 +21,7 @@ import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.core.SPDY;
 import com.teskalabs.seacat.android.client.intf.*;
 
-public class URLConnection extends HttpURLConnection implements IFrameProvider , IStream
+public class URLConnection extends HttpURLConnection implements IFrameProvider, IStream
 {
 	protected final Reactor reactor;
 
@@ -93,6 +93,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
 	public final InputStream getInputStream() throws IOException
 	{
 		launch();
+        waitForResponse();
 		return this.inboundStream;
 	}
 
@@ -111,12 +112,12 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
     }
 
     /*
-     * Block and wait for response from server.
+     * Blocks and waits for a response from the gateway.
      * Timeouts using SocketTimeoutException after getConnectTimeout() + getReadTimeout()
      */
     protected void waitForResponse() throws SocketTimeoutException
     {
-        long timeoutMillis = getConnectTimeout();
+        long timeoutMillis = getConnectTimeout() + getReadTimeout();
         if (timeoutMillis == 0) timeoutMillis = 1000*60*3; // 3 minutes timeout
         long cutOfTimeMillis = (System.nanoTime() / 1000000L) + timeoutMillis;
 
