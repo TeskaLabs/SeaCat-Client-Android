@@ -105,6 +105,7 @@ public class Reactor
 			try {
 				this.sessionThread.join(5000);
 			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 				continue;
 			}
 			

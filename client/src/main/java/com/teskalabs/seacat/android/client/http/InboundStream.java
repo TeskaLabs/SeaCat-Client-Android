@@ -93,7 +93,11 @@ public class InboundStream extends java.io.InputStream
 
 				currentFrame = frameQueue.poll(awaitMillis, TimeUnit.MILLISECONDS);
 			}
-			catch (InterruptedException e) { continue ; }
+			catch (InterruptedException e)
+			{
+				Thread.currentThread().interrupt();
+				continue;
+			}
 
 			if (currentFrame == QUEUE_IS_CLOSED)
 			{				

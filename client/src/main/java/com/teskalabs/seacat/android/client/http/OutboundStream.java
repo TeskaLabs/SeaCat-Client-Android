@@ -84,7 +84,11 @@ public class OutboundStream extends java.io.OutputStream implements IFrameProvid
 
             try {
                 res = frameQueue.offer(aFrame, awaitMillis, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) { continue; }
+            } catch (InterruptedException e)
+            {
+            	Thread.currentThread().interrupt();
+            	continue;
+            }
         }
 
         if (this.streamId != -1) reactor.registerFrameProvider(this, true);

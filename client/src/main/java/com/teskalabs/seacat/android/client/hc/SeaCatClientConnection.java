@@ -140,6 +140,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
                 try {
                     streamIdCondition.awaitNanos(awaitMillis * 1000000L);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
 
@@ -240,6 +241,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
                 try {
                     responseReadyCondition.awaitNanos(awaitMillis * 1000000L);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
 
@@ -423,6 +425,7 @@ public class SeaCatClientConnection implements ClientConnectionRequest, ManagedC
                 try {
                     responseReadyCondition.awaitNanos(awaitMillis * 1000000L);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }

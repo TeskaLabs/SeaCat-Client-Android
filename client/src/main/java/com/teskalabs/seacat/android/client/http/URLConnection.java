@@ -130,6 +130,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider ,
                 try {
                     responseReadyCondition.awaitNanos(awaitMillis * 1000000L);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }
