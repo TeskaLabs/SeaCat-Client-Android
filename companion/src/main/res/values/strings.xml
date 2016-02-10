@@ -24,6 +24,7 @@
 
     <string name="string_gateway_location_label">Location of Gateway</string>
     <string name="string_gateway_name_label">Gateway Name</string>
+    <string name="string_profile_name_label">Profile Name</string>
     <string name="title_activity_http_client">HttpClientActivity</string>
 
     <string name="title_section1">Section 1</string>
@@ -40,5 +41,6 @@
     <string name="dashboard_http_client">Http Client</string>
     <string name="dashboard_diagnostics">Diagnostics</string>
     <string name="title_activity_base">BaseActivity</string>
-
+    <string name="title_activity_profiles">Profiles</string>
+    <string name="title_activity_edit_profile">SeaCat Mate Profile</string>
 </resources>

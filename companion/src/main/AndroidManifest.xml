@@ -34,6 +34,17 @@
             android:name=".Base.BaseActivity"
             android:label="@string/title_activity_base" >
         </activity>
+        <activity
+            android:name=".Profiles.ProfilesActivity"
+            android:label="@string/title_activity_profiles" >
+        </activity>
+        <activity
+            android:name=".Profiles.EditProfileActivity"
+            android:label="@string/title_activity_edit_profile" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.teskalabs.seacat.android.companion.Profiles.ProfilesActivity" />
+        </activity>
     </application>
 
 </manifest>

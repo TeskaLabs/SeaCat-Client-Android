@@ -1,6 +1,7 @@
-package com.teskalabs.seacat.android.companion;
+package com.teskalabs.seacat.android.companion.Profiles;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -9,23 +10,19 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.teskalabs.seacat.android.companion.Base.BaseActivity;
-import com.teskalabs.seacat.android.companion.Model.ModelProfile;
+import com.teskalabs.seacat.android.companion.DiscoverConfStore;
+import com.teskalabs.seacat.android.companion.R;
 
 import java.util.regex.Pattern;
 
-
-public class LocalDiscoverActivity extends BaseActivity {
-    public static final String TAG = "compainion.LocalDiscoverActivity";
-
-    private int profileId;
-    public static final Integer ID_NEW = -1;
+public class EditProfileActivity extends ActionBarActivity {
+    public static final String TAG = "EditProfileActivity";
 
     public Button   buttonSave;
     public EditText editTextIP;
     public EditText editTextPort;
     public EditText editTextGatewayName;
-    public CheckBox checkBoxEnabled;
+    public EditText editTextProfileName;
 
     private DiscoverConfStore discoverConfStore;
 
@@ -58,47 +55,34 @@ public class LocalDiscoverActivity extends BaseActivity {
     private boolean validateIP(String ip) { return patternIP.matcher(ip).matches(); }
     private boolean validatePort(String port) { return patternPort.matcher(port).matches(); }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        contentStub.setLayoutResource(R.layout.activity_local_discover);
-        contentStub.inflate();
-
-        configFilePath = getFilesDir()+"/"+configFileName;
+        setContentView(R.layout.activity_edit_profile);
 
         buttonSave = (Button) findViewById(R.id.buttonSave);
-        checkBoxEnabled = (CheckBox) findViewById(R.id.checkBoxEnabled);
         editTextIP = (EditText) findViewById(R.id.editTextIP);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
         editTextGatewayName = (EditText) findViewById(R.id.editTextGatewayName);
+        editTextProfileName = (EditText) findViewById(R.id.editTextProfileName);
 
         StateWatcher sWatcher = new StateWatcher();
         editTextIP.addTextChangedListener(sWatcher);
         editTextPort.addTextChangedListener(sWatcher);
         editTextGatewayName.addTextChangedListener(sWatcher);
-        checkBoxEnabled.addTextChangedListener(sWatcher);
+        editTextProfileName.addTextChangedListener(sWatcher);
 
         discoverConfStore = new DiscoverConfStore(getApplicationContext());
-
-        Bundle extrasBundle = getIntent().getExtras();
-        profileId = extrasBundle.getInt("ID", ID_NEW);
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-
-        if (profileId != -1)
-        {
-            ModelProfile profile = new ModelProfile(getApplicationContext());
-            profile.findOneById(profileId);
-
-            editTextIP.setText(profile.getIp());
-            editTextPort.setText(profile.getPort());
-            editTextGatewayName.setText(profile.getGatewayName());
-        }
+        discoverConfStore.LoadFromPrefs(this);
+        editTextIP.setText(discoverConfStore.getIp());
+        editTextPort.setText(discoverConfStore.getPort());
+        editTextGatewayName.setText(discoverConfStore.getGatewayName());
 
         buttonSave.setEnabled(false);
     }
@@ -118,7 +102,6 @@ public class LocalDiscoverActivity extends BaseActivity {
         discoverConfStore.setGatewayName(getValueGatewayName());
         discoverConfStore.setIp(getValueIP());
         discoverConfStore.setPort(getValuePort());
-        discoverConfStore.setGwEnabled(checkBoxEnabled.isChecked());
 
         // Store
         discoverConfStore.store(this);
@@ -138,7 +121,7 @@ public class LocalDiscoverActivity extends BaseActivity {
     private boolean validateForm()
     {
         boolean isValid = true;
-        // Validate Gateway Name
+        // Validate App ID
         if (!validateGatewayName(getValueGatewayName()))
         {
             isValid = false;
@@ -150,7 +133,7 @@ public class LocalDiscoverActivity extends BaseActivity {
             isValid = false;
             editTextIP.setError("must be a valid IPv4 IP.");
         }
-        // Validate Port
+        // Validate port
         if (!validatePort(getValuePort()))
         {
             isValid = false;

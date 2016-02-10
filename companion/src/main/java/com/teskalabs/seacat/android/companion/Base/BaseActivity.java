@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.teskalabs.seacat.android.companion.DashboardActivity;
 import com.teskalabs.seacat.android.companion.HttpClientActivity;
-import com.teskalabs.seacat.android.companion.LocalDiscoverActivity;
+import com.teskalabs.seacat.android.companion.Profiles.ProfilesActivity;
 import com.teskalabs.seacat.android.companion.R;
 
 public class BaseActivity extends ActionBarActivity {
@@ -55,7 +55,7 @@ public class BaseActivity extends ActionBarActivity {
                     startActivity(intent);
                     break;
                 case 1:
-                    startActivity(new Intent(BaseActivity.this, LocalDiscoverActivity.class));
+                    startActivity(new Intent(BaseActivity.this, ProfilesActivity.class));
                     break;
                 case 2:
                     startActivity(new Intent(BaseActivity.this, HttpClientActivity.class));

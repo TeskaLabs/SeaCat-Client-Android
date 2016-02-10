@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 /**
  * Created by mpavelka on 09/02/16.
  */
@@ -17,23 +19,23 @@ public class ModelProfile extends SQLiteOpenHelper {
     private String port;
 
     public static final String TABLE_NAME = "profiles";
-    public static final String COL_ID = "id";
+    public static final String COL_ID = "_id";
     public static final String COL_PROFILE_NAME = "profileName";
     public static final String COL_GATEWAY_NAME = "gatewayName";
     public static final String COL_IP = "ip";
     public static final String COL_PORT = "port";
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "teskalabs.companion.db";
 
     public static final String SQL_CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COL_ID + " INTEGER PRIMARY KEY," +
                     COL_PROFILE_NAME + " TEXT," +
-                    COL_GATEWAY_NAME + "TEXT," +
-                    COL_IP + "TEXT," +
-                    COL_PORT + "TEXT" +
-                    " )";
+                    COL_GATEWAY_NAME + " TEXT," +
+                    COL_IP + " TEXT," +
+                    COL_PORT + " TEXT" +
+                    ")";
 
     public static final String SQL_DROP_TABLE =
             "DROP TABLE IF EXISTS " + TABLE_NAME + ";";
@@ -54,9 +56,18 @@ public class ModelProfile extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     public void onCreate(SQLiteDatabase db) {
+        Log.i(TAG, "Creating database.");
+        db.execSQL(SQL_DROP_TABLE);
         db.execSQL(ModelProfile.SQL_CREATE_TABLE);
+        db.execSQL("INSERT INTO " + TABLE_NAME + " (" + COL_PROFILE_NAME + "," + COL_GATEWAY_NAME + ", " + COL_IP + ", " + COL_PORT + ")" +
+                        " VALUES ('default', 'localhost.s.seacat.mobi', '10.0.2.2', '433');");
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.i(TAG, "Upgrading database.");
+        db.execSQL(SQL_DROP_TABLE);
+        db.execSQL(ModelProfile.SQL_CREATE_TABLE);
+        db.execSQL("INSERT INTO " + TABLE_NAME + " (" + COL_PROFILE_NAME + ", " + COL_GATEWAY_NAME + ", " + COL_IP + ", " + COL_PORT + ")" +
+                " VALUES ('default', 'localhost.s.seacat.mobi', '10.0.2.2', '433');");
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
@@ -71,7 +82,7 @@ public class ModelProfile extends SQLiteOpenHelper {
         this.setPort(cursor.getString(cursor.getColumnIndex(COL_PORT)));;
     }
 
-    public Cursor findAll(Context context)
+    public Cursor findAll()
     {
         SQLiteDatabase db = getReadableDatabase();
         return db.rawQuery(
@@ -107,6 +118,8 @@ public class ModelProfile extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
+        if (id != null)
+            values.put(COL_ID, id);
         values.put(COL_PROFILE_NAME, profileName);
         values.put(COL_GATEWAY_NAME, gatewayName);
         values.put(COL_IP, ip);
