@@ -14,8 +14,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.teskalabs.seacat.android.companion.DashboardActivity;
+import com.teskalabs.seacat.android.companion.DiscoverConfStore;
 import com.teskalabs.seacat.android.companion.Model.ModelProfile;
 import com.teskalabs.seacat.android.companion.R;
 
@@ -72,8 +74,11 @@ public class ProfilesActivity extends ActionBarActivity {
     }
 
     public class ProfilesCursorAdapter extends CursorAdapter {
+        private DiscoverConfStore confStore;
         public ProfilesCursorAdapter(Context mContext, Cursor cursor) {
             super(mContext, cursor, 0);
+            confStore = new DiscoverConfStore(getApplicationContext());
+            confStore.LoadFromPrefs();
         }
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
@@ -92,6 +97,12 @@ public class ProfilesActivity extends ActionBarActivity {
             TextView textViewProfileName = (TextView) view.findViewById(R.id.textViewProfileName);
             TextView textViewGatewayName = (TextView) view.findViewById(R.id.textViewGatewayName);
             TextView textViewIp = (TextView) view.findViewById(R.id.textViewIp);
+            ToggleButton buttonActive = (ToggleButton) view.findViewById(R.id.toggleButtonActive);
+            if (ip.equals(confStore.getIp()) &&
+                    port.equals(confStore.getPort()) &&
+                    gatewayName.equals(confStore.getGatewayName()) &&
+                    confStore.getGwEnabled())
+                buttonActive.setChecked(true);
 
             textViewProfileName.setText(profileName);
             textViewGatewayName.setText(gatewayName);
