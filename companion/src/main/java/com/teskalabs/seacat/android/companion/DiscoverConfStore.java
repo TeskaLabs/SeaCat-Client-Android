@@ -1,6 +1,5 @@
 package com.teskalabs.seacat.android.companion;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -45,7 +44,7 @@ public class DiscoverConfStore
 
     public void store()
     {
-        if (!gwEnabled)
+        if (!gwEnabled.booleanValue())
         {
             File configFile = new File(configFilePath);
             if (configFile.exists())
