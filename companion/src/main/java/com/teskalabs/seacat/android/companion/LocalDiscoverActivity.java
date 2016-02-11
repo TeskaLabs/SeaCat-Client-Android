@@ -10,16 +10,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.teskalabs.seacat.android.companion.Base.BaseActivity;
-import com.teskalabs.seacat.android.companion.Model.ModelProfile;
 
 import java.util.regex.Pattern;
 
 
 public class LocalDiscoverActivity extends BaseActivity {
     public static final String TAG = "compainion.LocalDiscoverActivity";
-
-    private int profileId;
-    public static final Integer ID_NEW = -1;
 
     public Button   buttonSave;
     public EditText editTextIP;
@@ -81,24 +77,17 @@ public class LocalDiscoverActivity extends BaseActivity {
 
         discoverConfStore = new DiscoverConfStore(getApplicationContext());
 
-        Bundle extrasBundle = getIntent().getExtras();
-        profileId = extrasBundle.getInt("ID", ID_NEW);
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-
-        if (profileId != -1)
-        {
-            ModelProfile profile = new ModelProfile(getApplicationContext());
-            profile.findOneById(profileId);
-
-            editTextIP.setText(profile.getIp());
-            editTextPort.setText(profile.getPort());
-            editTextGatewayName.setText(profile.getGatewayName());
-        }
+        discoverConfStore.LoadFromPrefs();
+        editTextIP.setText(discoverConfStore.getIp());
+        editTextPort.setText(discoverConfStore.getPort());
+        editTextGatewayName.setText(discoverConfStore.getGatewayName());
+        checkBoxEnabled.setChecked(discoverConfStore.getGwEnabled());
 
         buttonSave.setEnabled(false);
     }
@@ -121,8 +110,8 @@ public class LocalDiscoverActivity extends BaseActivity {
         discoverConfStore.setGwEnabled(checkBoxEnabled.isChecked());
 
         // Store
-        discoverConfStore.store(this);
-        discoverConfStore.storeToPrefs(this);
+        discoverConfStore.store();
+        discoverConfStore.storeToPrefs();
 
         if (discoverConfStore.getGwEnabled())
             Toast.makeText(getApplicationContext(), "Gateway enabled", Toast.LENGTH_SHORT)
