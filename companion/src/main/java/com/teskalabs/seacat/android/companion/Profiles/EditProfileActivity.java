@@ -4,6 +4,10 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -11,12 +15,16 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.teskalabs.seacat.android.companion.DiscoverConfStore;
+import com.teskalabs.seacat.android.companion.Model.ModelProfile;
 import com.teskalabs.seacat.android.companion.R;
 
 import java.util.regex.Pattern;
 
 public class EditProfileActivity extends ActionBarActivity {
     public static final String TAG = "EditProfileActivity";
+
+    private Integer profileId;
+    public static final Integer ID_NEW = -1;
 
     public Button   buttonSave;
     public EditText editTextIP;
@@ -25,6 +33,7 @@ public class EditProfileActivity extends ActionBarActivity {
     public EditText editTextProfileName;
 
     private DiscoverConfStore discoverConfStore;
+    ModelProfile profile;
 
     protected String configFileName = "local-discover.conf";
     protected String configFilePath;
@@ -50,6 +59,7 @@ public class EditProfileActivity extends ActionBarActivity {
     protected String getValueIP() { return editTextIP.getText().toString(); }
     protected String getValuePort() { return editTextPort.getText().toString(); }
     protected String getValueGatewayName() { return editTextGatewayName.getText().toString(); }
+    protected String getValueProfileName() { return editTextProfileName.getText().toString(); }
 
     private boolean validateGatewayName(String appId) { return patternName.matcher(appId).matches(); }
     private boolean validateIP(String ip) { return patternIP.matcher(ip).matches(); }
@@ -72,19 +82,58 @@ public class EditProfileActivity extends ActionBarActivity {
         editTextGatewayName.addTextChangedListener(sWatcher);
         editTextProfileName.addTextChangedListener(sWatcher);
 
-        discoverConfStore = new DiscoverConfStore(getApplicationContext());
+        Bundle extrasBundle = getIntent().getExtras();
+        profileId = extrasBundle.getInt("ID", ID_NEW);
+        profile = new ModelProfile(getApplicationContext());
+
+        if (profileId != -1)
+        {
+            profile.findOneById(profileId);
+            editTextIP.setText(profile.getIp());
+            editTextPort.setText(profile.getPort());
+            editTextGatewayName.setText(profile.getGatewayName());
+            editTextProfileName.setText(profile.getProfileName());
+
+            // Show remove profile button
+        }
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-        discoverConfStore.LoadFromPrefs(this);
-        editTextIP.setText(discoverConfStore.getIp());
-        editTextPort.setText(discoverConfStore.getPort());
-        editTextGatewayName.setText(discoverConfStore.getGatewayName());
+    }
 
-        buttonSave.setEnabled(false);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.edit_profile_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.remove_profile:
+                removeProfile();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void removeProfile()
+    {
+        boolean success = profile.removeById(profileId) > 0;
+        if (success) {
+            Toast.makeText(getApplicationContext(), "Profile removed.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        else {
+            Log.e(TAG, "Couldn't remove data from SQL.");
+            Toast.makeText(getApplicationContext(), "Couldn't remove profile.", Toast.LENGTH_SHORT).show();;
+        }
     }
 
     public void checkBoxEnabledOnClick(View v)
@@ -98,24 +147,34 @@ public class EditProfileActivity extends ActionBarActivity {
         {
             return;
         }
-        boolean previouslyEnabled = discoverConfStore.getGwEnabled();
-        discoverConfStore.setGatewayName(getValueGatewayName());
-        discoverConfStore.setIp(getValueIP());
-        discoverConfStore.setPort(getValuePort());
-
         // Store
-        discoverConfStore.store(this);
-        discoverConfStore.storeToPrefs(this);
+        profile.setProfileName(getValueProfileName());
+        profile.setGatewayName(getValueGatewayName());
+        profile.setPort(getValuePort());
+        profile.setIp(getValueIP());
 
-        if (discoverConfStore.getGwEnabled())
-            Toast.makeText(getApplicationContext(), "Gateway enabled", Toast.LENGTH_SHORT)
-                    .show();
-        else if (!discoverConfStore.getGwEnabled() && previouslyEnabled)
-            Toast.makeText(getApplicationContext(), "Gateway disabled", Toast.LENGTH_SHORT)
-                    .show();
+        boolean success;
+        if (profileId == -1) {
+            success = profile.insert() != -1;
+        }
+        else {
+            success = profile.update() > 0;
+        }
 
-        buttonSave.setEnabled(false);
+        if (success) {
+            Toast.makeText(getApplicationContext(), "Profile saved.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        else {
+            Log.e(TAG, "Couldn't save data to SQL.");
+            Toast.makeText(getApplicationContext(), "Couldn't save.", Toast.LENGTH_SHORT).show();;
+        }
         return;
+    }
+
+    public void onButtonDeleteClick(View v)
+    {
+        ;
     }
 
     private boolean validateForm()

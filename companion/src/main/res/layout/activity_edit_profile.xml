@@ -89,16 +89,16 @@
                 android:maxWidth="40dp"
                 android:minWidth="40dp" />
 
-
         </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Apply"
-            android:id="@+id/buttonSave"
-            android:onClick="buttonSaveOnClick" />
-
     </LinearLayout>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save profile"
+        android:id="@+id/buttonSave"
+        android:onClick="buttonSaveOnClick"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
