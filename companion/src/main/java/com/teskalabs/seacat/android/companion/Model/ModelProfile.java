@@ -60,7 +60,7 @@ public class ModelProfile extends SQLiteOpenHelper {
         db.execSQL(SQL_DROP_TABLE);
         db.execSQL(ModelProfile.SQL_CREATE_TABLE);
         db.execSQL("INSERT INTO " + TABLE_NAME + " (" + COL_PROFILE_NAME + "," + COL_GATEWAY_NAME + ", " + COL_IP + ", " + COL_PORT + ")" +
-                        " VALUES ('default', 'localhost.s.seacat.mobi', '10.0.2.2', '433');");
+                " VALUES ('default', 'localhost.s.seacat.mobi', '10.0.2.2', '433');");
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.i(TAG, "Upgrading database.");
@@ -114,7 +114,7 @@ public class ModelProfile extends SQLiteOpenHelper {
         return this;
     }
 
-    public long insert(Context context)
+    public long insert()
     {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -131,7 +131,7 @@ public class ModelProfile extends SQLiteOpenHelper {
                 values);
     }
 
-    public long update(Context context)
+    public long update()
     {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -143,6 +143,15 @@ public class ModelProfile extends SQLiteOpenHelper {
         return db.update(
                 TABLE_NAME,
                 values,
+                COL_ID + "=?",
+                new String[]{id.toString()});
+    }
+
+    public int removeById(Integer id)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.delete(
+                TABLE_NAME,
                 COL_ID + "=?",
                 new String[]{id.toString()});
     }
