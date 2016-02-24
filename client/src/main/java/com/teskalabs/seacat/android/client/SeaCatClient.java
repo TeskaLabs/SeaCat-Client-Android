@@ -367,6 +367,11 @@ public final class SeaCatClient
         RC.checkAndThrowIOException("seacatcc.yield(reset)", rc);
     }
 
+    public static void renew() throws IOException
+    {
+        int rc = seacatcc.yield('n');
+        RC.checkAndThrowIOException("seacatcc.yield(renew)", rc);
+    }
 
     ///
 
