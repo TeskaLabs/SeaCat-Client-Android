@@ -236,15 +236,12 @@ public class MainActivity extends ActionBarActivity
         DefaultHttpClient httpclient = (DefaultHttpClient) SeaCatClient.httpClient();
         httpclient.setCookieStore(HTTPClient_cookieStore);
 
-        //HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/fortune?%s", getPackageName()));
-        HttpGet httpget = new HttpGet("https://service.seacat/apk/FreshApCz-22.apk");
-
+        HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/fortune?%s", getPackageName()));
 
         HttpResponse response = httpclient.execute(httpget);
 
         HttpEntity entity = response.getEntity();
-        byte[] x = EntityUtils.toByteArray(entity);
-        final String output = "GetTimerMethod_HTTPClient_GET\r\nReceived bytes:" + x.length;
+        final String output = "GetTimerMethod_HTTPClient_GET\r\n" + EntityUtils.toString(entity);
 
         runOnUiThread(new Runnable() {
             @Override
@@ -412,7 +409,6 @@ public class MainActivity extends ActionBarActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_reset_identity) {
             try {
                 SeaCatClient.reset();
@@ -425,7 +421,17 @@ public class MainActivity extends ActionBarActivity
             return true;
         }
 
-        if (id == R.id.action_gw_disconnect) {
+        else if (id == R.id.action_renew_certificate) {
+            try {
+                SeaCatClient.renew();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(getApplicationContext(), "Certificate renewal process initialised!", Toast.LENGTH_LONG).show();
+            return true;
+        }
+
+        else if (id == R.id.action_gw_disconnect) {
             try {
                 SeaCatClient.disconnect();
             } catch (IOException e) {
@@ -433,7 +439,7 @@ public class MainActivity extends ActionBarActivity
             }
         }
 
-        if (id == R.id.action_long_request) {
+        else if (id == R.id.action_long_request) {
             try
             {
                 GetTimerMethod_HTTPClient_PUT_chunked();
