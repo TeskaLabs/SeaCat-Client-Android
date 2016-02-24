@@ -69,22 +69,6 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cs
 
 /*
  * Class:     com_teskalabs_seacat_android_client_core_seacatcc
- * Method:    cacert_url
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cacert_1url
-  (JNIEnv *, jclass);
-
-/*
- * Class:     com_teskalabs_seacat_android_client_core_seacatcc
- * Method:    cacert_worker
- * Signature: ([B)V
- */
-JNIEXPORT void JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cacert_1worker
-  (JNIEnv *, jclass, jbyteArray);
-
-/*
- * Class:     com_teskalabs_seacat_android_client_core_seacatcc
  * Method:    set_proxy_server_worker
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */

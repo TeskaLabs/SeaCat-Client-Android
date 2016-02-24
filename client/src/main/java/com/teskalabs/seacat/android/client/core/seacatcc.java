@@ -17,9 +17,6 @@ public final class seacatcc
 
     static public native int csrgen_worker(String[] params);
 
-    static public native String cacert_url();
-    static public native void cacert_worker(byte[] cacert);
-
     static public native int set_proxy_server_worker(String proxy_host, String proxy_port);
 
     // This is thread-safe (but quite expensive) method to obtain current time in format used by SeaCatCC event loop

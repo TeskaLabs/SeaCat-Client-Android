@@ -268,12 +268,6 @@ public class Reactor
                 break;
             }
 
-				
-			case 'R':
-				workerExecutor.execute(new CACertWorker());
-				break;
-				
-
 			default:
                 Log.w(SeaCatInternals.L, "Unknown worker requested: " + workerCode);
 		}

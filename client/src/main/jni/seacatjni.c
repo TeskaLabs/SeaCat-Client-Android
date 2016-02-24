@@ -560,22 +560,6 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cs
 }
 
 
-JNIEXPORT jstring JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cacert_1url(JNIEnv * env, jclass cls)
-{
-	jstring result = (*env)->NewStringUTF(env, seacatcc_cacert_url());
- 	return result;
-}
-
-JNIEXPORT void JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cacert_1worker(JNIEnv * env, jclass cls, jbyteArray cert)
-{
-	int len = (*env)->GetArrayLength(env, cert);
-    jbyte *ptr = (jbyte *)(*env)->GetByteArrayElements(env, cert, NULL);
-
-    seacatcc_cacert_worker((const char *)ptr, len);
-
-    (*env)->ReleaseByteArrayElements(env, cert, ptr, 0);
-}
-
 JNIEXPORT jdouble JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_time(JNIEnv * env, jclass cls)
 {
 	return seacatcc_time();

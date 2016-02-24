@@ -25,6 +25,7 @@ int seacatcc_shutdown(void);
 Yieds:
 	'd': Disconnect from gateway
 	'r': Reset identity
+	'n': Renew my certificate (aka trigger renewal process)
 	'f': Recover from fatal state
 	'W': We have data to send, call hook_write_ready ASAP
 */
@@ -32,21 +33,18 @@ int seacatcc_yield(char what);
 
 const char * seacatcc_version(void);
 
-const char * seacatcc_cacert_url(void);
-
 /*
 Workers:
 	'C': CSR -> seacatcc_csrgen_worker()
 	'P': PPK generator -> seacatcc_ppkgen_worker()
-	'R': SeaCat CA download 
 	'f': Recovery from fatal error worker, call seacatcc_yield('f') when done
 	'n': Network not-reachable worker
+	'R': OBSOLETED, NOT USED anylonger -> SeaCat CA download 
 */
 
 // Workers (functions to be launched in 'other' thread than reactor)
 void seacatcc_ppkgen_worker(void);
 int seacatcc_csrgen_worker(const char * csr_entries[]);
-void seacatcc_cacert_worker(const char * cacert, uint16_t cacert_len);
 
 
 // Hooks
@@ -137,6 +135,7 @@ double seacatcc_time(void);
 #define SEACATCC_RC_E_MYCERT_INVALID (-9934)
 #define SEACATCC_RC_E_MYCERT_NOT_VALID_YET (-9935)
 #define SEACATCC_RC_E_MYCERT_EXPIRED (-9936)
+#define SEACATCC_RC_E_CACERT_INVALID (-9937)
 
 #define SEACATCC_RC_E_PERMA_INVALID (-9941)
 
