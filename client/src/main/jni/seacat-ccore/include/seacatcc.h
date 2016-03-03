@@ -143,4 +143,11 @@ double seacatcc_time(void);
 
 #define SEACATCC_RC_E_GENERIC (-9999)
 
+// Progress return codes (internal use only)
+#define SEACATCC_RC_P_WANT_READ (-7801)
+#define SEACATCC_RC_P_WANT_WRITE (-7802)
+#define SEACATCC_RC_P_WANT_AGAIN (-7803)
+#define SEACATCC_RC_P_WANT_CLOSE (-7804)
+
+
 #endif //_SEACATCC_H_
