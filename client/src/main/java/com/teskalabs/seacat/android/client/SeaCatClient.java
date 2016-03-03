@@ -64,7 +64,6 @@ import org.apache.http.params.HttpParams;
  *
  *      protected void onStart() {
  *          super.onStart();
-
  *          IntentFilter intentFilter = new IntentFilter();
  *          intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
  *          registerReceiver(receiver, intentFilter);
