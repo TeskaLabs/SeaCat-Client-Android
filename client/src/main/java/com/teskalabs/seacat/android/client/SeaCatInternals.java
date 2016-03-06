@@ -31,4 +31,6 @@ public class SeaCatInternals
     }
 
     public static String applicationIdSuffix = null;
+
+    public static boolean logDebug = false;
 }

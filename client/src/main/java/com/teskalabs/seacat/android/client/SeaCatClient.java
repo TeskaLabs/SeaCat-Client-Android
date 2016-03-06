@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.EnumSet;
+import java.util.Iterator;
 
 import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.hc.SeaCatHttpClient;
@@ -377,6 +379,38 @@ public final class SeaCatClient
     public static void setCSRWorker(Runnable csrWorker)
     {
         SeaCatInternals.setCSRWorker(csrWorker);
+    }
+
+    ///
+
+    public enum LogFlag
+    {
+        DEBUG_GENERIC(0x0000000000000001);
+
+        public static final EnumSet<LogFlag> ALL_SET = EnumSet.allOf(LogFlag.class);
+        public static final EnumSet<LogFlag> NONE_SET = EnumSet.noneOf(LogFlag.class);
+
+        LogFlag(long v)
+        {
+            this.value = v;
+        }
+        private final long value;
+    }
+
+    public static void setLogMask(EnumSet<LogFlag> mask) throws IOException
+    {
+        Iterator itr = mask.iterator();
+        long bitmask = 0l;
+        while(itr.hasNext())
+        {
+            LogFlag flag = (LogFlag) itr.next();
+            bitmask |= flag.value;
+        }
+        int rc = seacatcc.log_set_mask(bitmask);
+        RC.checkAndThrowIOException("seacatcc.log_set_mask()", rc);
+
+        if (mask.contains(LogFlag.DEBUG_GENERIC)) SeaCatInternals.logDebug = true;
+        else SeaCatInternals.logDebug = false;
     }
 
     ///

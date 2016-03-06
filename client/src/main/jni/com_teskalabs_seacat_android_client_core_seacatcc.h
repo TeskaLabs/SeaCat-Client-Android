@@ -83,6 +83,14 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_se
 JNIEXPORT jdouble JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_time
   (JNIEnv *, jclass);
 
+/*
+ * Class:     com_teskalabs_seacat_android_client_core_seacatcc
+ * Method:    log_set_mask
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_log_1set_1mask
+  (JNIEnv *, jclass, jlong);
+
 #ifdef __cplusplus
 }
 #endif

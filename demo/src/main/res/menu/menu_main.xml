@@ -9,5 +9,8 @@
         android:orderInCategory="201" app:showAsAction="never" />
     <item android:id="@+id/action_long_request" android:title="Long request"
         android:orderInCategory="202" app:showAsAction="never" />
-
+    <item android:id="@+id/action_enable_debug_messages" android:title="Enable debug messages"
+        android:orderInCategory="202" app:showAsAction="never" />
+    <item android:id="@+id/action_disable_debug_messages" android:title="Disable debug messages"
+        android:orderInCategory="202" app:showAsAction="never" />
 </menu>

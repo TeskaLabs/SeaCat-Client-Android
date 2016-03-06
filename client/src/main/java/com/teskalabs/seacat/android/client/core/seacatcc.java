@@ -22,6 +22,8 @@ public final class seacatcc
     // This is thread-safe (but quite expensive) method to obtain current time in format used by SeaCatCC event loop
     static public native double time();
 
+    static public native int log_set_mask(long bitmask);
+
     ///
     static public final int RC_OK = (0);
     static public final int RC_E_GENERIC = (-9999);

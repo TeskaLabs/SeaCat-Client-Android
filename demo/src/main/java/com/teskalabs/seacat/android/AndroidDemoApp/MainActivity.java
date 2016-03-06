@@ -32,6 +32,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.EnumSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -456,6 +457,22 @@ public class MainActivity extends ActionBarActivity
                         resultTextView.setText(output);
                     }
                 });
+            }
+        }
+
+        else if (id == R.id.action_enable_debug_messages) {
+            try {
+                SeaCatClient.setLogMask(EnumSet.of(SeaCatClient.LogFlag.DEBUG_GENERIC));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        else if (id == R.id.action_disable_debug_messages) {
+            try {
+                SeaCatClient.setLogMask(SeaCatClient.LogFlag.NONE_SET);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 

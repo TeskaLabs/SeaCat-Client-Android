@@ -586,3 +586,9 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_se
 
 	return rc;
 }
+
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_log_1set_1mask(JNIEnv * env, jclass cls, jlong mask)
+{
+	union seacatcc_log_mask_u cc_mask = {.value = mask};
+	return seacatcc_log_set_mask(cc_mask);
+}
