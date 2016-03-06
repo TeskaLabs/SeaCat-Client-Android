@@ -178,13 +178,13 @@ static void JNICALLBACK_write_ready(void ** data, uint16_t * data_len)
 	{
 		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
 		{
-			seacatcc_log_p('E', "AttachCurrentThread failed");
+			seacatcc_log('E', "AttachCurrentThread failed");
 			return;
 		}
 	}
 	else if (getEnvStat == JNI_EVERSION)
 	{
-		seacatcc_log_p('E', "version not supported");
+		seacatcc_log('E', "version not supported");
 		return;
 	}
 
@@ -221,13 +221,13 @@ static void JNICALLBACK_read_ready(void ** data, uint16_t * data_len)
 	{
 		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
 		{
-			seacatcc_log_p('E', "AttachCurrentThread failed");
+			seacatcc_log('E', "AttachCurrentThread failed");
 			return;
 		}
 	}
 	else if (getEnvStat == JNI_EVERSION)
 	{
-		seacatcc_log_p('E', "version not supported");
+		seacatcc_log('E', "version not supported");
 		return;
 	}
 
@@ -252,7 +252,7 @@ static void JNICALLBACK_read_ready(void ** data, uint16_t * data_len)
 
 	else
 	{
-		seacatcc_log_p('E', "starvation");
+		seacatcc_log('E', "starvation");
 	}
 
 	if (getEnvStat == JNI_EDETACHED)
@@ -271,13 +271,13 @@ static void JNICALLBACK_frame_received(void * data, uint16_t frame_len)
 	{
 		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
 		{
-			seacatcc_log_p('E', "AttachCurrentThread failed");
+			seacatcc_log('E', "AttachCurrentThread failed");
 			return;
 		}
 	}
 	else if (getEnvStat == JNI_EVERSION)
 	{
-		seacatcc_log_p('E', "version not supported");
+		seacatcc_log('E', "version not supported");
 		return;
 	}
 
@@ -302,13 +302,13 @@ static void JNICALLBACK_frame_return(void * data)
 	{
 		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
 		{
-			seacatcc_log_p('E', "AttachCurrentThread failed");
+			seacatcc_log('E', "AttachCurrentThread failed");
 			return;
 		}
 	}
 	else if (getEnvStat == JNI_EVERSION)
 	{
-		seacatcc_log_p('E', "version not supported");
+		seacatcc_log('E', "version not supported");
 		return;
 	}
 
@@ -328,7 +328,7 @@ static void JNICALLBACK_frame_return(void * data)
 
 	else
 	{
-		seacatcc_log_p('E', "unknown frame");
+		seacatcc_log('E', "unknown frame");
 	}	
 
 
@@ -348,13 +348,13 @@ static void JNICALLBACK_worker_request(char worker)
 	{
 		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
 		{
-			seacatcc_log_p('E', "AttachCurrentThread failed");
+			seacatcc_log('E', "AttachCurrentThread failed");
 			return;
 		}
 	}
 	else if (getEnvStat == JNI_EVERSION)
 	{
-		seacatcc_log_p('E', "version not supported");
+		seacatcc_log('E', "version not supported");
 		return;
 	}
 
@@ -377,13 +377,13 @@ double JNICALLBACK_evloop_heartbeat(double now)
 	{
 		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
 		{
-			seacatcc_log_p('E', "AttachCurrentThread failed");
+			seacatcc_log('E', "AttachCurrentThread failed");
 			return NAN;
 		}
 	}
 	else if (getEnvStat == JNI_EVERSION)
 	{
-		seacatcc_log_p('E', "version not supported");
+		seacatcc_log('E', "version not supported");
 		return NAN;
 	}
 
@@ -407,13 +407,13 @@ static void JNICALLBACK_evloop_started(void)
 	{
 		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
 		{
-			seacatcc_log_p('E', "AttachCurrentThread failed");
+			seacatcc_log('E', "AttachCurrentThread failed");
 			return;
 		}
 	}
 	else if (getEnvStat == JNI_EVERSION)
 	{
-		seacatcc_log_p('E', "version not supported");
+		seacatcc_log('E', "version not supported");
 		return;
 	}
 
@@ -434,13 +434,13 @@ static void JNICALLBACK_gwconn_reset(void)
 	{
 		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
 		{
-			seacatcc_log_p('E', "AttachCurrentThread failed");
+			seacatcc_log('E', "AttachCurrentThread failed");
 			return;
 		}
 	}
 	else if (getEnvStat == JNI_EVERSION)
 	{
-		seacatcc_log_p('E', "version not supported");
+		seacatcc_log('E', "version not supported");
 		return;
 	}
 
@@ -460,13 +460,13 @@ static void JNICALLBACK_gwconn_connected(void)
 	{
 		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
 		{
-			seacatcc_log_p('E', "AttachCurrentThread failed");
+			seacatcc_log('E', "AttachCurrentThread failed");
 			return;
 		}
 	}
 	else if (getEnvStat == JNI_EVERSION)
 	{
-		seacatcc_log_p('E', "version not supported");
+		seacatcc_log('E', "version not supported");
 		return;
 	}
 
@@ -486,13 +486,13 @@ static void JNICALLBACK_state_changed(void)
 	{
 		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
 		{
-			seacatcc_log_p('E', "AttachCurrentThread failed");
+			seacatcc_log('E', "AttachCurrentThread failed");
 			return;
 		}
 	}
 	else if (getEnvStat == JNI_EVERSION)
 	{
-		seacatcc_log_p('E', "version not supported");
+		seacatcc_log('E', "version not supported");
 		return;
 	}
 

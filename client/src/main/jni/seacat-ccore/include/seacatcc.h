@@ -61,7 +61,6 @@ typedef void (* seacatcc_hook)(void);
 int seacatcc_hook_register(char code, seacatcc_hook hook);
 int static inline seacatcc_hook_unregister(char code) { return seacatcc_hook_register(code, NULL); }
 
-
 // Logging
 
 /*
@@ -74,10 +73,22 @@ Log levels:
 */
 
 void seacatcc_log(char level, const char * format, ...)  __attribute__ ((__format__ (__printf__, 2, 3)));
-#define seacatcc_log_p(level, format, ...) seacatcc_log(level, "%s:%s:%d " format, __FILE__, __func__, __LINE__, ##__VA_ARGS__)
 
 typedef void (* seacatcc_log_fnct)(char level, const char * message);
 void seacatcc_log_setfnct(seacatcc_log_fnct log_fnct);
+
+union seacatcc_log_mask_u
+{
+   struct
+   {
+      uint64_t DEBUG_GENERIC :1;
+      //TODO: uint64_t DEBUG_DISCOVER  :1,
+      uint64_t res2          :1;
+   };
+   uint64_t value;
+};
+
+int seacatcc_log_set_mask(union seacatcc_log_mask_u mask);
 
 
 // State

@@ -18,7 +18,7 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_C_INCLUDES := ./seacat-ccore/include
-LOCAL_LDLIBS := -llog -lz
+LOCAL_LDLIBS := -llog
 LOCAL_MODULE    := seacatjni
 LOCAL_SRC_FILES := seacatjni.c logging.c
 
