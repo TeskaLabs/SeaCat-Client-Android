@@ -2,6 +2,7 @@ package com.teskalabs.seacat.android.client.core;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
@@ -353,12 +354,24 @@ public class Reactor
 
     public void configureProxyServer() throws IOException
     {
-        // It includes also un-set
         // TODO: Execute this code (proxy reconfiguration) on any network related change
-        String proxy_host = System.getProperty("https.proxyHost", "");
-        String proxy_port = System.getProperty("https.proxyPort", "");
-        //String proxy_user = System.getProperty("https.proxyUser", "");
-        //String proxy_password = System.getProperty("https.proxyPassword", "");
+
+        SharedPreferences sp = context.getSharedPreferences(SeaCatInternals.SeaCatPreferences, Context.MODE_PRIVATE);
+
+        String proxy_host = sp.getString("HTTPSProxyHost", "");
+        String proxy_port = sp.getString("HTTPSProxyPort", "");
+
+        if (proxy_host.isEmpty())
+        {
+            String ProxyHostPropertyName = sp.getString("ProxyHostPropertyName", "https.proxyHost");
+            String ProxyPortPropertyName = sp.getString("ProxyPortPropertyName", "https.proxyPort");
+
+            proxy_host = System.getProperty(ProxyHostPropertyName, "");
+            proxy_port = System.getProperty(ProxyPortPropertyName, "");
+            //String proxy_user = System.getProperty("https.proxyUser", "");
+            //String proxy_password = System.getProperty("https.proxyPassword", "");
+        }
+
         int rc = seacatcc.set_proxy_server_worker(proxy_host, proxy_port);
         RC.checkAndThrowIOException("seacatcc.set_proxy_server_worker", rc);
     }
