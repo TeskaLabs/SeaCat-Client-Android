@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -17,6 +18,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.lang.System;
 
+import com.teskalabs.seacat.android.client.SeaCatInternals;
 import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.core.SPDY;
 import com.teskalabs.seacat.android.client.intf.*;
@@ -45,6 +47,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
 	public URLConnection(Reactor reactor, URL u, int priority)
 	{
 		super(u);
+
 		this.reactor = reactor;
 		this.priority = priority;
 
@@ -61,6 +64,10 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
     {
         if (!launched)
         {
+            final String host = getURL().getHost();
+            if (!host.endsWith(SeaCatInternals.SeaCatHostSuffix))
+                throw new MalformedURLException(String.format("Incorrect SeaCat URL host '%s', the host has to end by '%s'", host, SeaCatInternals.SeaCatHostSuffix));
+
             if (outboundStream != null)
             {
                 int contentLength = outboundStream.getContentLength();

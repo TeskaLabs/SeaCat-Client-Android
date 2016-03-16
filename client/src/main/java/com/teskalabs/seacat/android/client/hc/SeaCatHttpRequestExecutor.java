@@ -27,6 +27,8 @@
 
 package com.teskalabs.seacat.android.client.hc;
 
+import com.teskalabs.seacat.android.client.SeaCatInternals;
+
 import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -39,6 +41,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpProcessor;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 /**
  * HttpRequestExecutor is a client side HTTP protocol handler based on the 
@@ -131,8 +134,13 @@ public class SeaCatHttpRequestExecutor extends org.apache.http.protocol.HttpRequ
         if (context == null) {
             throw new IllegalArgumentException("HTTP context may not be null");
         }
+
         context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
         processor.process(request, context);
+
+        final String host = request.getFirstHeader("Host").getValue();
+        if (!host.endsWith(SeaCatInternals.SeaCatHostSuffix))
+            throw new MalformedURLException(String.format("Incorrect SeaCat URL host '%s', the host has to end by '%s'", host, SeaCatInternals.SeaCatHostSuffix));
     }
 
     /**

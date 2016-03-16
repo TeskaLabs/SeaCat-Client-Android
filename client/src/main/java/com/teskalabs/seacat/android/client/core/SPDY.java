@@ -1,5 +1,8 @@
 package com.teskalabs.seacat.android.client.core;
 
+import android.util.Log;
+
+import com.teskalabs.seacat.android.client.SeaCatInternals;
 import com.teskalabs.seacat.android.client.http.Headers;
 
 import java.io.UnsupportedEncodingException;
@@ -88,8 +91,16 @@ public class SPDY
 		assert buffer.position() == 18;
 
 		// Host (without .seacat)
-		final int lastPeriodPos = host.lastIndexOf('.');
-		if (lastPeriodPos > 0) host = host.substring(0, lastPeriodPos);
+        if (host.endsWith(SeaCatInternals.SeaCatHostSuffix))
+        {
+            final int lastPeriodPos = host.lastIndexOf('.');
+            if (lastPeriodPos > 0) host = host.substring(0, lastPeriodPos);
+        }
+        else
+        {
+            Log.w(SeaCatInternals.L, String.format("Incorrect SeaCat URL '%s', the host has to end by '%s'", host, SeaCatInternals.SeaCatHostSuffix));
+        }
+
 		appendVLEString(buffer, host);
 		appendVLEString(buffer, method);
 		appendVLEString(buffer, path);
