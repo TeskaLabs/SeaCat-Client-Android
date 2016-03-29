@@ -42,6 +42,7 @@ public class Reactor
 	final private BlockingQueue<IFrameProvider> frameProviders;
 
     final private Context context;
+    private String lastState;
 
 	///
 	
@@ -59,7 +60,7 @@ public class Reactor
 		int rc = seacatcc.init(context.getPackageName(), applicationIdSuffix, vardir.getAbsolutePath(), this);
 		RC.checkAndThrowIOException("seacatcc.init", rc);
 
-        configureProxyServer();
+        lastState = seacatcc.state();
 
 		// Setup frame provider priority queue
 		Comparator<IFrameProvider> frameProvidersComparator = new Comparator<IFrameProvider>()
@@ -305,13 +306,25 @@ public class Reactor
     protected void JNICallbackStateChanged(String state)
     {
         if (SeaCatInternals.logDebug) Log.d(SeaCatInternals.L, "State changed to "+state);
-        broadcastState(state);
+
+        Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
+        intent.putExtra(SeaCatClient.EXTRA_STATE, state);
+        intent.putExtra(SeaCatClient.EXTRA_PREV_STATE, lastState);
+        context.sendBroadcast(intent);
+
+        if ((lastState.charAt(0) != 'C') && (state.charAt(0) == 'C'))
+        {
+            configureProxyServer();
+        }
+
+        lastState = state;
     }
 
-    public void broadcastState(String state)
+    public void broadcastState()
     {
         Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
         intent.putExtra(SeaCatClient.EXTRA_STATE, seacatcc.state());
+        intent.putExtra(SeaCatClient.EXTRA_PREV_STATE, lastState);
         context.sendBroadcast(intent);
     }
 
@@ -352,10 +365,8 @@ public class Reactor
 	}
 
 
-    public void configureProxyServer() throws IOException
+    protected void configureProxyServer()
     {
-        // TODO: Execute this code (proxy reconfiguration) on any network related change
-
         SharedPreferences sp = context.getSharedPreferences(SeaCatInternals.SeaCatPreferences, Context.MODE_PRIVATE);
 
         String proxy_host = sp.getString("HTTPSProxyHost", "");
@@ -363,16 +374,13 @@ public class Reactor
 
         if (proxy_host.isEmpty())
         {
-            String ProxyHostPropertyName = sp.getString("ProxyHostPropertyName", "https.proxyHost");
-            String ProxyPortPropertyName = sp.getString("ProxyPortPropertyName", "https.proxyPort");
-
-            proxy_host = System.getProperty(ProxyHostPropertyName, "");
-            proxy_port = System.getProperty(ProxyPortPropertyName, "");
+            proxy_host = System.getProperty("https.proxyHost", "");
+            proxy_port = System.getProperty("https.proxyPort", "");
             //String proxy_user = System.getProperty("https.proxyUser", "");
             //String proxy_password = System.getProperty("https.proxyPassword", "");
         }
 
         int rc = seacatcc.set_proxy_server_worker(proxy_host, proxy_port);
-        RC.checkAndThrowIOException("seacatcc.set_proxy_server_worker", rc);
+        RC.checkAndLogError("seacatcc.set_proxy_server_worker", rc);
     }
 }

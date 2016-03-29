@@ -143,6 +143,7 @@ public final class SeaCatClient
      * </p>
      */
     public final static String EXTRA_STATE = "SEACAT_STATE";
+    public final static String EXTRA_PREV_STATE = "SEACAT_PREV_STATE";
 
     ///
 
@@ -184,7 +185,7 @@ public final class SeaCatClient
     public static void broadcastState()
     {
         Reactor reactor = getReactor();
-        if (reactor != null) reactor.broadcastState(getState());
+        if (reactor != null) reactor.broadcastState();
     }
 
     ///
