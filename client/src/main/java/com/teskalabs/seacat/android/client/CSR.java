@@ -203,6 +203,7 @@ public class CSR
 
                 CSR csr = new CSR();
 
+                //TODO: Remove this (don't need unique identifier)
                 csr.setUniqueIdentifier();
 
                 try {
