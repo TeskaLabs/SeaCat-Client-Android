@@ -116,8 +116,8 @@ extern "C" {
 
 #if !(defined(VMS) || defined(__VMS)) /* VMS uses logical names instead */
 #if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
-#define ENGINESDIR "/Users/alex/Workspace/seacat/client-ccore/openssl/android/armeabi/lib/engines"
-#define OPENSSLDIR "/Users/alex/Workspace/seacat/client-ccore/openssl/android/armeabi"
+#define ENGINESDIR "/Users/ateska/Workspace/seacat/client-ccore/openssl/android/armeabi/lib/engines"
+#define OPENSSLDIR "/Users/ateska/Workspace/seacat/client-ccore/openssl/android/armeabi"
 #endif
 #endif
 

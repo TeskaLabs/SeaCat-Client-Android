@@ -20,4 +20,4 @@ ${JAVAC} -d ../../../build/jni/classes -classpath ~/Library/Android/sdk/platform
 javah -d . -classpath ~/Library/Android/sdk/platforms/android-10/android.jar:../../../build/jni/classes com.teskalabs.seacat.android.client.core.seacatcc
 
 # Compile Android JNI
-${ANDROID_NDK}/ndk-build
+${ANDROID_NDK}/ndk-build -B
