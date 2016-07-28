@@ -170,9 +170,8 @@ public class SPDY
 
 	public static String parseVLEString(ByteBuffer buffer)
 	{
-		//TODO: Check and correctly handle signed values!
-		int length = buffer.get();
-		if (length == 0xFF) length = buffer.getShort();
+		int length = ((short) (buffer.get() & 0xff));
+		if (length == 0xFF) length = ((int) (buffer.getShort() & 0xffff));
 
 		assert length >= 0;
 		
