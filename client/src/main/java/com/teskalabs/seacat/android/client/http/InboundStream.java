@@ -56,6 +56,7 @@ public class InboundStream extends java.io.InputStream
 		if (closed)
 		{
 			// This stream is closed -> send RST_STREAM back
+			frame.clear();
 			reactor.streamFactory.sendRST_STREAM(frame, reactor, this.streamId, SPDY.RST_STREAM_STATUS_STREAM_ALREADY_CLOSED);
 			return false;
 		}
