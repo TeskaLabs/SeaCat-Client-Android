@@ -144,9 +144,9 @@ public class Reactor
 		int rc = seacatcc.yield('W');
 		if ((rc > 7900) && (rc < 8000))
 		{
-            Log.w(SeaCatInternals.L, String.format("return code %d in %s",rc ,"seacatcc.yield"));
+			Log.w(SeaCatInternals.L, String.format("return code %d in %s",rc ,"seacatcc.yield"));
 			rc = seacatcc.RC_OK;
-        }
+		}
 		RC.checkAndThrowIOException("seacatcc.yield", rc);
 	}
 
