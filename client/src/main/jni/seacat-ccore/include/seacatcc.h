@@ -5,6 +5,12 @@
 #include <stdarg.h>
 #include <stdint.h>
 
+/*
+
+How to use hashed application id:
+application_id = if it starts with '##' is it hashed already
+
+ */
 int seacatcc_init(
 	const char * application_id,
 	const char * application_id_suffix,
@@ -23,6 +29,7 @@ int seacatcc_shutdown(void);
 
 /*
 Yieds:
+	'c': Connect from gateway (no need to call this explicitly)
 	'd': Disconnect from gateway
 	'r': Reset identity
 	'n': Renew my certificate (aka trigger renewal process)
@@ -54,7 +61,7 @@ Hooks:
 	'E': evloop_started
 	'e': evloop_finished
 	'R': gwconn_reset
-	'C': gwconn_connected
+	'c': gwconn_connected
 	'S': state_changed
 */
 typedef void (* seacatcc_hook)(void);
@@ -90,6 +97,8 @@ union seacatcc_log_mask_u
 
 int seacatcc_log_set_mask(union seacatcc_log_mask_u mask);
 
+// Get gateway certificate
+int seacatcc_gwconn_cert(void * cert_buffer, uint16_t * cert_buffer_size);
 
 // State
 #define SEACATCC_STATE_BUF_SIZE 7
