@@ -90,6 +90,14 @@ public class SPDY
 		
 		assert buffer.position() == 18;
 
+		// Strip .seacat from hosts
+		// That's for historical reason (we need to support .seacat extension this way)
+        if (host.endsWith(SeaCatInternals.SeaCatHostSuffix))
+        {
+            final int lastPeriodPos = host.lastIndexOf('.');
+            if (lastPeriodPos > 0) host = host.substring(0, lastPeriodPos);
+        }
+
 		appendVLEString(buffer, host);
 		appendVLEString(buffer, method);
 		appendVLEString(buffer, path);
