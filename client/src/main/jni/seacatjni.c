@@ -157,7 +157,7 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_in
 	assert(rc == SEACATCC_RC_OK);
 	rc = seacatcc_hook_register('R', JNICALLBACK_gwconn_reset);
 	assert(rc == SEACATCC_RC_OK);
-	rc = seacatcc_hook_register('C', JNICALLBACK_gwconn_connected);
+	rc = seacatcc_hook_register('c', JNICALLBACK_gwconn_connected);
 	assert(rc == SEACATCC_RC_OK);
 	rc = seacatcc_hook_register('S', JNICALLBACK_state_changed);
 	assert(rc == SEACATCC_RC_OK);
