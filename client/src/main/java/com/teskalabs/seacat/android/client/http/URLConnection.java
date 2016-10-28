@@ -64,10 +64,6 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
     {
         if (!launched)
         {
-            final String host = getURL().getHost();
-            if (!host.endsWith(SeaCatInternals.SeaCatHostSuffix))
-                throw new MalformedURLException(String.format("Incorrect SeaCat URL host '%s', the host has to end by '%s'", host, SeaCatInternals.SeaCatHostSuffix));
-
             if (outboundStream != null)
             {
                 int contentLength = outboundStream.getContentLength();

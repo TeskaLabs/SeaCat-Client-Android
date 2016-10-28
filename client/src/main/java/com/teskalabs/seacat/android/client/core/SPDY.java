@@ -90,17 +90,6 @@ public class SPDY
 		
 		assert buffer.position() == 18;
 
-		// Host (without .seacat)
-        if (host.endsWith(SeaCatInternals.SeaCatHostSuffix))
-        {
-            final int lastPeriodPos = host.lastIndexOf('.');
-            if (lastPeriodPos > 0) host = host.substring(0, lastPeriodPos);
-        }
-        else
-        {
-            Log.w(SeaCatInternals.L, String.format("Incorrect SeaCat URL '%s', the host has to end by '%s'", host, SeaCatInternals.SeaCatHostSuffix));
-        }
-
 		appendVLEString(buffer, host);
 		appendVLEString(buffer, method);
 		appendVLEString(buffer, path);

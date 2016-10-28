@@ -137,10 +137,6 @@ public class SeaCatHttpRequestExecutor extends org.apache.http.protocol.HttpRequ
 
         context.setAttribute(ExecutionContext.HTTP_REQUEST, request);
         processor.process(request, context);
-
-        final String host = request.getFirstHeader("Host").getValue();
-        if (!host.endsWith(SeaCatInternals.SeaCatHostSuffix))
-            throw new MalformedURLException(String.format("Incorrect SeaCat URL host '%s', the host has to end by '%s'", host, SeaCatInternals.SeaCatHostSuffix));
     }
 
     /**

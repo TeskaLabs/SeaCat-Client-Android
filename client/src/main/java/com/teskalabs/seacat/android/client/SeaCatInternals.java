@@ -10,8 +10,6 @@ public class SeaCatInternals
 {
     final public static String L = "SeaCat";
 
-    final public static String SeaCatHostSuffix = ".seacat";
-
     final public static String SeaCatPreferences = "seacat_preferences";
 
     final static public Intent createIntent(String action)
