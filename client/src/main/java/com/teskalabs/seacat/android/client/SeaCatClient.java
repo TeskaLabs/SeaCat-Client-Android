@@ -231,6 +231,11 @@ public final class SeaCatClient
         getReactor().pingFactory.ping(reactor, ping);
 	}
 
+    public static void ping() throws IOException
+    {
+        getReactor().pingFactory.ping(reactor, new Ping() {});
+    }
+
 
     ///
 
