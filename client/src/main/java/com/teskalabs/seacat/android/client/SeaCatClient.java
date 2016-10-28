@@ -337,6 +337,19 @@ public final class SeaCatClient
     ///
 
     /**
+     * Connect to SeaCat gateway.
+     *
+     *
+     * @throws IOException if generic IO error occurred.
+     */
+
+    public static void connect() throws IOException
+    {
+        int rc = seacatcc.yield('c');
+        RC.checkAndThrowIOException("seacatcc.yield(connect)", rc);
+    }
+
+    /**
      * Disconnect from SeaCat gateway.
      *
      * <p>
