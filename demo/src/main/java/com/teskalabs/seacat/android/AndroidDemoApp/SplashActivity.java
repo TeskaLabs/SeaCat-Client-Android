@@ -18,9 +18,12 @@ import android.widget.Toast;
 import java.io.IOException;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
+import com.teskalabs.seacat.android.client.socket.SocketConfig;
 
 public class SplashActivity extends ActionBarActivity
 {
+    private static final String TAG = "SplashActivity";
+
     private BroadcastReceiver receiver;
     private Handler handler;
     private Runnable stateChecker;
@@ -29,6 +32,7 @@ public class SplashActivity extends ActionBarActivity
 
     CSRDialog csrDialog = null;
     boolean closing = false;
+    private boolean theFirstEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -79,6 +83,8 @@ public class SplashActivity extends ActionBarActivity
     {
         super.onStart();
 
+        theFirstEvent = true;
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
         intentFilter.addAction(SeaCatClient.ACTION_SEACAT_CSR_NEEDED);
@@ -103,8 +109,29 @@ public class SplashActivity extends ActionBarActivity
     private synchronized void onStateChanged(String state)
     {
         statusTextView.setText(state);
+
+        if (theFirstEvent)
+        {
+            theFirstEvent = false;
+
+            final String spath = getFilesDir().getAbsolutePath() + "/test.socket";
+            Log.i(TAG, "Test socket path:"+spath);
+
+            try {
+                SeaCatClient.configureSocket(
+                    SocketConfig.Domain.AF_UNIX,
+                    SocketConfig.Type.SOCK_STREAM,
+                    0,
+                    5900, spath
+                );
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to open test socket", e);
+            }
+        }
+
         if ((state.charAt(3) == 'Y') && (state.charAt(4) == 'N') && (state.charAt(0) != 'f')) {
             if (closing == false) {
+                // Close activity and go to Main Activity
                 closing = true;
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
                 finish();

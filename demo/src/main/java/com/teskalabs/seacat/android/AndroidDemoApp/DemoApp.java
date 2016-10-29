@@ -1,7 +1,6 @@
 package com.teskalabs.seacat.android.AndroidDemoApp;
 
 import android.app.Application;
-
 import com.teskalabs.seacat.android.client.SeaCatClient;
 
 import java.io.IOException;
