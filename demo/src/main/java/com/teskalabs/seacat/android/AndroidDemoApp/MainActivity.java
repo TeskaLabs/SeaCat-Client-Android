@@ -1,6 +1,9 @@
 package com.teskalabs.seacat.android.AndroidDemoApp;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -36,16 +39,20 @@ import java.util.EnumSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.teskalabs.seacat.android.AndroidDemoApp.R.id.statusTextView;
+
 public class MainActivity extends ActionBarActivity
 {
-
     private TextView resultTextView = null;
     private TextView pingTextView = null;
+    private TextView statusTextView = null;
+
     private Timer pingTimer = null;
     private Timer getTimer = null;
     private int counter = 0;
 
     private org.apache.http.client.CookieStore HTTPClient_cookieStore;
+    private BroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -55,6 +62,7 @@ public class MainActivity extends ActionBarActivity
 
         resultTextView = (TextView) findViewById(R.id.resultTextView);
         pingTextView = (TextView) findViewById(R.id.pingTextView);
+        statusTextView = (TextView) findViewById(R.id.statusTextView);
     }
 
     @Override
@@ -110,6 +118,26 @@ public class MainActivity extends ActionBarActivity
             }
             }
         }, 0, 1000);
+
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.hasCategory(SeaCatClient.CATEGORY_SEACAT))
+                {
+                    String action = intent.getAction();
+                    if (action.equals(SeaCatClient.ACTION_SEACAT_STATE_CHANGED)) {
+                        statusTextView.setText(intent.getStringExtra(SeaCatClient.EXTRA_STATE));
+                        return;
+                    }
+                }
+            }
+        };
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
+        intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
+        registerReceiver(receiver, intentFilter);
 
     }
 

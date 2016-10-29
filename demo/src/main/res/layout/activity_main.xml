@@ -15,11 +15,20 @@
         android:layout_alignParentStart="true" />
 
     <TextView android:text="Waiting ..." android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/resultTextView"
+              android:textSize="8dp"
+              android:layout_below="@+id/pingTextView"
+              android:layout_alignParentLeft="true"
+              android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/resultTextView"
-        android:textSize="8dp"
-        android:layout_below="@+id/pingTextView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:text="@string/status_unknown"
+        android:id="@+id/statusTextView"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>
