@@ -14,6 +14,7 @@ import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.hc.SeaCatHttpClient;
 import com.teskalabs.seacat.android.client.http.URLConnection;
 import com.teskalabs.seacat.android.client.ping.Ping;
+import com.teskalabs.seacat.android.client.socket.SocketConfig;
 import com.teskalabs.seacat.android.client.util.RC;
 import com.teskalabs.seacat.android.client.core.seacatcc;
 
@@ -430,6 +431,14 @@ public final class SeaCatClient
 
         if (mask.contains(LogFlag.DEBUG_GENERIC)) SeaCatInternals.logDebug = true;
         else SeaCatInternals.logDebug = false;
+    }
+
+    ///
+
+    public static void configureSocket(SocketConfig.Domain domain, SocketConfig.Type type, int protocol, int port, String address) throws IOException
+    {
+        int rc = seacatcc.socket_configure_worker(domain.getValue(), type.getValue(), protocol, port, address);
+        RC.checkAndThrowIOException("seacatcc.socket_configure_worker()", rc);
     }
 
     ///

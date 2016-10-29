@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <sys/socket.h>
 
 #include <seacatcc.h>
 
@@ -591,4 +592,38 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_lo
 {
 	union seacatcc_log_mask_u cc_mask = {.value = mask};
 	return seacatcc_log_set_mask(cc_mask);
+}
+
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_socket_1configure_1worker(JNIEnv * env, jclass cls, jchar domain, jchar sock_type, jint protocol, jint port, jstring address)
+{
+	int domain_int = -1;
+	switch (domain)
+	{
+		case 'u': domain_int = AF_UNIX; break;
+		case '4': domain_int = AF_INET; break;
+		case '6': domain_int = AF_INET6; break;
+	};
+	if (domain_int == -1)
+	{
+		seacatcc_log('E', "Unknown/invalid domain at socket_configure_worker: '%c'", domain);
+		return SEACATCC_RC_E_INVALID_ARGS;
+	}
+
+	int sock_type_int = -1;
+	switch (sock_type)
+	{
+		case 's': sock_type_int = SOCK_STREAM; break;
+		case 'd': sock_type_int = SOCK_DGRAM; break;
+	};
+	if (sock_type_int == -1)
+	{
+		seacatcc_log('E', "Unknown/invalid type at socket_configure_worker: '%c'", sock_type);
+		return SEACATCC_RC_E_INVALID_ARGS;
+	}
+
+	const char * addressChar = (*env)->GetStringUTFChars(env, address, 0);
+	int rc = seacatcc_socks_configure_worker(domain_int, sock_type_int, protocol, port, addressChar);
+	(*env)->ReleaseStringUTFChars(env, address, addressChar);
+
+	return rc;
 }

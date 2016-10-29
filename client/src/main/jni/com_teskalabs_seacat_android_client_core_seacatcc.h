@@ -91,6 +91,14 @@ JNIEXPORT jdouble JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc
 JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_log_1set_1mask
   (JNIEnv *, jclass, jlong);
 
+/*
+ * Class:     com_teskalabs_seacat_android_client_core_seacatcc
+ * Method:    socket_configure_worker
+ * Signature: (CCIILjava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_socket_1configure_1worker
+  (JNIEnv *, jclass, jchar, jchar, jint, jint, jstring);
+
 #ifdef __cplusplus
 }
 #endif
