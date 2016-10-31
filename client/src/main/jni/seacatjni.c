@@ -594,7 +594,7 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_lo
 	return seacatcc_log_set_mask(cc_mask);
 }
 
-JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_socket_1configure_1worker(JNIEnv * env, jclass cls, jchar domain, jchar sock_type, jint protocol, jint port, jstring address)
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_socket_1configure_1worker(JNIEnv * env, jclass cls, jchar domain, jchar sock_type, jint protocol, jint port, jstring peer_address, jstring peer_port)
 {
 	int domain_int = -1;
 	switch (domain)
@@ -621,9 +621,11 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_so
 		return SEACATCC_RC_E_INVALID_ARGS;
 	}
 
-	const char * addressChar = (*env)->GetStringUTFChars(env, address, 0);
-	int rc = seacatcc_socks_configure_worker(domain_int, sock_type_int, protocol, port, addressChar);
-	(*env)->ReleaseStringUTFChars(env, address, addressChar);
+	const char * peerAddressChar = (*env)->GetStringUTFChars(env, peer_address, 0);
+	const char * peerPortChar = (*env)->GetStringUTFChars(env, peer_port, 0);
+	int rc = seacatcc_socks_configure_worker(domain_int, sock_type_int, protocol, port, peerAddressChar, peerPortChar);
+	(*env)->ReleaseStringUTFChars(env, peer_port, peerPortChar);
+	(*env)->ReleaseStringUTFChars(env, peer_address, peerAddressChar);
 
 	return rc;
 }

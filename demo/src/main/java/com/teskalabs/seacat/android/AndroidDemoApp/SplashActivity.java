@@ -122,7 +122,8 @@ public class SplashActivity extends ActionBarActivity
                     SocketConfig.Domain.AF_UNIX,
                     SocketConfig.Type.SOCK_STREAM,
                     0,
-                    5900, spath
+                    5900,
+                    spath, ""
                 );
             } catch (IOException e) {
                 Log.e(TAG, "Failed to open test socket", e);

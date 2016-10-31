@@ -110,8 +110,8 @@ int seacatcc_set_proxy_server_worker(const char * proxy_host, const char * proxy
 
 
 // Socks
-// For unconfiguring a port, use: seacatcc_socks_configure_worker(0, [type], 0, [port number], NULL)
-int seacatcc_socks_configure_worker(uint16_t domain, uint16_t type, uint16_t protocol, uint16_t port, const char * address);
+// For unconfiguring a port, use: seacatcc_socks_configure_worker(0, [type], 0, [port number], NULL, NULL)
+int seacatcc_socks_configure_worker(uint16_t domain, uint16_t type, uint16_t protocol, uint16_t port, const char * peer_address, const char * peer_port);
 
 // Misc
 int seacatcc_network_reachable(void);

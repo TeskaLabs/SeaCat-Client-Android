@@ -94,10 +94,10 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_lo
 /*
  * Class:     com_teskalabs_seacat_android_client_core_seacatcc
  * Method:    socket_configure_worker
- * Signature: (CCIILjava/lang/String;)I
+ * Signature: (CCIILjava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_socket_1configure_1worker
-  (JNIEnv *, jclass, jchar, jchar, jint, jint, jstring);
+  (JNIEnv *, jclass, jchar, jchar, jint, jint, jstring, jstring);
 
 #ifdef __cplusplus
 }
