@@ -53,7 +53,7 @@
         android:layout_alignParentBottom="true" />
 
     <TextView
-        android:text="-----------------"
+        android:text="[????????????????]"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
