@@ -435,9 +435,9 @@ public final class SeaCatClient
 
     ///
 
-    public static void configureSocket(SocketConfig.Domain domain, SocketConfig.Type type, int protocol, int port, String peerAddress, String peerPort) throws IOException
+    public static void configureSocket(int port, SocketConfig.Domain domain, SocketConfig.Type type, int protocol, String peerAddress, String peerPort) throws IOException
     {
-        int rc = seacatcc.socket_configure_worker(domain.getValue(), type.getValue(), protocol, port, peerAddress, peerPort);
+        int rc = seacatcc.socket_configure_worker(port, domain.getValue(), type.getValue(), protocol, peerAddress, peerPort);
         RC.checkAndThrowIOException("seacatcc.socket_configure_worker()", rc);
     }
 

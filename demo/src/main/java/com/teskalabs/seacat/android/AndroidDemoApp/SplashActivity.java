@@ -119,10 +119,8 @@ public class SplashActivity extends ActionBarActivity
 
             try {
                 SeaCatClient.configureSocket(
-                    SocketConfig.Domain.AF_UNIX,
-                    SocketConfig.Type.SOCK_STREAM,
-                    0,
                     5900,
+                    SocketConfig.Domain.AF_UNIX,  SocketConfig.Type.SOCK_STREAM,  0,
                     spath, ""
                 );
             } catch (IOException e) {

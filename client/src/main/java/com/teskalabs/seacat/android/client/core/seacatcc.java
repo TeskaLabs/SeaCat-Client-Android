@@ -24,7 +24,7 @@ public final class seacatcc
 
     static public native int log_set_mask(long bitmask);
 
-    static public native int socket_configure_worker(char domain, char type, int protocol, int port, String peer_address, String peer_port);
+    static public native int socket_configure_worker(int port, char domain, char type, int protocol, String peer_address, String peer_port);
 
     ///
     static public final int RC_OK = (0);

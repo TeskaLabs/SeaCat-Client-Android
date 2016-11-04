@@ -63,6 +63,7 @@ Hooks:
 	'R': gwconn_reset
 	'c': gwconn_connected
 	'S': state_changed
+	'I': client_id_changed (and also client tag)
 */
 typedef void (* seacatcc_hook)(void);
 int seacatcc_hook_register(char code, seacatcc_hook hook);
@@ -97,21 +98,25 @@ union seacatcc_log_mask_u
 
 int seacatcc_log_set_mask(union seacatcc_log_mask_u mask);
 
+// Those functiond are *NOT* safe to be called from other than seacat thread, should be called from hook handlers etc.
 // Get gateway certificate
 int seacatcc_gwconn_cert(void * cert_buffer, uint16_t * cert_buffer_size);
 
+const char * seacatcc_client_id(void);
+const char * seacatcc_client_tag(void);
+
 // State
-#define SEACATCC_STATE_BUF_SIZE 7
-void seacatcc_state(char * state_buf);
+#define SEACATCC_STATE_BUF_SIZE (7)
+void seacatcc_state(char * state_buffer);
 
 
 // Proxy
 int seacatcc_set_proxy_server_worker(const char * proxy_host, const char * proxy_port);
 
 
-// Socks
-// For unconfiguring a port, use: seacatcc_socks_configure_worker(0, [type], 0, [port number], NULL, NULL)
-int seacatcc_socks_configure_worker(uint16_t domain, uint16_t type, uint16_t protocol, uint16_t port, const char * peer_address, const char * peer_port);
+// Sockets
+// For unconfiguring a port, use: seacatcc_socket_configure_worker(0, [type], 0, [port number], NULL, NULL)
+int seacatcc_socket_configure_worker(uint16_t port, uint16_t domain, uint16_t type, uint16_t protocol, const char * peer_address, const char * peer_port);
 
 // Misc
 int seacatcc_network_reachable(void);
