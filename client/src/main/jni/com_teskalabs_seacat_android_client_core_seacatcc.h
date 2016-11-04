@@ -99,6 +99,22 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_lo
 JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_socket_1configure_1worker
   (JNIEnv *, jclass, jint, jchar, jchar, jint, jstring, jstring);
 
+/*
+ * Class:     com_teskalabs_seacat_android_client_core_seacatcc
+ * Method:    client_id
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_client_1id
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     com_teskalabs_seacat_android_client_core_seacatcc
+ * Method:    client_tag
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_client_1tag
+  (JNIEnv *, jclass);
+
 #ifdef __cplusplus
 }
 #endif

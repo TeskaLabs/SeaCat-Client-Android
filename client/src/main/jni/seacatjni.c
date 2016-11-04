@@ -575,6 +575,18 @@ JNIEXPORT jstring JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc
  	return result;
 }
 
+JNIEXPORT jstring JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_client_1id(JNIEnv * env, jclass cls)
+{
+	jstring result = (*env)->NewStringUTF(env, seacatcc_client_id());
+ 	return result;
+}
+
+JNIEXPORT jstring JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_client_1tag(JNIEnv * env, jclass cls)
+{
+	jstring result = (*env)->NewStringUTF(env, seacatcc_client_tag());
+ 	return result;
+}
+
 JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_set_1proxy_1server_1worker(JNIEnv * env, jclass cls, jstring proxy_host, jstring proxy_port)
 {
 	const char * proxyHostChar = (*env)->GetStringUTFChars(env, proxy_host, 0);

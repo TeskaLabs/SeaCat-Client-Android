@@ -26,6 +26,9 @@ public final class seacatcc
 
     static public native int socket_configure_worker(int port, char domain, char type, int protocol, String peer_address, String peer_port);
 
+    static public native String client_id();
+    static public native String client_tag();
+
     ///
     static public final int RC_OK = (0);
     static public final int RC_E_GENERIC = (-9999);
