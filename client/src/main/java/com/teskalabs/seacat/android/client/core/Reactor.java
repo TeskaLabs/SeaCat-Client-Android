@@ -44,6 +44,9 @@ public class Reactor
     final private Context context;
     private String lastState;
 
+	private String clientId = "ANONYMOUS_CLIENT";
+	private String clientTag = "[ANONYMOUS0CLIENT]";
+
 	///
 	
 	public Reactor(Context context, String applicationIdSuffix) throws IOException
@@ -320,6 +323,17 @@ public class Reactor
         lastState = state;
     }
 
+	protected void JNICallbackClientIdChanged(String clientId, String clientTag)
+	{
+		this.clientId = clientId;
+		this.clientTag = clientTag;
+
+		Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_CLIENTID_CHANGED);
+		intent.putExtra(SeaCatClient.EXTRA_CLIENT_ID, this.clientId);
+		intent.putExtra(SeaCatClient.EXTRA_CLIENT_TAG, this.clientTag);
+		context.sendBroadcast(intent);
+	}
+
     public void broadcastState()
     {
         Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
@@ -383,4 +397,16 @@ public class Reactor
         int rc = seacatcc.set_proxy_server_worker(proxy_host, proxy_port);
         RC.checkAndLogError("seacatcc.set_proxy_server_worker", rc);
     }
+
+	///
+
+	public String getClientTag()
+	{
+		return this.clientTag;
+	}
+
+	public String getClientId()
+	{
+		return this.clientId;
+	}
 }

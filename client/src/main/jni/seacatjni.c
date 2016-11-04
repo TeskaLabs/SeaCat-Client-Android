@@ -28,6 +28,7 @@ static jmethodID g_reactor_JNICALLBACK_evloop_started_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_gwconn_reset_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_gwconn_connected_mid = 0;
 static jmethodID g_reactor_JNICALLBACK_state_changed_mid = 0;
+static jmethodID g_reactor_JNICALLBACK_clientid_changed_mid = 0;
 
 static jobject g_write_buffer_obj = NULL;
 static jobject g_read_buffer_obj = NULL;
@@ -45,6 +46,7 @@ static void JNICALLBACK_evloop_started(void);
 static void JNICALLBACK_gwconn_connected(void);
 static void JNICALLBACK_gwconn_reset(void);
 static void JNICALLBACK_state_changed(void);
+static void JNICALLBACK_clientid_changed(void);
 
 ///
 
@@ -132,6 +134,9 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_in
 	g_reactor_JNICALLBACK_state_changed_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackStateChanged", "(Ljava/lang/String;)V");
 	if (g_reactor_JNICALLBACK_state_changed_mid == NULL) return SEACATCC_RC_E_GENERIC;
 
+	g_reactor_JNICALLBACK_clientid_changed_mid = (*env)->GetMethodID(env, g_clazz, "JNICallbackClientIdChanged", "(Ljava/lang/String;Ljava/lang/String;)V");
+	if (g_reactor_JNICALLBACK_clientid_changed_mid == NULL) return SEACATCC_RC_E_GENERIC;
+
 #ifdef __ANDROID__
 	static const char * platform = "and";
 #else
@@ -161,6 +166,8 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_in
 	rc = seacatcc_hook_register('c', JNICALLBACK_gwconn_connected);
 	assert(rc == SEACATCC_RC_OK);
 	rc = seacatcc_hook_register('S', JNICALLBACK_state_changed);
+	assert(rc == SEACATCC_RC_OK);
+	rc = seacatcc_hook_register('i', JNICALLBACK_clientid_changed);
 	assert(rc == SEACATCC_RC_OK);
 
 	return rc;
@@ -507,6 +514,38 @@ static void JNICALLBACK_state_changed(void)
 
 	if (getEnvStat == JNI_EDETACHED)
 		(*g_java_vm)->DetachCurrentThread(g_java_vm);
+}
+
+static void JNICALLBACK_clientid_changed(void)
+{
+	JNIEnv * g_env;
+	assert(g_java_vm != NULL);
+
+	int getEnvStat = (*g_java_vm)->GetEnv(g_java_vm, (void **)&g_env, JNI_VERSION_1_6);
+	if (getEnvStat == JNI_EDETACHED)
+	{
+		if ((*g_java_vm)->AttachCurrentThread(g_java_vm, (JNINATIVEINTERFACEPTR) &g_env, NULL) != 0)
+		{
+			seacatcc_log('E', "AttachCurrentThread failed");
+			return;
+		}
+	}
+	else if (getEnvStat == JNI_EVERSION)
+	{
+		seacatcc_log('E', "version not supported");
+		return;
+	}
+
+	jstring clientid_buf = (*g_env)->NewStringUTF(g_env, seacatcc_client_id());
+	jstring clienttag_buf = (*g_env)->NewStringUTF(g_env, seacatcc_client_tag());
+	(*g_env)->CallVoidMethod(g_env, g_reactor_obj, g_reactor_JNICALLBACK_clientid_changed_mid, clientid_buf, clienttag_buf, NULL);
+	(*g_env)->DeleteLocalRef(g_env, clientid_buf);
+	clientid_buf= NULL;
+	(*g_env)->DeleteLocalRef(g_env, clienttag_buf);
+	clienttag_buf= NULL;
+
+	if (getEnvStat == JNI_EDETACHED)
+		(*g_java_vm)->DetachCurrentThread(g_java_vm);	
 }
 
 ////

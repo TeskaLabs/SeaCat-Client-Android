@@ -29,6 +29,7 @@ public class SplashActivity extends ActionBarActivity
     private Runnable stateChecker;
 
     private TextView statusTextView = null;
+    private TextView clientTagTextView = null;
 
     CSRDialog csrDialog = null;
     boolean closing = false;
@@ -41,6 +42,7 @@ public class SplashActivity extends ActionBarActivity
         setContentView(R.layout.activity_splash);
 
         statusTextView = (TextView) findViewById(R.id.statusTextView);
+        clientTagTextView = (TextView) findViewById(R.id.clientTagTextView);
 
         receiver = new BroadcastReceiver() {
             @Override
@@ -53,11 +55,15 @@ public class SplashActivity extends ActionBarActivity
                         return;
                     }
 
+                    if (action.equals(SeaCatClient.ACTION_SEACAT_CLIENTID_CHANGED)) {
+                        SplashActivity.this.onClientIdChanged(intent.getStringExtra(SeaCatClient.EXTRA_CLIENT_ID), intent.getStringExtra(SeaCatClient.EXTRA_CLIENT_TAG));
+                        return;
+                    }
+
                     if (action.equals(SeaCatClient.ACTION_SEACAT_CSR_NEEDED)) {
                         //SplashActivity.this.onCSRNeeded();
                         return;
                     }
-
                 }
 
                 Log.w(SplashActivity.class.getCanonicalName(), "Unexpected intent: "+intent);
@@ -88,12 +94,14 @@ public class SplashActivity extends ActionBarActivity
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
         intentFilter.addAction(SeaCatClient.ACTION_SEACAT_CSR_NEEDED);
+        intentFilter.addAction(SeaCatClient.ACTION_SEACAT_CLIENTID_CHANGED);
         intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
         registerReceiver(receiver, intentFilter);
 
         closing = false;
         stateChecker.run();
 
+        clientTagTextView.setText(SeaCatClient.getClientTag());
     }
 
     @Override
@@ -163,6 +171,11 @@ public class SplashActivity extends ActionBarActivity
             }
         };
         csrDialog.show();
+    }
+
+    private void onClientIdChanged(String clientId, String clientTag)
+    {
+        clientTagTextView.setText(clientTag);
     }
 
     // Menu

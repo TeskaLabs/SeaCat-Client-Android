@@ -127,6 +127,8 @@ public final class SeaCatClient
      */
     public final static String ACTION_SEACAT_STATE_CHANGED = "mobi.seacat.client.intent.action.STATE_CHANGED";
 
+    public final static String ACTION_SEACAT_CLIENTID_CHANGED = "mobi.seacat.client.intent.action.CLIENTID_CHANGED";
+
     /**
      * The key to <tt>Intent</tt> extras with information about client state.<br>
      * Used in <tt>ACTION_SEACAT_STATE_CHANGED</tt> Intents.<br>
@@ -145,6 +147,9 @@ public final class SeaCatClient
      */
     public final static String EXTRA_STATE = "SEACAT_STATE";
     public final static String EXTRA_PREV_STATE = "SEACAT_PREV_STATE";
+
+    public final static String EXTRA_CLIENT_ID = "SEACAT_CLIENT_ID";
+    public final static String EXTRA_CLIENT_TAG = "SEACAT_CLIENT_TAG";
 
     ///
 
@@ -443,5 +448,21 @@ public final class SeaCatClient
 
     ///
 
-	private SeaCatClient() { } // This is static-only class, so we hide constructor
+    public static final String getClientId()
+    {
+        Reactor r = getReactor();
+        if (r == null) return null;
+        return r.getClientId();
+    }
+
+    public static final String getClientTag()
+    {
+        Reactor r = getReactor();
+        if (r == null) return null;
+        return r.getClientTag();
+    }
+
+    ///
+
+    private SeaCatClient() { } // This is static-only class, so we hide constructor
 }
