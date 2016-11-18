@@ -10,13 +10,6 @@ import com.teskalabs.seacat.android.client.core.Reactor;
 
 public class SeaCatService extends Service
 {
-    static SeaCatService instance = null;
-
-    public SeaCatService()
-    {
-        instance = this;
-    }
-
     @Override
     public void onCreate()
     {
@@ -27,7 +20,7 @@ public class SeaCatService extends Service
         }
 
         try {
-            SeaCatClient.setReactor(new Reactor(getApplicationContext(), SeaCatInternals.applicationIdSuffix));
+            SeaCatClient.setReactor(new Reactor(this, SeaCatInternals.applicationIdSuffix));
         } catch (Exception e) {
             Log.e(SeaCatInternals.L, "Reactor shutdown failed:", e);
         }
@@ -69,20 +62,10 @@ public class SeaCatService extends Service
     }
 
 
-    // Binder
-
-    public class LocalBinder extends Binder {
-        SeaCatService getService()
-        {
-            return SeaCatService.this;
-        }
-    }
-
-    private final IBinder mBinder = new LocalBinder();
-
+    // Don't offer binding
     @Override
     public IBinder onBind(Intent intent)
     {
-        return mBinder;
+        return null;
     }
 }

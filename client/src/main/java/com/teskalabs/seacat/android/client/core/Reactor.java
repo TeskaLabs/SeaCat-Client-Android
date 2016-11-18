@@ -1,12 +1,14 @@
 package com.teskalabs.seacat.android.client.core;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
 import com.teskalabs.seacat.android.client.SeaCatInternals;
+import com.teskalabs.seacat.android.client.SeaCatService;
 import com.teskalabs.seacat.android.client.intf.ICntlFrameConsumer;
 import com.teskalabs.seacat.android.client.intf.IFrameProvider;
 import com.teskalabs.seacat.android.client.ping.PingFactory;
@@ -27,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 //TODO: Replace print by Android logging (done in this file, check others)
 
-public class Reactor
+public class Reactor extends ContextWrapper
 {
 	final public FramePool framePool = new FramePool();
 	final private Thread sessionThread;
@@ -41,7 +43,6 @@ public class Reactor
 	final private Map<Integer, ICntlFrameConsumer> cntlFrameConsumers = new HashMap<Integer, ICntlFrameConsumer>();
 	final private BlockingQueue<IFrameProvider> frameProviders;
 
-    final private Context context;
     private String lastState;
 
 	private String clientId = "ANONYMOUS_CLIENT";
@@ -49,18 +50,18 @@ public class Reactor
 
 	///
 	
-	public Reactor(Context context, String applicationIdSuffix) throws IOException
+	public Reactor(SeaCatService service, String applicationIdSuffix) throws IOException
 	{
-        this.context = context;
+		super(service);
 
 		this.sessionThread = new Thread(new Runnable() { public void run() { Reactor._run(); }});
 		this.sessionThread.setName("SeaCatReactorThread");
 		this.sessionThread.setDaemon(true);
 		this.workerExecutor = new ThreadPoolExecutor(0, 1000, 5, TimeUnit.SECONDS, workerQueue);
 
-        java.io.File vardir = context.getDir("seacat", Context.MODE_PRIVATE);
+        java.io.File vardir = this.getDir("seacat", Context.MODE_PRIVATE);
 
-		int rc = seacatcc.init(context.getPackageName(), applicationIdSuffix, vardir.getAbsolutePath(), this);
+		int rc = seacatcc.init(this.getPackageName(), applicationIdSuffix, vardir.getAbsolutePath(), this);
 		RC.checkAndThrowIOException("seacatcc.init", rc);
 
         lastState = seacatcc.state();
@@ -268,7 +269,7 @@ public class Reactor
                 if (CSRWorker != null) workerExecutor.execute(CSRWorker);
 
                 Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_CSR_NEEDED);
-                context.sendBroadcast(intent);
+                this.sendBroadcast(intent);
 
                 break;
             }
@@ -291,19 +292,19 @@ public class Reactor
 
 	protected void JNICallbackEvLoopStarted()
 	{
-        context.sendBroadcast(SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_EVLOOP_STARTED));
+        this.sendBroadcast(SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_EVLOOP_STARTED));
 	}
 
 	protected void JNICallbackGWConnConnected()
 	{
-        context.sendBroadcast(SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_GWCONN_CONNECTED));
+        this.sendBroadcast(SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_GWCONN_CONNECTED));
 	}
 
     protected void JNICallbackGWConnReset()
     {
         pingFactory.reset();
         streamFactory.reset();
-        context.sendBroadcast(SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_GWCONN_RESET));
+        this.sendBroadcast(SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_GWCONN_RESET));
     }
 
     protected void JNICallbackStateChanged(String state)
@@ -313,7 +314,7 @@ public class Reactor
         Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
         intent.putExtra(SeaCatClient.EXTRA_STATE, state);
         intent.putExtra(SeaCatClient.EXTRA_PREV_STATE, lastState);
-        context.sendBroadcast(intent);
+        this.sendBroadcast(intent);
 
         if ((lastState.charAt(0) != 'C') && (state.charAt(0) == 'C'))
         {
@@ -331,7 +332,7 @@ public class Reactor
 		Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_CLIENTID_CHANGED);
 		intent.putExtra(SeaCatClient.EXTRA_CLIENT_ID, this.clientId);
 		intent.putExtra(SeaCatClient.EXTRA_CLIENT_TAG, this.clientTag);
-		context.sendBroadcast(intent);
+		this.sendBroadcast(intent);
 	}
 
     public void broadcastState()
@@ -339,7 +340,7 @@ public class Reactor
         Intent intent = SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
         intent.putExtra(SeaCatClient.EXTRA_STATE, seacatcc.state());
         intent.putExtra(SeaCatClient.EXTRA_PREV_STATE, lastState);
-        context.sendBroadcast(intent);
+        this.sendBroadcast(intent);
     }
 
     ///
@@ -381,7 +382,7 @@ public class Reactor
 
     protected void configureProxyServer()
     {
-        SharedPreferences sp = context.getSharedPreferences(SeaCatInternals.SeaCatPreferences, Context.MODE_PRIVATE);
+        SharedPreferences sp = this.getSharedPreferences(SeaCatInternals.SeaCatPreferences, Context.MODE_PRIVATE);
 
         String proxy_host = sp.getString("HTTPSProxyHost", "");
         String proxy_port = sp.getString("HTTPSProxyPort", "");

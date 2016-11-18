@@ -49,7 +49,7 @@ public class CSRDialog extends Dialog implements View.OnClickListener {
             case R.id.dialog_button_ok:
 
                 CSR csr = new CSR();
-                csr.setUniqueIdentifier();
+                csr.setUniqueIdentifier(this.getContext());
                 csr.setEmailAddress(emailAddressTV.getText().toString());
 
                 JSONObject object = new JSONObject();

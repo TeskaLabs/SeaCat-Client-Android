@@ -1,5 +1,6 @@
 package com.teskalabs.seacat.android.client;
 
+import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -147,11 +148,11 @@ public class CSR
 
     ///
 
-    public void setUniqueIdentifier()
+    public void setUniqueIdentifier(Context context)
     {
         UUID deviceUuid = null;
         final String androidId = Settings.Secure.getString(
-                SeaCatService.instance.getApplicationContext().getContentResolver(),
+                context.getApplicationContext().getContentResolver(),
                 Settings.Secure.ANDROID_ID
         );
 
@@ -202,9 +203,6 @@ public class CSR
             {
 
                 CSR csr = new CSR();
-
-                //TODO: Remove this (don't need unique identifier)
-                csr.setUniqueIdentifier();
 
                 try {
                     csr.submit();
