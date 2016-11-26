@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
 import com.teskalabs.seacat.android.client.SeaCatInternals;
-import com.teskalabs.seacat.android.client.SeaCatService;
 import com.teskalabs.seacat.android.client.intf.ICntlFrameConsumer;
 import com.teskalabs.seacat.android.client.intf.IFrameProvider;
 import com.teskalabs.seacat.android.client.ping.PingFactory;
@@ -26,17 +25,23 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 //TODO: Replace print by Android logging (done in this file, check others)
 
 public class Reactor extends ContextWrapper
 {
 	final public FramePool framePool = new FramePool();
-	final private Thread sessionThread;
-	
+	final private Thread ccoreThread;
+
+	final Lock eventLoopNotStartedlock = new ReentrantLock();
+	final Condition eventLoopStartedCond = eventLoopNotStartedlock.newCondition();
+	private boolean eventLoopStarted = false;
+
 	final private Executor workerExecutor;
-	final private BlockingQueue<Runnable> workerQueue = new LinkedBlockingQueue<Runnable>();
-	
+
 	final public PingFactory pingFactory;
 	final public StreamFactory streamFactory;
 	
@@ -50,18 +55,18 @@ public class Reactor extends ContextWrapper
 
 	///
 	
-	public Reactor(SeaCatService service, String applicationIdSuffix) throws IOException
+	public Reactor(Context context) throws IOException
 	{
-		super(service);
+		super(context);
 
-		this.sessionThread = new Thread(new Runnable() { public void run() { Reactor._run(); }});
-		this.sessionThread.setName("SeaCatReactorThread");
-		this.sessionThread.setDaemon(true);
-		this.workerExecutor = new ThreadPoolExecutor(0, 1000, 5, TimeUnit.SECONDS, workerQueue);
+		this.ccoreThread = new Thread(new Runnable() { public void run() { Reactor._run(); }});
+		this.ccoreThread.setName("SeaCatCCoreThread");
+		this.ccoreThread.setDaemon(true);
+		this.workerExecutor = new ThreadPoolExecutor(0, 1000, 5, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
         java.io.File vardir = this.getDir("seacat", Context.MODE_PRIVATE);
 
-		int rc = seacatcc.init(this.getPackageName(), applicationIdSuffix, vardir.getAbsolutePath(), this);
+		int rc = seacatcc.init(this.getPackageName(), SeaCatInternals.applicationIdSuffix, vardir.getAbsolutePath(), this);
 		RC.checkAndThrowIOException("seacatcc.init", rc);
 
         lastState = seacatcc.state();
@@ -79,7 +84,7 @@ public class Reactor extends ContextWrapper
 				else return 1;
 			}
 		};
-		frameProviders = new PriorityBlockingQueue<IFrameProvider>(11, frameProvidersComparator);
+		frameProviders = new PriorityBlockingQueue<>(11, frameProvidersComparator);
 
 
 		// Create and register stream factory as control frame consumer
@@ -91,16 +96,19 @@ public class Reactor extends ContextWrapper
 		// Create and register ping factory as control frame consumer
 		pingFactory = new PingFactory();
 		cntlFrameConsumers.put(SPDY.buildFrameVersionType(SPDY.CNTL_FRAME_VERSION_SPD3, SPDY.CNTL_TYPE_PING), pingFactory);
+
+		// Start reactor thread
+		ccoreThread.start();
+
+		eventLoopNotStartedlock.lock();
+		while (!eventLoopStarted)
+		{
+			eventLoopStartedCond.awaitUninterruptibly();
+		}
+		eventLoopNotStartedlock.unlock();
 	}
 
-	
-	public void start()
-	{
-		this.sessionThread.start();
-	}
-
-    public boolean isStarted() { return this.sessionThread.isAlive(); }
-
+	// TODO: 26/11/2016 This one is never used ... how and when to shutdown on Android?
 	public void shutdown() throws IOException
 	{
 		int rc = seacatcc.shutdown();
@@ -109,15 +117,15 @@ public class Reactor extends ContextWrapper
 		while (true)
 		{
 			try {
-				this.sessionThread.join(5000);
+				ccoreThread.join(5000);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 				continue;
 			}
 			
-			if (this.sessionThread.isAlive())
+			if (ccoreThread.isAlive())
 			{
-				throw new IOException(String.format("%s is still alive", this.sessionThread.getName()));
+				throw new IOException(String.format("%s is still alive", this.ccoreThread.getName()));
 			}
 			
 			break;
@@ -162,7 +170,7 @@ public class Reactor extends ContextWrapper
 		try
 		{
 			ByteBuffer frame =  null;
-			Vector<IFrameProvider> providersToKeep = new Vector<IFrameProvider>(); 
+			Vector<IFrameProvider> providersToKeep = new Vector<>();
 			
 			synchronized (frameProviders)
 			{
@@ -287,11 +295,18 @@ public class Reactor extends ContextWrapper
 
 		pingFactory.heartBeat(now);
 		framePool.heartBeat(now);
+
+		// TODO: 26/11/2016 Find the best sleeping interval, can be much longer that 5 seconds, I guess
 		return 5.0; // Seconds
 	}
 
 	protected void JNICallbackEvLoopStarted()
 	{
+		eventLoopNotStartedlock.lock();
+		eventLoopStarted = true;
+		eventLoopStartedCond.signalAll();
+		eventLoopNotStartedlock.unlock();
+
         this.sendBroadcast(SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_EVLOOP_STARTED));
 	}
 
@@ -357,15 +372,8 @@ public class Reactor extends ContextWrapper
 		{
             Log.w(SeaCatInternals.L, String.format("Incorrect frame received: %d %x %d %x - closing connection", frame.limit(), frameVersionType, frameLength, frameFlags));
 
-			// Invalid frame received - shutdown a reactor (disconnect) ...
-			try
-			{
-				shutdown();
-			}
-			catch (Exception e)
-			{
-                Log.e(SeaCatInternals.L, "receivedControlFrame:", e);
-			}
+			// Invalid frame received -> disconnect from a gateway
+			seacatcc.yield('d');
 			return true;
 		}
 		
@@ -410,4 +418,5 @@ public class Reactor extends ContextWrapper
 	{
 		return this.clientId;
 	}
+
 }

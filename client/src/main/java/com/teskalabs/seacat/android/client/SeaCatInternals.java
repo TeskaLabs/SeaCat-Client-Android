@@ -8,13 +8,15 @@ import android.content.Intent;
  */
 public class SeaCatInternals
 {
-    final public static String L = "SeaCat";
+    public final static String L = "SeaCat";
+    public final static String SeaCatHostSuffix = ".seacat";
+    public final static String SeaCatPreferences = "seacat_preferences";
 
-    final public static String SeaCatHostSuffix = ".seacat";
+    private static Runnable CSRWorker = null;
+    public static String applicationIdSuffix = null;
+    public static boolean logDebug = false;
 
-    final public static String SeaCatPreferences = "seacat_preferences";
-
-    final static public Intent createIntent(String action)
+    public static Intent createIntent(String action)
     {
         Intent Intent = new Intent(action);
         Intent.addCategory(SeaCatClient.CATEGORY_SEACAT);
@@ -22,19 +24,13 @@ public class SeaCatInternals
         return Intent;
     }
 
-    private static Runnable CSRWorker = null;
-
     public static void setCSRWorker(Runnable csrWorker)
     {
         CSRWorker = csrWorker;
     }
-
     public static Runnable getCSRWorker()
     {
         return CSRWorker;
     }
 
-    public static String applicationIdSuffix = null;
-
-    public static boolean logDebug = false;
 }

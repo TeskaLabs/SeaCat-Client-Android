@@ -1,7 +1,7 @@
 package com.teskalabs.seacat.android.client;
 
 import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -85,7 +85,7 @@ import org.apache.http.params.HttpParams;
  */
 public final class SeaCatClient
 {
-    static Reactor reactor = null;
+    static private Reactor reactor = null;
 
     /**
      * The <tt>Intent</tt> category for all Intents sent by SeaCat client.
@@ -179,9 +179,13 @@ public final class SeaCatClient
     {
         SeaCatInternals.applicationIdSuffix = applicationIdSuffix;
         setCSRWorker(CSRworker);
-        context.startService(new Intent(context, SeaCatService.class));
-    }
 
+        try {
+            reactor = new Reactor(context);
+        } catch (IOException e) {
+            Log.e(SeaCatInternals.L, "Exception during SeaCat reactor start", e);
+        }
+    }
 
     /**
      * Triggers sending of an <tt>ACTION_SEACAT_STATE_CHANGED</tt> <tt>Intent</tt> even if the state has not changed.
@@ -196,12 +200,7 @@ public final class SeaCatClient
 
     ///
 
-    synchronized static void setReactor(Reactor reactor)
-    {
-        SeaCatClient.reactor = reactor;
-    }
-
-    synchronized static Reactor getReactor()
+    static Reactor getReactor()
     {
         return SeaCatClient.reactor;
     }
@@ -287,7 +286,7 @@ public final class SeaCatClient
      * @throws IOException if generic IO error occurred.
      * @throws MalformedURLException if spec could not be parsed as a URL or has an unsupported protocol.
      */
-	public static HttpURLConnection open(String url) throws IOException, MalformedURLException
+	public static HttpURLConnection open(String url) throws IOException
 	{
 		return open(new URL(url));
 	}
@@ -425,7 +424,7 @@ public final class SeaCatClient
     public static void setLogMask(EnumSet<LogFlag> mask) throws IOException
     {
         Iterator itr = mask.iterator();
-        long bitmask = 0l;
+        long bitmask = 0L;
         while(itr.hasNext())
         {
             LogFlag flag = (LogFlag) itr.next();
@@ -448,14 +447,14 @@ public final class SeaCatClient
 
     ///
 
-    public static final String getClientId()
+    public static String getClientId()
     {
         Reactor r = getReactor();
         if (r == null) return null;
         return r.getClientId();
     }
 
-    public static final String getClientTag()
+    public static String getClientTag()
     {
         Reactor r = getReactor();
         if (r == null) return null;
