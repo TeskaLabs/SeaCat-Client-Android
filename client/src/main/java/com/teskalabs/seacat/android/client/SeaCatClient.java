@@ -433,8 +433,7 @@ public final class SeaCatClient
         int rc = seacatcc.log_set_mask(bitmask);
         RC.checkAndThrowIOException("seacatcc.log_set_mask()", rc);
 
-        if (mask.contains(LogFlag.DEBUG_GENERIC)) SeaCatInternals.logDebug = true;
-        else SeaCatInternals.logDebug = false;
+        SeaCatInternals.logDebug = mask.contains(LogFlag.DEBUG_GENERIC);
     }
 
     ///
