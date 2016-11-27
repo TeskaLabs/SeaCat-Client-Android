@@ -3,7 +3,6 @@ package com.teskalabs.seacat.android.client;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
-import android.provider.Settings;
 import android.util.DisplayMetrics;
 
 import com.teskalabs.seacat.android.client.core.seacatcc;
@@ -11,6 +10,8 @@ import com.teskalabs.seacat.android.client.util.RC;
 
 import java.util.ArrayList;
 import java.util.Properties;
+
+import static android.provider.Settings.*;
 
 public abstract class SeaCatPlugin {
 
@@ -56,7 +57,7 @@ public abstract class SeaCatPlugin {
 		caps.add(String.format("%s\037%s", "dpydpi", dm.ydpi));
 
 		caps.add(String.format("%s\037%s", "uid",
-			Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID)
+			Secure.getString(context.getContentResolver(), Secure.ANDROID_ID)
 		));
 
 		caps.add(null);
