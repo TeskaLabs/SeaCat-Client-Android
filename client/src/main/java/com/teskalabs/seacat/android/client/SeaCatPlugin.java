@@ -19,13 +19,17 @@ import static android.provider.Settings.*;
 public abstract class SeaCatPlugin {
 
 	static private ArrayList<SeaCatPlugin> plugins;
+	static private boolean capabilitiesCommited;
 
 	static {
 		plugins = new ArrayList<>();
+		capabilitiesCommited = false;
 	}
 
-	static void commitCapabilities(Context context)
+	static synchronized void commitCapabilities(Context context)
 	{
+		if (capabilitiesCommited) throw new RuntimeException("SeaCat Capabilities are already comited!");
+
 		ArrayList<String> caps = new ArrayList<>();
 		for (SeaCatPlugin p : plugins) {
 			final Properties pcaps = p.getCapabilities();
@@ -79,6 +83,7 @@ public abstract class SeaCatPlugin {
 		caparr = caps.toArray(caparr);
 		int rc = seacatcc.capabilities_store(caparr);
 		RC.checkAndLogError("seacatcc.capabilities_store", rc);
+		if (rc == 0) capabilitiesCommited = true;
 	}
 
 	///
@@ -87,8 +92,6 @@ public abstract class SeaCatPlugin {
 	{
 		plugins.add(this);
 	}
-
-
 
 	abstract public Properties getCapabilities();
 
