@@ -149,6 +149,7 @@ double seacatcc_time(void);
 #define SEACATCC_RC_E_FRAME_TOO_SMALL (-9903)
 #define SEACATCC_RC_E_INCORRECT_STATE (-9904)
 #define SEACATCC_RC_E_NO_FRAMES (-9905)
+#define SEACATCC_RC_E_NO_MEMORY (-9906)
 
 #define SEACATCC_RC_E_DISCOVER_INVALID_SRV (-9921)
 //Following error code means that there is no license (resp. related DNS SVR entry)
@@ -167,6 +168,7 @@ double seacatcc_time(void);
 #define SEACATCC_RC_E_CACERT_INVALID (-9937)
 
 #define SEACATCC_RC_E_PERMA_INVALID (-9941)
+#define SEACATCC_RC_E_CAPFILE_INVALID (-9942)
 
 #define SEACATCC_RC_E_PROXY_ERROR (-9951)
 
