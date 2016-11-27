@@ -1,9 +1,12 @@
 package com.teskalabs.seacat.android.client;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import com.teskalabs.seacat.android.client.core.seacatcc;
 import com.teskalabs.seacat.android.client.util.RC;
@@ -56,6 +59,16 @@ public abstract class SeaCatPlugin {
 		caps.add(String.format("%s\037%s", "dpxdpi", dm.xdpi));
 		caps.add(String.format("%s\037%s", "dpydpi", dm.ydpi));
 
+		//TODO: How to obtain and add version of the SeaCat client for Android?
+
+		try {
+			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+			caps.add(String.format("%s\037%s", "apN", pInfo.versionName));
+			caps.add(String.format("%s\037%s", "apV", pInfo.versionCode));
+		} catch (PackageManager.NameNotFoundException e) {
+			Log.e(SeaCatInternals.L, "Cannot get package info of the application");
+		}
+
 		caps.add(String.format("%s\037%s", "uid",
 			Secure.getString(context.getContentResolver(), Secure.ANDROID_ID)
 		));
@@ -74,6 +87,8 @@ public abstract class SeaCatPlugin {
 	{
 		plugins.add(this);
 	}
+
+
 
 	abstract public Properties getCapabilities();
 
