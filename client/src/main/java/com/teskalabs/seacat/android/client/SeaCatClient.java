@@ -187,7 +187,7 @@ public final class SeaCatClient
         }
 
         // Process plugins
-        SeaCatPlugin.commitCapabilities();
+        SeaCatPlugin.commitCapabilities(context);
     }
 
     /**

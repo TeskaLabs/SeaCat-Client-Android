@@ -1,6 +1,10 @@
 package com.teskalabs.seacat.android.client;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.os.Build;
+import android.provider.Settings;
+import android.util.DisplayMetrics;
 
 import com.teskalabs.seacat.android.client.core.seacatcc;
 import com.teskalabs.seacat.android.client.util.RC;
@@ -16,7 +20,7 @@ public abstract class SeaCatPlugin {
 		plugins = new ArrayList<>();
 	}
 
-	static void commitCapabilities()
+	static void commitCapabilities(Context context)
 	{
 		ArrayList<String> caps = new ArrayList<>();
 		for (SeaCatPlugin p : plugins) {
@@ -44,7 +48,16 @@ public abstract class SeaCatPlugin {
 		caps.add(String.format("%s\037%s", "plt", Build.TAGS));
 		caps.add(String.format("%s\037%s", "plT", Build.TYPE));
 
-		//TODO: Add info about screen resolution
+		DisplayMetrics dm = Resources.getSystem().getDisplayMetrics();
+		caps.add(String.format("%s\037%sx%s", "dpr", dm.widthPixels, dm.heightPixels));
+		caps.add(String.format("%s\037%s", "dpi", dm.densityDpi));
+		caps.add(String.format("%s\037%s", "dpden", dm.density));
+		caps.add(String.format("%s\037%s", "dpxdpi", dm.xdpi));
+		caps.add(String.format("%s\037%s", "dpydpi", dm.ydpi));
+
+		caps.add(String.format("%s\037%s", "uid",
+			Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID)
+		));
 
 		caps.add(null);
 
