@@ -100,6 +100,7 @@ public class Reactor extends ContextWrapper
 		// Start reactor thread
 		ccoreThread.start();
 
+		// Wait till started
 		eventLoopNotStartedlock.lock();
 		while (!eventLoopStarted)
 		{
