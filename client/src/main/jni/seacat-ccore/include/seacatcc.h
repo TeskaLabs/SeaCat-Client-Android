@@ -118,10 +118,12 @@ int seacatcc_set_proxy_server_worker(const char * proxy_host, const char * proxy
 // For unconfiguring a port, use: seacatcc_socket_configure_worker(0, [type], 0, [port number], NULL, NULL)
 int seacatcc_socket_configure_worker(uint16_t port, uint16_t domain, uint16_t type, uint16_t protocol, const char * peer_address, const char * peer_port);
 
+// Capabilities
+int seacatcc_capabilities_store(const char ** capabilities);
+
 // Misc
 int seacatcc_network_reachable(void);
 double seacatcc_time(void);
-
 
 // Return codes
 

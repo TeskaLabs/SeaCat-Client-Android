@@ -185,6 +185,9 @@ public final class SeaCatClient
         } catch (IOException e) {
             Log.e(SeaCatInternals.L, "Exception during SeaCat reactor start", e);
         }
+
+        // Process plugins
+        SeaCatPlugin.commitCapabilities();
     }
 
     /**

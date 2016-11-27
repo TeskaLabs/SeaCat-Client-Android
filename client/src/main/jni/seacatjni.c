@@ -680,3 +680,36 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_so
 
 	return rc;
 }
+
+
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_capabilities_1store(JNIEnv * env, jclass cls, jobjectArray caparr)
+{
+	int capcnt = (*env)->GetArrayLength(env, caparr);
+
+	const char * ccaparr[capcnt];
+	jstring ccapstr[capcnt];
+
+	for (int i=0; i<capcnt; i+=1)
+	{
+		ccapstr[i] = (jstring) ((*env)->GetObjectArrayElement(env, caparr, i));
+		if (ccapstr[i] != NULL)
+		{
+			ccaparr[i] = (*env)->GetStringUTFChars(env, ccapstr[i], 0);
+		}
+		else
+		{
+			if (i != (capcnt-1)) seacatcc_log('E', "Received 'null' in a capability list");
+			ccaparr[i] = NULL;
+		}
+    }
+
+    int rc = seacatcc_capabilities_store(ccaparr);
+
+	for (int i=0; i<capcnt; i+=1)
+	{
+		if (ccapstr[i] != NULL)
+			(*env)->ReleaseStringUTFChars(env, ccapstr[i], ccaparr[i]);
+    }
+
+    return rc;
+}

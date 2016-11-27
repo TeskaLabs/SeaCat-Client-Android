@@ -7,7 +7,6 @@ import java.io.IOException;
 
 public class DemoApp extends Application
 {
-
     @Override
     public void onCreate()
     {
@@ -22,5 +21,7 @@ public class DemoApp extends Application
         // Enable SeaCat
         SeaCatClient.initialize(getApplicationContext(), "foobar2");
     }
+
+    private DemoPlugin demoSeaCatPlugin = new DemoPlugin();
 
 }
