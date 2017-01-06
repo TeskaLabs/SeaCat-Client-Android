@@ -1,13 +1,16 @@
-.DS_Store
-.gradle
-
-/build
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
 
 /client/build
 /client/src/main/libs/
 /client/src/main/obj/
 /demo/build
 client/src/main/jni/build.site
+
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/captures
+.externalNativeBuild
