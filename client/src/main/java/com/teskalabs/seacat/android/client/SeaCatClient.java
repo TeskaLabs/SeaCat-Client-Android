@@ -449,7 +449,7 @@ public final class SeaCatClient
 
     ///
 
-    public void setPackageName(String packageName)
+    public static void setPackageName(String packageName)
     {
         Reactor.setPackageName(packageName);
     }
