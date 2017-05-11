@@ -44,17 +44,22 @@ public abstract class SeaCatPlugin {
 		caps.add(String.format("%s\037%s", "plv", Build.VERSION.RELEASE));
 		caps.add(String.format("%s\037%s", "pls", Build.VERSION.SDK_INT));
 		caps.add(String.format("%s\037%s", "pli", Build.VERSION.INCREMENTAL));
-		caps.add(String.format("%s\037%s", "plb", Build.BOARD));
 		caps.add(String.format("%s\037%s", "plB", Build.BRAND));
-		caps.add(String.format("%s\037%s", "pld", Build.DEVICE));
 		caps.add(String.format("%s\037%s", "plf", Build.FINGERPRINT));
 		caps.add(String.format("%s\037%s", "plI", Build.ID));
 		caps.add(String.format("%s\037%s", "plm", Build.MANUFACTURER));
 		caps.add(String.format("%s\037%s", "plM", Build.MODEL));
 		caps.add(String.format("%s\037%s", "plp", Build.PRODUCT));
-		caps.add(String.format("%s\037%s", "plS", Build.SERIAL));
 		caps.add(String.format("%s\037%s", "plt", Build.TAGS));
 		caps.add(String.format("%s\037%s", "plT", Build.TYPE));
+		caps.add(String.format("%s\037%s", "plU",
+			Secure.getString(context.getContentResolver(), Secure.ANDROID_ID)
+		));
+
+		// Add hardware capabilities
+		caps.add(String.format("%s\037%s", "hwb", Build.BOARD));
+		caps.add(String.format("%s\037%s", "hwd", Build.DEVICE));
+		caps.add(String.format("%s\037%s", "hwS", Build.SERIAL));
 
 		DisplayMetrics dm = Resources.getSystem().getDisplayMetrics();
 		caps.add(String.format("%s\037%sx%s", "dpr", dm.widthPixels, dm.heightPixels));
@@ -72,10 +77,6 @@ public abstract class SeaCatPlugin {
 		} catch (PackageManager.NameNotFoundException e) {
 			Log.e(SeaCatInternals.L, "Cannot get package info of the application");
 		}
-
-		caps.add(String.format("%s\037%s", "uid",
-			Secure.getString(context.getContentResolver(), Secure.ANDROID_ID)
-		));
 
 		caps.add(null);
 
