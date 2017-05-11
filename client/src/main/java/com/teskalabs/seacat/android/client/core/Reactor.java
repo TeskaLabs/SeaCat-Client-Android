@@ -53,11 +53,15 @@ public class Reactor extends ContextWrapper
 	private String clientId = "ANONYMOUS_CLIENT";
 	private String clientTag = "[ANONYMOUS0CLIENT]";
 
+	static String packageName = null;
+
 	///
 	
 	public Reactor(Context context) throws IOException
 	{
 		super(context);
+
+		if (packageName == null) packageName = getPackageName();
 
 		this.ccoreThread = new Thread(new Runnable() { public void run() { Reactor._run(); }});
 		this.ccoreThread.setName("SeaCatCCoreThread");
@@ -66,7 +70,7 @@ public class Reactor extends ContextWrapper
 
         java.io.File vardir = this.getDir("seacat", Context.MODE_PRIVATE);
 
-		int rc = seacatcc.init(this.getPackageName(), SeaCatInternals.applicationIdSuffix, vardir.getAbsolutePath(), this);
+		int rc = seacatcc.init(packageName, SeaCatInternals.applicationIdSuffix, vardir.getAbsolutePath(), this);
 		RC.checkAndThrowIOException("seacatcc.init", rc);
 
         lastState = seacatcc.state();
@@ -418,6 +422,11 @@ public class Reactor extends ContextWrapper
 	public String getClientId()
 	{
 		return this.clientId;
+	}
+
+	public static void setPackageName(String packageName)
+	{
+		Reactor.packageName = packageName;
 	}
 
 }

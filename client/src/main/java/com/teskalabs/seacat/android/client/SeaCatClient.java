@@ -449,6 +449,13 @@ public final class SeaCatClient
 
     ///
 
+    public void setPackageName(String packageName)
+    {
+        Reactor.setPackageName(packageName);
+    }
+
+    ///
+
     public static String getClientId()
     {
         Reactor r = getReactor();
