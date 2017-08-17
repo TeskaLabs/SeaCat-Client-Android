@@ -29,7 +29,7 @@ public final class seacatcc
     static public native String client_id();
     static public native String client_tag();
 
-    static public native int capabilities_store(String[] capabilities);
+    static public native int characteristics_store(String[] characteristics);
     ///
     static public final int RC_OK = (0);
     static public final int RC_E_GENERIC = (-9999);

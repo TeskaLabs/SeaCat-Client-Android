@@ -82,8 +82,8 @@ public abstract class SeaCatPlugin {
 
 		String[] caparr = new String[caps.size()];
 		caparr = caps.toArray(caparr);
-		int rc = seacatcc.capabilities_store(caparr);
-		RC.checkAndLogError("seacatcc.capabilities_store", rc);
+		int rc = seacatcc.characteristics_store(caparr);
+		RC.checkAndLogError("seacatcc.characteristics_store", rc);
 		if (rc == 0) capabilitiesCommited = true;
 	}
 

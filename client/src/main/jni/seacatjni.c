@@ -682,7 +682,7 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_so
 }
 
 
-JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_capabilities_1store(JNIEnv * env, jclass cls, jobjectArray caparr)
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_characteristics_1store(JNIEnv * env, jclass cls, jobjectArray caparr)
 {
 	int capcnt = (*env)->GetArrayLength(env, caparr);
 
@@ -698,12 +698,12 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_ca
 		}
 		else
 		{
-			if (i != (capcnt-1)) seacatcc_log('E', "Received 'null' in a capability list");
+			if (i != (capcnt-1)) seacatcc_log('E', "Received 'null' in a characteristics list");
 			ccaparr[i] = NULL;
 		}
     }
 
-    int rc = seacatcc_capabilities_store(ccaparr);
+    int rc = seacatcc_characteristics_store(ccaparr);
 
 	for (int i=0; i<capcnt; i+=1)
 	{
