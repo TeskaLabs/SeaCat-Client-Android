@@ -39,7 +39,7 @@ def getVersionNameDashes = { ->
 }
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 21
     buildToolsVersion '25.0.3'
 
     defaultConfig {

@@ -7,7 +7,7 @@ import java.util.Properties;
 final class DemoPlugin extends SeaCatPlugin {
 
 	@Override
-	public Properties getCapabilities(){
+	public Properties getCharacteristics(){
 		Properties p = new Properties();
 		p.setProperty("DummyCap", "123 ahoj!");
 		return p;

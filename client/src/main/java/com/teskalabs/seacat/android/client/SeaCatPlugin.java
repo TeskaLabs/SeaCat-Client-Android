@@ -19,72 +19,72 @@ import static android.provider.Settings.*;
 public abstract class SeaCatPlugin {
 
 	static private ArrayList<SeaCatPlugin> plugins;
-	static private boolean capabilitiesCommited;
+	static private boolean characteristicsCommited;
 
 	static {
 		plugins = new ArrayList<>();
-		capabilitiesCommited = false;
+		characteristicsCommited = false;
 	}
 
-	static synchronized void commitCapabilities(Context context)
+	static synchronized void commitCharacteristics(Context context)
 	{
-		if (capabilitiesCommited) throw new RuntimeException("SeaCat Capabilities are already comited!");
+		if (characteristicsCommited) throw new RuntimeException("SeaCat characteristics are already comited!");
 
-		ArrayList<String> caps = new ArrayList<>();
+		ArrayList<String> chrs = new ArrayList<>();
 		for (SeaCatPlugin p : plugins) {
-			final Properties pcaps = p.getCapabilities();
-			if (pcaps == null) continue;
-			for (String name : pcaps.stringPropertyNames())
+			final Properties pchrs = p.getCharacteristics();
+			if (pchrs == null) continue;
+			for (String name : pchrs.stringPropertyNames())
 			{
-				caps.add(String.format("%s\037%s", name, pcaps.getProperty(name)));
+				chrs.add(String.format("%s\037%s", name, pchrs.getProperty(name)));
 			}
 		}
 
-		// Add platform capabilities
-		caps.add(String.format("%s\037%s", "plv", Build.VERSION.RELEASE));
-		caps.add(String.format("%s\037%s", "pls", Build.VERSION.SDK_INT));
-		caps.add(String.format("%s\037%s", "pli", Build.VERSION.INCREMENTAL));
-		caps.add(String.format("%s\037%s", "plB", Build.BRAND));
-		caps.add(String.format("%s\037%s", "plf", Build.FINGERPRINT));
-		caps.add(String.format("%s\037%s", "plI", Build.ID));
-		caps.add(String.format("%s\037%s", "plm", Build.MANUFACTURER));
-		caps.add(String.format("%s\037%s", "plM", Build.MODEL));
-		caps.add(String.format("%s\037%s", "plp", Build.PRODUCT));
-		caps.add(String.format("%s\037%s", "plt", Build.TAGS));
-		caps.add(String.format("%s\037%s", "plT", Build.TYPE));
-		caps.add(String.format("%s\037%s", "plU",
+		// Add platform characteristics
+		chrs.add(String.format("%s\037%s", "plv", Build.VERSION.RELEASE));
+		chrs.add(String.format("%s\037%s", "pls", Build.VERSION.SDK_INT));
+		chrs.add(String.format("%s\037%s", "pli", Build.VERSION.INCREMENTAL));
+		chrs.add(String.format("%s\037%s", "plB", Build.BRAND));
+		chrs.add(String.format("%s\037%s", "plf", Build.FINGERPRINT));
+		chrs.add(String.format("%s\037%s", "plI", Build.ID));
+		chrs.add(String.format("%s\037%s", "plm", Build.MANUFACTURER));
+		chrs.add(String.format("%s\037%s", "plM", Build.MODEL));
+		chrs.add(String.format("%s\037%s", "plp", Build.PRODUCT));
+		chrs.add(String.format("%s\037%s", "plt", Build.TAGS));
+		chrs.add(String.format("%s\037%s", "plT", Build.TYPE));
+		chrs.add(String.format("%s\037%s", "plU",
 			Secure.getString(context.getContentResolver(), Secure.ANDROID_ID)
 		));
 
-		// Add hardware capabilities
-		caps.add(String.format("%s\037%s", "hwb", Build.BOARD));
-		caps.add(String.format("%s\037%s", "hwd", Build.DEVICE));
-		caps.add(String.format("%s\037%s", "hwS", Build.SERIAL));
+		// Add hardware characteristics
+		chrs.add(String.format("%s\037%s", "hwb", Build.BOARD));
+		chrs.add(String.format("%s\037%s", "hwd", Build.DEVICE));
+		chrs.add(String.format("%s\037%s", "hwS", Build.SERIAL));
 
 		DisplayMetrics dm = Resources.getSystem().getDisplayMetrics();
-		caps.add(String.format("%s\037%sx%s", "dpr", dm.widthPixels, dm.heightPixels));
-		caps.add(String.format("%s\037%s", "dpi", dm.densityDpi));
-		caps.add(String.format("%s\037%s", "dpden", dm.density));
-		caps.add(String.format("%s\037%s", "dpxdpi", dm.xdpi));
-		caps.add(String.format("%s\037%s", "dpydpi", dm.ydpi));
+		chrs.add(String.format("%s\037%sx%s", "dpr", dm.widthPixels, dm.heightPixels));
+		chrs.add(String.format("%s\037%s", "dpi", dm.densityDpi));
+		chrs.add(String.format("%s\037%s", "dpden", dm.density));
+		chrs.add(String.format("%s\037%s", "dpxdpi", dm.xdpi));
+		chrs.add(String.format("%s\037%s", "dpydpi", dm.ydpi));
 
 		//TODO: How to obtain and add version of the SeaCat client for Android?
 
 		try {
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-			caps.add(String.format("%s\037%s", "apN", pInfo.versionName));
-			caps.add(String.format("%s\037%s", "apV", pInfo.versionCode));
+			chrs.add(String.format("%s\037%s", "apN", pInfo.versionName));
+			chrs.add(String.format("%s\037%s", "apV", pInfo.versionCode));
 		} catch (PackageManager.NameNotFoundException e) {
 			Log.e(SeaCatInternals.L, "Cannot get package info of the application");
 		}
 
-		caps.add(null);
+		chrs.add(null);
 
-		String[] caparr = new String[caps.size()];
-		caparr = caps.toArray(caparr);
-		int rc = seacatcc.characteristics_store(caparr);
+		String[]chrsarr = new String[chrs.size()];
+		chrsarr = chrs.toArray(chrsarr);
+		int rc = seacatcc.characteristics_store(chrsarr);
 		RC.checkAndLogError("seacatcc.characteristics_store", rc);
-		if (rc == 0) capabilitiesCommited = true;
+		if (rc == 0) characteristicsCommited = true;
 	}
 
 	///
@@ -94,6 +94,6 @@ public abstract class SeaCatPlugin {
 		plugins.add(this);
 	}
 
-	abstract public Properties getCapabilities();
+	abstract public Properties getCharacteristics();
 
 }
