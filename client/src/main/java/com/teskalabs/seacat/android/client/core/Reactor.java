@@ -50,8 +50,8 @@ public class Reactor extends ContextWrapper
 
     private String lastState;
 
-	private String clientId = "ANONYMOUS_CLIENT";
-	private String clientTag = "[ANONYMOUS0CLIENT]";
+	private String clientId = "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+	private String clientTag = "[AAAAAAAAAAAAAAAA]";
 
 	static String packageName = null;
 
