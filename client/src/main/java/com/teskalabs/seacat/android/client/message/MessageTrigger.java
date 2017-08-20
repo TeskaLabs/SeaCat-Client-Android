@@ -1,7 +1,6 @@
-package com.teskalabs.seacat.android.client;
+package com.teskalabs.seacat.android.client.message;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.teskalabs.seacat.android.client.SeaCatClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -10,31 +9,27 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class SeaCatEventTrigger implements Runnable {
+abstract public class MessageTrigger implements Runnable {
 
-	private static final String TAG = SeaCatEventTrigger.class.getName();
+	private static final String TAG = MessageTrigger.class.getName();
+	private static final String eventsAPIUrlBase = "https://api.seacat/event/trigger/";
+
 	private final URL url;
-	private final JSONObject json = new JSONObject();
 
 	protected int responseCode = -1;
 	protected String responseMessage = null;
 	protected final ByteArrayOutputStream responseBody;
 
-	private static final String eventsAPIUrlBase = "https://api.seacat/event/trigger/";
 
-	public SeaCatEventTrigger(String eventName) throws IOException {
+	public MessageTrigger(String eventName) throws IOException {
 		this(eventsAPIUrlBase, eventName);
 	}
 
-	public SeaCatEventTrigger(String URLBase, String eventName) throws IOException {
+	public MessageTrigger(String URLBase, String eventName) throws IOException {
 		url = new URL(URLBase +  eventName);
 		responseBody = new ByteArrayOutputStream();
 	}
 
-	public SeaCatEventTrigger put(String name, String value) throws JSONException {
-		json.put(name, value);
-		return this;
-	}
 
 	@Override
 	public void run() {
@@ -44,12 +39,11 @@ public class SeaCatEventTrigger implements Runnable {
 			HttpURLConnection conn = SeaCatClient.open(url);
 
 			conn.setRequestMethod("PUT");
-			conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+			conn.setRequestProperty("Content-Type", getMessageContentType());
 			conn.setDoOutput(true);
 
 			DataOutputStream outputStream = new DataOutputStream(conn.getOutputStream());
-			outputStream.writeBytes(json.toString());
-			outputStream.flush();
+			writeContent(outputStream);
 			outputStream.close();
 
 			InputStream is = conn.getInputStream();
@@ -71,28 +65,27 @@ public class SeaCatEventTrigger implements Runnable {
 
 
 	/* Override me ! */
-	public void onPreExecute() {
-	}
+	public void onPreExecute() { }
 
 	/* Override me ! */
-	public void onPostExecute() {
-	}
+	public void onPostExecute() { }
 
 	/* Override me ! */
-	public void onError(IOException e) {
-	}
+	public void onError(IOException e) { }
 
 
 	public int getResponseCode() {
 		return responseCode;
 	}
-
 	public String getResponseMessage() {
 		return responseMessage;
 	}
-
 	public ByteArrayOutputStream getResponseBody() {
 		return responseBody;
 	}
 
+
+	// Pure virtual methods
+	protected abstract String getMessageContentType();
+	protected abstract void writeContent(DataOutputStream outputStream) throws IOException;
 }
