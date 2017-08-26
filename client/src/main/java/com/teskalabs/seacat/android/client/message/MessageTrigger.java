@@ -9,9 +9,13 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+//TODO: Move this into a plugin, separated from a SeaCat Android SDK core
+
 abstract public class MessageTrigger implements Runnable {
 
 	private static final String TAG = MessageTrigger.class.getName();
+
+	//TODO: This value should be easily configurable
 	private static final String eventsAPIUrlBase = "https://api.seacat/event/trigger/";
 
 	private final URL url;
