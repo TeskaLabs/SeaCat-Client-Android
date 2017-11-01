@@ -41,6 +41,8 @@ abstract public class MessageTrigger implements Runnable {
 
 		try {
 			HttpURLConnection conn = SeaCatClient.open(url);
+			conn.setConnectTimeout(1500);
+			conn.setReadTimeout(1500);
 
 			conn.setRequestMethod("PUT");
 			conn.setRequestProperty("Content-Type", getMessageContentType());
