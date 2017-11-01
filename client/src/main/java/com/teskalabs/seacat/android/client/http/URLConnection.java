@@ -262,6 +262,21 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
 	synchronized public boolean receivedSPD3_RST_STREAM(Reactor reactor, ByteBuffer frame, int frameLength, byte frameFlags)
 	{
 		reset();
+
+		// Status
+		responseCode = 500; // TODO: Read reset code from a reset stream
+		responseMessage = HttpStatus.getMessage(responseCode);
+
+		responseReadyLock.lock();
+		try
+		{
+			responseReady = true;
+			responseReadyCondition.signalAll();
+		}
+		finally {
+			responseReadyLock.unlock();
+		}
+
 		return true;
 	}
 
