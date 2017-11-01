@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
@@ -44,7 +46,9 @@ public class Reactor extends ContextWrapper
 
 	final public PingFactory pingFactory;
 	final public StreamFactory streamFactory;
-	
+
+	final public ConnectivityManager connectivityManager;
+
 	final private Map<Integer, ICntlFrameConsumer> cntlFrameConsumers = new HashMap<Integer, ICntlFrameConsumer>();
 	final private BlockingQueue<IFrameProvider> frameProviders;
 
@@ -90,6 +94,7 @@ public class Reactor extends ContextWrapper
 		};
 		frameProviders = new PriorityBlockingQueue<>(11, frameProvidersComparator);
 
+		connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 		// Create and register stream factory as control frame consumer
 		streamFactory = new StreamFactory();
@@ -301,7 +306,28 @@ public class Reactor extends ContextWrapper
 		pingFactory.heartBeat(now);
 		framePool.heartBeat(now);
 
-		// TODO: 26/11/2016 Find the best sleeping interval, can be much longer that 5 seconds, I guess
+		// If SeaCat client is connected (or connecting) and Android reports a loss of connectivity, disconnect
+		if ((lastState.charAt(0) == 'E') || (lastState.charAt(0) == 'H') || (lastState.charAt(0) == 'P') || (lastState.charAt(0) == 'p')  || (lastState.charAt(0) == 'C')) {
+			NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+			boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+			if (!isConnected)
+			{
+				seacatcc.yield('d');
+				this.sendBroadcast(SeaCatInternals.createIntent(SeaCatClient.ACTION_SEACAT_GWCONN_RESET));
+			}
+		}
+
+		// Recover from a network unavailability when reporting network error
+		else if (lastState.charAt(0) == 'n')
+		{
+			NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+			boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+			if (isConnected)
+			{
+				seacatcc.yield('Q');
+			}
+		}
+
 		return 5.0; // Seconds
 	}
 
