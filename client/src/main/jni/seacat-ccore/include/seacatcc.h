@@ -125,6 +125,13 @@ void seacatcc_set_discover_domain(const char * domain);
 int seacatcc_socket_configure_worker(uint16_t port, uint16_t domain, uint16_t type, uint16_t protocol, const char * peer_address, const char * peer_port);
 
 // Characteristics
+/*
+Argument `characteristics` is an array of items.
+Each item is a string with key and value. Key is delimited with by a characted `0x1F`
+
+const char ** characteristics = {"key1\037value1", "key2\037value2", NULL};
+
+*/
 int seacatcc_characteristics_store(const char ** characteristics);
 
 // Misc
