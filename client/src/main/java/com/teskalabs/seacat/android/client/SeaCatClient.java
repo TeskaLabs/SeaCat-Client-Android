@@ -162,12 +162,12 @@ public final class SeaCatClient
      */
     public static void initialize(Context context)
     {
-        SeaCatClient.initialize(context, CSR.createDefault(), null);
+        SeaCatClient.initialize(context, CSR.submitDefault(), null);
     }
 
     public static void initialize(Context context, String applicationIdSuffix)
     {
-        SeaCatClient.initialize(context, CSR.createDefault(), applicationIdSuffix);
+        SeaCatClient.initialize(context, CSR.submitDefault(), applicationIdSuffix);
     }
 
     public static void initialize(Context context, Runnable CSRworker)
