@@ -16,7 +16,7 @@ abstract public class MessageTrigger implements Runnable {
 	private static final String TAG = MessageTrigger.class.getName();
 
 	//TODO: This value should be easily configurable
-	private static final String eventsAPIUrlBase = "https://api.seacat/event/trigger/";
+	private static final String eventsAPIUrlBase = "https://api.seacat/message/trigger/";
 
 	private final URL url;
 
