@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -18,7 +17,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.lang.System;
 
-import com.teskalabs.seacat.android.client.SeaCatInternals;
 import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.core.SPDY;
 import com.teskalabs.seacat.android.client.intf.*;
@@ -193,12 +191,12 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
         // If there is outbound stream, launch that
         if (outboundStream != null)
         {
-            assert((frame.getShort(4) & SPDY.FLAG_FIN) == 0);
+			if (!((frame.get(4) & SPDY.FLAG_FIN) == 0)) throw new RuntimeException(); // Assert
             outboundStream.launch(streamId);
         }
         else
         {
-            assert((frame.getShort(4) & SPDY.FLAG_FIN) == SPDY.FLAG_FIN);
+			if (!((frame.get(4) & SPDY.FLAG_FIN) == SPDY.FLAG_FIN)) throw new RuntimeException(); // Assert
         }
 
         return new IFrameProvider.Result(frame, false);
