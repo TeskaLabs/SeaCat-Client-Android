@@ -176,9 +176,6 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
 
         if (fixedContentLength > 0) addRequestProperty("Content-length", String.format("%d", fixedContentLength));
 
-        //TODO: addRequestProperty("X-SC-SDK", isAndroid ? "and" : "jav");
-        addRequestProperty("X-SC-SDK", "and");
-
         // Add If-Modified-Since header
         long ifModifiedSince = getIfModifiedSince();
         if (ifModifiedSince != 0) addRequestProperty("If-Modified-Since", HttpDate.format(new Date(ifModifiedSince)));
