@@ -40,11 +40,11 @@ def getVersionNameDashes = { ->
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 21
         versionCode getVersionCode()
         versionName getVersionName()
         setProperty("archivesBaseName", "SeaCatClient_Android_"+getVersionNameDashes())
