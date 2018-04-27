@@ -455,4 +455,11 @@ public class Reactor extends ContextWrapper
 		Reactor.packageName = packageName;
 	}
 
+	///
+
+	public byte[] deriveKey(String keyId, int length)
+	{
+		return seacatcc.derive_key(keyId, length);
+	}
+
 }

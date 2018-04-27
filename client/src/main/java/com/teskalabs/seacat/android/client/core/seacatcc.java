@@ -30,6 +30,9 @@ public final class seacatcc
     static public native String client_tag();
 
     static public native int characteristics_store(String[] characteristics);
+
+    static public native byte[] derive_key(String keyId, int length);
+
     ///
     static public final int RC_OK = (0);
     static public final int RC_E_GENERIC = (-9999);

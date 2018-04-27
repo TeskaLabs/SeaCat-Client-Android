@@ -123,6 +123,14 @@ JNIEXPORT jstring JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc
 JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_characteristics_1store
   (JNIEnv *, jclass, jobjectArray);
 
+/*
+ * Class:     com_teskalabs_seacat_android_client_core_seacatcc
+ * Method:    derive_key
+ * Signature: (Ljava/lang/String;I)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_derive_1key
+  (JNIEnv *, jclass, jstring, jint);
+
 #ifdef __cplusplus
 }
 #endif

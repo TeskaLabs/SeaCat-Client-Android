@@ -14,28 +14,20 @@ import android.widget.Toast;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.util.EntityUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.util.EnumSet;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 
 public class MainActivity extends ActionBarActivity
 {
@@ -47,7 +39,6 @@ public class MainActivity extends ActionBarActivity
     private Timer getTimer = null;
     private int counter = 0;
 
-    private org.apache.http.client.CookieStore HTTPClient_cookieStore;
     private BroadcastReceiver receiver;
 
     @Override
@@ -62,80 +53,78 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    protected void onStart()
-    {
-        super.onStart();
+    protected void onStart() {
+		super.onStart();
 
-        HTTPClient_cookieStore = new BasicCookieStore();
+		// Start ping timer
+		if (pingTimer == null) pingTimer = new Timer();
+		pingTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				sendPing();
+			}
 
-        // Start ping timer
-        if (pingTimer == null) pingTimer = new Timer();
-        pingTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                sendPing();
-            }
+		}, 0, 1000);
 
-        }, 0, 1000);
+		// Start get timer
+		if (getTimer == null) getTimer = new Timer();
+		getTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					int what = counter % 4;
+					counter += 1;
 
-        // Start get timer
-        if (getTimer == null) getTimer = new Timer();
-        getTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-            try
-            {
-                int what = counter % 4;
-                counter += 1;
+					//if (what == 0) NoSeaCat_GET();
+					//else if (what == 1) NoSeaCat_HC_GET();
 
-                GetTimerMethod_HTTPClient_GET();
+					//if (what == 0) GetTimerMethod_GET();
+					//else if (what == 1) GetTimerMethod_PUT_ContentLenght();
+					//else if (what == 2) GetTimerMethod_HTTPClient_GET();
+					//else if (what == 3) GetTimerMethod_HTTPClient_PUT_ContentLenght();
+					//else if (what == 4) GetTimerMethod_HTTPClient_PUT_chunked();
+				} catch (Exception e) {
+					final String output = e.toString();
+					Log.e("XXX", "Exception: ", e);
 
-                //if (what == 0) NoSeaCat_GET();
-                //else if (what == 1) NoSeaCat_HC_GET();
-
-                //if (what == 0) GetTimerMethod_GET();
-                //else if (what == 1) GetTimerMethod_PUT_ContentLenght();
-                //else if (what == 2) GetTimerMethod_HTTPClient_GET();
-                //else if (what == 3) GetTimerMethod_HTTPClient_PUT_ContentLenght();
-                //else if (what == 4) GetTimerMethod_HTTPClient_PUT_chunked();
-            }
-
-            catch (Exception e)
-            {
-                final String output = e.toString();
-                Log.e("XXX", "Exception: ", e);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        resultTextView.setText(output);
-                    }
-                });
-            }
-            }
-        }, 0, 1000);
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							resultTextView.setText(output);
+						}
+					});
+				}
+			}
+		}, 0, 1000);
 
 
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.hasCategory(SeaCatClient.CATEGORY_SEACAT))
-                {
-                    String action = intent.getAction();
-                    if (action.equals(SeaCatClient.ACTION_SEACAT_STATE_CHANGED)) {
-                        statusTextView.setText(intent.getStringExtra(SeaCatClient.EXTRA_STATE));
-                        return;
-                    }
-                }
-            }
-        };
+		receiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if (intent.hasCategory(SeaCatClient.CATEGORY_SEACAT)) {
+					String action = intent.getAction();
+					if (action.equals(SeaCatClient.ACTION_SEACAT_STATE_CHANGED)) {
+						statusTextView.setText(intent.getStringExtra(SeaCatClient.EXTRA_STATE));
+						return;
+					}
+				}
+			}
+		};
 
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
-        intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
-        registerReceiver(receiver, intentFilter);
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
+		intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
+		registerReceiver(receiver, intentFilter);
 
-    }
+		try {
+			SecretKeySpec skeySpec = SeaCatClient.deriveKey("aes-key-1", "AES", 32);
+			Cipher cipher = Cipher.getInstance("AES");
+			cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+			cipher.doFinal("To be encrypted.".getBytes("UTF8"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 
     @Override
@@ -250,121 +239,6 @@ public class MainActivity extends ActionBarActivity
         });
     }
 
-    protected void GetTimerMethod_HTTPClient_GET() throws IOException
-    {
-        BasicClientCookie c = new BasicClientCookie("TestSet", "AHoj");
-        c.setDomain("evalhost.seacat");
-        c.setPath("/");
-        HTTPClient_cookieStore.addCookie(c);
-
-        DefaultHttpClient httpclient = (DefaultHttpClient) SeaCatClient.httpClient();
-        httpclient.setCookieStore(HTTPClient_cookieStore);
-
-        HttpGet httpget = new HttpGet(String.format("https://evalhost.seacat/fortune?%s", getPackageName()));
-
-        HttpResponse response = httpclient.execute(httpget);
-
-        HttpEntity entity = response.getEntity();
-        final String output = "GetTimerMethod_HTTPClient_GET\r\n" + EntityUtils.toString(entity);
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                resultTextView.setText(output);
-            }
-        });
-    }
-
-    protected void GetTimerMethod_HTTPClient_PUT_chunked() throws IOException
-    {
-        HttpClient httpclient = SeaCatClient.httpClient();
-        HttpPut httpput = new HttpPut(String.format("https://evalhost.seacat/put?%s", getPackageName()));
-
-        AbstractHttpEntity requestEntity = new AbstractHttpEntity() {
-
-            public boolean isRepeatable() {
-                return false;
-            }
-
-            public long getContentLength() {
-                return -1;
-            }
-
-            public boolean isStreaming() {
-                return true;
-            }
-
-            public InputStream getContent() throws IOException {
-                // Should be implemented as well but is irrelevant for this case
-                throw new UnsupportedOperationException();
-            }
-
-            public void writeTo(final OutputStream outstream) throws IOException
-            {
-                for(int i=0; i<100; i++)
-                {
-                    byte[] buffer = new byte[16*1024];
-                    for (int j=0; j<16*1024; j++) buffer[j] = 'x';
-                    outstream.write(buffer);
-                }
-                outstream.close();
-            }
-
-        };
-
-        Log.i("XXX", "1111");
-        httpput.setEntity(requestEntity);
-        Log.i("XXX", "2222");
-        HttpResponse response = httpclient.execute(httpput);
-        Log.i("XXX", "3333");
-
-        HttpEntity entity = response.getEntity();
-
-        int length = 0;
-        InputStream is = entity.getContent();
-        while (true)
-        {
-            byte[] buffer = new byte[1024];
-            int ret = is.read(buffer);
-            if (ret == -1) break;
-            length += ret;
-        }
-
-        final String output = "GetTimerMethod_HTTPClient_PUT_chunked: "+length;
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                resultTextView.setText(output);
-            }
-        });
-
-    }
-
-
-    protected void GetTimerMethod_HTTPClient_PUT_ContentLenght() throws IOException
-    {
-        HttpClient httpclient = SeaCatClient.httpClient();
-        HttpPut httpput = new HttpPut(String.format("https://evalhost.seacat/put?%s", getPackageName()));
-
-        String data = "som3Data4nyFormat=seeThat??SeaCat";
-        HttpEntity reqEntity = new StringEntity(data);
-        httpput.setEntity(reqEntity);
-
-        HttpResponse response = httpclient.execute(httpput);
-
-        HttpEntity entity = response.getEntity();
-        final String output = EntityUtils.toString(entity);
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                resultTextView.setText(output);
-            }
-        });
-
-    }
-
 
     private void NoSeaCat_GET() throws IOException
     {
@@ -394,28 +268,6 @@ public class MainActivity extends ActionBarActivity
 
     }
 
-
-
-    private void NoSeaCat_HC_GET() throws IOException
-    {
-
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        httpclient.setCookieStore(HTTPClient_cookieStore);
-
-        HttpGet httpget = new HttpGet("http://eval.seacat.mobi/");
-
-        HttpResponse response = httpclient.execute(httpget);
-
-        HttpEntity entity = response.getEntity();
-        final String output = new String(EntityUtils.toByteArray(entity));
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                resultTextView.setText(output);
-            }
-        });
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -460,26 +312,6 @@ public class MainActivity extends ActionBarActivity
                 SeaCatClient.disconnect();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-        }
-
-        else if (id == R.id.action_long_request) {
-            try
-            {
-                GetTimerMethod_HTTPClient_PUT_chunked();
-            }
-
-            catch (Exception e)
-            {
-                final String output = e.toString();
-                Log.e("XXX", "Exception: ", e);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        resultTextView.setText(output);
-                    }
-                });
             }
         }
 

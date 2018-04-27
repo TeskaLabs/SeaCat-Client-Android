@@ -713,3 +713,20 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_ch
 
     return rc;
 }
+
+
+JNIEXPORT jbyteArray JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_derive_1key(JNIEnv * env, jclass cls, jstring keyid, jint keylength)
+{
+	const char * keyidChar = (*env)->GetStringUTFChars(env, keyid, 0);
+
+	jbyte keybuf[keylength];
+	int rc = seacatcc_derive_key(keyidChar, keylength, (char *)keybuf);
+
+	(*env)->ReleaseStringUTFChars(env, keyid, keyidChar);
+
+	if (rc != SEACATCC_RC_OK) return NULL;
+
+	jbyteArray ret = (*env)->NewByteArray(env, keylength);
+	(*env)->SetByteArrayRegion(env, ret, 0, keylength, keybuf);
+	return ret;
+}

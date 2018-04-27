@@ -17,6 +17,7 @@ import com.teskalabs.seacat.android.client.socket.SocketConfig;
 import com.teskalabs.seacat.android.client.util.RC;
 import com.teskalabs.seacat.android.client.core.seacatcc;
 
+import javax.crypto.spec.SecretKeySpec;
 
 
 /**
@@ -429,6 +430,41 @@ public final class SeaCatClient
         Reactor r = getReactor();
         if (r == null) return null;
         return r.getClientTag();
+    }
+
+    ///
+
+	/**
+	 * Construct a derived key. The key is derived from a primary private key.
+	 * If identity is reset (by calling reset() method), derived keys will automatically change.
+	 *
+	 * <p>
+	 * Example:
+	 * <pre>
+	 * {@code
+	 * SecretKeySpec skeySpec = SeaCatClient.deriveKey("aes-key-1", "AES", 32);
+	 * Cipher cipher = Cipher.getInstance("AES");
+	 * cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+	 * cipher.doFinal("To be encrypted.".getBytes("UTF8"));
+	 * }
+	 * </pre>
+	 * </p>
+     *
+	 *
+	 * @param keyId Identification of the key.
+	 * @param algorithm Name of the key algorithm such as 'AES'. See https://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/CryptoSpec.html#AppA for details
+	 * @param length Length of the key in bytes. It must be 16 for AES-128), 24 for AES-192, or 32 for AES-256.
+	 *
+	 */
+
+	public static SecretKeySpec deriveKey(String keyId, String algorithm, int length)
+    {
+        Reactor r = getReactor();
+        if (r == null) return null;
+        byte[] key =  r.deriveKey(keyId, length);
+        if (key == null) return null;
+
+        return new SecretKeySpec(key, algorithm);
     }
 
     ///
