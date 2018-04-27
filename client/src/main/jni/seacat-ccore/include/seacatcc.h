@@ -134,6 +134,11 @@ const char ** characteristics = {"key1\037value1", "key2\037value2", NULL};
 */
 int seacatcc_characteristics_store(const char ** characteristics);
 
+
+// Key derivation
+// A key derivation function derives secret keys from a primary master key
+int seacatcc_derive_key(const char * key_id, uint16_t output_size, char * output);
+
 // Misc
 double seacatcc_time(void);
 
