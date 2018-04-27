@@ -11,15 +11,12 @@ import java.util.EnumSet;
 import java.util.Iterator;
 
 import com.teskalabs.seacat.android.client.core.Reactor;
-import com.teskalabs.seacat.android.client.hc.SeaCatHttpClient;
 import com.teskalabs.seacat.android.client.http.URLConnection;
 import com.teskalabs.seacat.android.client.ping.Ping;
 import com.teskalabs.seacat.android.client.socket.SocketConfig;
 import com.teskalabs.seacat.android.client.util.RC;
 import com.teskalabs.seacat.android.client.core.seacatcc;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.params.HttpParams;
 
 
 /**
@@ -293,42 +290,6 @@ public final class SeaCatClient
 	{
 		return open(new URL(url));
 	}
-
-    ///
-
-    /**
-     * The <tt>org.apache.http.client</tt> compatible HTTP client interface (see <a href="http://hc.apache.org/">Apache HttpComponents Client</a> ).
-     *
-     * <p>Executes HTTP/HTTPS call via SeaCat gateway.</p>
-     *
-     * <p>
-     * Example:
-     * <pre>
-     * {@code
-     * HttpClient httpclient = SeaCatClient.httpClient();
-     * HttpGet httpget = new HttpGet("https://backendhost.seacat/remote-api");
-     * HttpResponse response = httpclient.execute(httpget);
-     * HttpEntity entity = response.getEntity();
-     * final String output = EntityUtils.toString(entity);
-     * }
-     * </pre>
-     * </p>
-     *
-     */
-    public static HttpClient httpClient(final HttpParams params)
-    {
-        return new SeaCatHttpClient(params, getReactor());
-    }
-
-    /**
-     * This is a convenience function for <tt>httpClient(final HttpParams params)</tt> method.
-     *
-     * @return instance of <tt>HttpClient</tt>.
-     */
-    public static HttpClient httpClient()
-    {
-        return new SeaCatHttpClient(getReactor());
-    }
 
     ///
 
