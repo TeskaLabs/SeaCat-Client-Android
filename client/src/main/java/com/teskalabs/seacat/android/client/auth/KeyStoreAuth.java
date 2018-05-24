@@ -3,7 +3,10 @@ package com.teskalabs.seacat.android.client.auth;
 import android.annotation.TargetApi;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
@@ -29,7 +32,14 @@ public class KeyStoreAuth
 
 	public void startAuth(Reactor reactor) {
 
-		boolean requireUserAuth = true;
+		boolean requireUserAuth = false;
+
+		try {
+			ApplicationInfo ai = reactor.getPackageManager().getApplicationInfo(reactor.getPackageName(), PackageManager.GET_META_DATA);
+			Bundle bundle = ai.metaData;
+			requireUserAuth = bundle.getBoolean("seacat.require_user_auth", false);
+		} catch (PackageManager.NameNotFoundException|NullPointerException e) {
+		}
 
 		if (!keypair.exists())
 		{
