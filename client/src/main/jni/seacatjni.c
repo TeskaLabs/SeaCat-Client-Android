@@ -149,7 +149,8 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_in
 		JNICALLBACK_frame_received,
 		JNICALLBACK_frame_return,
 		JNICALLBACK_worker_request,
-		JNICALLBACK_evloop_heartbeat
+		JNICALLBACK_evloop_heartbeat,
+		NULL // There is no OpenSSL engine on Android
 	);
 
 	(*env)->ReleaseStringUTFChars(env, varDir, varDirChar);
@@ -598,6 +599,14 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cs
 
 	return rc;
 }
+
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_secret_1key_1worker(JNIEnv * env, jclass jclass, jbyteArray secret_key)
+{
+	int rc;
+	rc = seacatcc_secret_key_worker("12345678901234567890123456789012");
+	return rc;
+}
+
 
 
 JNIEXPORT jdouble JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_time(JNIEnv * env, jclass cls)

@@ -21,7 +21,8 @@ int seacatcc_init(
 	void (* hook_frame_received)(void * data, uint16_t frame_len),
 	void (* hook_frame_return)(void *data),
 	void (* hook_worker_request)(char worker),
-	double (* hook_evloop_heartbeat)(double now) // Return a interval (in seconds) after heartbeat should timeout (return Inf to disable)
+	double (* hook_evloop_heartbeat)(double now), // Return a interval (in seconds) after heartbeat should timeout (return Inf to disable)
+	const char * openssl_engine_ppk // Can be NULL
 );
 
 int seacatcc_run(void);
@@ -29,7 +30,7 @@ int seacatcc_shutdown(void);
 
 /*
 Yieds:
-	'c': Connect from gateway (no need to call this explicitly)
+	'c': Connect to a gateway (no need to call this explicitly)
 	'd': Disconnect from gateway
 	'r': Reset identity
 	'n': Renew my certificate (aka trigger renewal process)
@@ -48,11 +49,18 @@ Workers:
 	'f': Recovery from fatal error worker, call seacatcc_yield('f') when done
 	'n': Network not-reachable worker
 	'R': OBSOLETED, NOT USED anylonger -> SeaCat CA download 
+	's': Provide secret key via seacatcc_secret_key_worker()
 */
 
 // Workers (functions to be launched in 'other' thread than reactor)
 void seacatcc_ppkgen_worker(void);
 int seacatcc_csrgen_worker(const char * csr_entries[]);
+
+// Secret key worker
+// The secret key will be copied from a given location - the expected length is SEACATCC_SECRET_KEY_LENGTH / 32 bytes / AES key length
+// If `secret_key` parameter is NULL, the secret key is removed ...
+#define SEACATCC_SECRET_KEY_LENGTH (256/8)
+int seacatcc_secret_key_worker(const void * secret_key);
 
 
 // Hooks

@@ -69,6 +69,14 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cs
 
 /*
  * Class:     com_teskalabs_seacat_android_client_core_seacatcc
+ * Method:    secret_key_worker
+ * Signature: ([B)I
+ */
+JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_secret_1key_1worker
+  (JNIEnv *, jclass, jbyteArray);
+
+/*
+ * Class:     com_teskalabs_seacat_android_client_core_seacatcc
  * Method:    set_proxy_server_worker
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
