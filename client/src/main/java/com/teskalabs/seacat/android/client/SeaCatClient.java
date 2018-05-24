@@ -83,7 +83,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public final class SeaCatClient
 {
-    static private Reactor reactor = null;
+	static private Reactor reactor = null;
 
     /**
      * The <tt>Intent</tt> category for all Intents sent by SeaCat client.
@@ -119,6 +119,10 @@ public final class SeaCatClient
      */
     public final static String ACTION_SEACAT_CSR_NEEDED = "mobi.seacat.client.intent.action.CSR_NEEDED";
 
+
+    public static final String ACTION_SEACAT_USER_AUTH_NEEDED = "mobi.seacat.client.intent.action.USER_AUTH_NEEDED";
+    public final static String ACTION_SEACAT_SECURE_LOCK_NEEDED = "mobi.seacat.client.intent.action.SECURE_LOCK_NEEDED";
+
     /**
      * The <tt>Intent</tt> action used to inform that client state changed.
      * Detailed information about state change is in <tt>EXTRA_STATE</tt>.
@@ -126,6 +130,7 @@ public final class SeaCatClient
     public final static String ACTION_SEACAT_STATE_CHANGED = "mobi.seacat.client.intent.action.STATE_CHANGED";
 
     public final static String ACTION_SEACAT_CLIENTID_CHANGED = "mobi.seacat.client.intent.action.CLIENTID_CHANGED";
+
 
     /**
      * The key to <tt>Intent</tt> extras with information about client state.<br>
@@ -353,8 +358,11 @@ public final class SeaCatClient
      */
     public static void reset() throws IOException
     {
+        SeaCatInternals.getAuth().reset();
         int rc = seacatcc.yield('r');
         RC.checkAndThrowIOException("seacatcc.yield(reset)", rc);
+
+
     }
 
     public static void renew() throws IOException
@@ -466,6 +474,23 @@ public final class SeaCatClient
 
         return new SecretKeySpec(key, algorithm);
     }
+
+    ///
+
+    public static void startAuth()
+    {
+        Reactor r = getReactor();
+        if (r == null) return;
+        SeaCatInternals.getAuth().startAuth(reactor);
+    }
+
+    public static void deauth()
+    {
+        Reactor r = getReactor();
+        if (r == null) return;
+        SeaCatInternals.getAuth().deauth();
+    }
+
 
     ///
 

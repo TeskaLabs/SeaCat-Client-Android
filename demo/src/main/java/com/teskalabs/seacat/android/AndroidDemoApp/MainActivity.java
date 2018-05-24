@@ -115,6 +115,7 @@ public class MainActivity extends ActionBarActivity
 		intentFilter.addAction(SeaCatClient.ACTION_SEACAT_STATE_CHANGED);
 		intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
 		registerReceiver(receiver, intentFilter);
+		SeaCatClient.broadcastState();
 
 		try {
 			SecretKeySpec skeySpec = SeaCatClient.deriveKey("aes-key-1", "AES", 32);
@@ -330,6 +331,11 @@ public class MainActivity extends ActionBarActivity
                 e.printStackTrace();
             }
         }
+
+		else if (id == R.id.action_deauth) {
+			SeaCatClient.deauth();
+		}
+
 
         return super.onOptionsItemSelected(item);
     }

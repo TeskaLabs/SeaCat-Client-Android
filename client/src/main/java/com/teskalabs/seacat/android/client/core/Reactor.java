@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.teskalabs.seacat.android.client.SeaCatClient;
 import com.teskalabs.seacat.android.client.SeaCatInternals;
+import com.teskalabs.seacat.android.client.auth.KeyStoreAuth;
 import com.teskalabs.seacat.android.client.intf.ICntlFrameConsumer;
 import com.teskalabs.seacat.android.client.intf.IFrameProvider;
 import com.teskalabs.seacat.android.client.ping.PingFactory;
@@ -67,7 +68,11 @@ public class Reactor extends ContextWrapper
 
 		if (packageName == null) packageName = getPackageName();
 
-		this.ccoreThread = new Thread(new Runnable() { public void run() { Reactor._run(); }});
+		this.ccoreThread = new Thread(new Runnable() { public void run() {
+			int rc = seacatcc.run();
+			if (rc != seacatcc.RC_OK)
+				Log.e(SeaCatInternals.L, String.format("return code %d in %s",rc ,"seacatcc.run"));
+		}});
 		this.ccoreThread.setName("SeaCatCCoreThread");
 		this.ccoreThread.setDaemon(true);
 		this.workerExecutor = new ThreadPoolExecutor(0, 1000, 5, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
@@ -142,14 +147,6 @@ public class Reactor extends ContextWrapper
 		}
 	}
 
-
-	private static void _run()
-	{
-		int rc = seacatcc.run();
-		if (rc != seacatcc.RC_OK)
-            Log.e(SeaCatInternals.L, String.format("return code %d in %s",rc ,"seacatcc.run"));
-	}
-	
 	///
 
 
@@ -291,6 +288,12 @@ public class Reactor extends ContextWrapper
 
                 break;
             }
+
+			case 's': {
+				Log.d(SeaCatInternals.L, "Secret key requested.");
+				SeaCatInternals.getAuth().startAuth(this);
+				break;
+			}
 
 			default:
                 Log.w(SeaCatInternals.L, "Unknown worker requested: " + workerCode);

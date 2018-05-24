@@ -603,7 +603,20 @@ JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_cs
 JNIEXPORT jint JNICALL Java_com_teskalabs_seacat_android_client_core_seacatcc_secret_1key_1worker(JNIEnv * env, jclass jclass, jbyteArray secret_key)
 {
 	int rc;
-	rc = seacatcc_secret_key_worker("12345678901234567890123456789012");
+
+	if (secret_key != NULL)
+	{
+		jsize size = (*env)->GetArrayLength(env, secret_key);
+		//TODO: assert(size == 32)
+		char key[size];
+		(*env)->GetByteArrayRegion(env, secret_key, 0, size, (jbyte*)&key[0]);
+
+		rc = seacatcc_secret_key_worker(key);
+	}
+	else
+	{
+		rc = seacatcc_secret_key_worker(NULL);
+	}
 	return rc;
 }
 

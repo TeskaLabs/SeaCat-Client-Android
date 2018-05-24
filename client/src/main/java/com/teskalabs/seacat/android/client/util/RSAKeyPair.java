@@ -10,6 +10,7 @@ import android.security.keystore.UserNotAuthenticatedException;
 import android.util.Log;
 
 import com.teskalabs.seacat.android.client.SeaCatInternals;
+import com.teskalabs.seacat.android.client.auth.SeaCatUserNotAuthenticatedException;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -66,7 +67,7 @@ public class RSAKeyPair {
     }
 
 
-    public byte[] decrypt(byte[] input) throws UserAuth.UserNotAuthenticatedException, GeneralSecurityException {
+    public byte[] decrypt(byte[] input) throws SeaCatUserNotAuthenticatedException, GeneralSecurityException {
         KeyStore keyStore = obtainKeyStore();
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
         if (privateKey == null) return null; // No key pair
@@ -81,7 +82,7 @@ public class RSAKeyPair {
                 if (e instanceof UserNotAuthenticatedException)
                 {
                     Log.w(TAG, "User not logged in!");
-                    throw new UserAuth.UserNotAuthenticatedException(e);
+                    throw new SeaCatUserNotAuthenticatedException(e);
                 }
             }
 
@@ -101,7 +102,7 @@ public class RSAKeyPair {
     }
 
 
-    public byte[] derive(String keyId, int outLengthBytes) throws UserAuth.UserNotAuthenticatedException, GeneralSecurityException {
+    public byte[] derive(String keyId, int outLengthBytes) throws SeaCatUserNotAuthenticatedException, GeneralSecurityException {
 		// More at https://en.wikipedia.org/wiki/HKDF
     	// Inspired by https://github.com/patrickfav/hkdf
 
@@ -122,7 +123,7 @@ public class RSAKeyPair {
 				if (e instanceof UserNotAuthenticatedException)
 				{
 					Log.w(TAG, "User not logged in!");
-					throw new UserAuth.UserNotAuthenticatedException(e);
+					throw new SeaCatUserNotAuthenticatedException(e);
 				}
 			}
 
@@ -260,7 +261,7 @@ public class RSAKeyPair {
 
         if (requireUserAuth) {
             builder.setUserAuthenticationRequired(true);
-            builder.setUserAuthenticationValidityDurationSeconds(5 * 60);
+            builder.setUserAuthenticationValidityDurationSeconds(5);
         }
 
         KeyPairGenerator kpg = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore");
@@ -312,5 +313,6 @@ public class RSAKeyPair {
         if (cert == null) return null;
         return cert.getPublicKey();
     }
+
 
 }
