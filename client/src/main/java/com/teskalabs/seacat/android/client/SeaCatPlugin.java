@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.teskalabs.seacat.android.client.core.seacatcc;
 import com.teskalabs.seacat.android.client.util.RC;
+import com.teskalabs.seacat.android.client.util.RootUtil;
 
 import java.util.ArrayList;
 import java.util.Properties;
@@ -67,6 +68,11 @@ public abstract class SeaCatPlugin {
 		chrs.add(String.format("%s\037%s", "dpden", dm.density));
 		chrs.add(String.format("%s\037%s", "dpxdpi", dm.xdpi));
 		chrs.add(String.format("%s\037%s", "dpydpi", dm.ydpi));
+
+		if (RootUtil.isRooted(context))
+		{
+			chrs.add(String.format("%s\037%s", "ROOTED", "1"));
+		}
 
 		//TODO: How to obtain and add version of the SeaCat client for Android?
 
