@@ -46,20 +46,20 @@ public class AuthActivity extends ActionBarActivity {
 		}
 
 		// Authenticate!
-		showAuthenticationScreen(this,null, null, REQUEST_CODE_USER_AUTHORIZED);
+		showAuthenticationScreen();
 	}
 
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static void showAuthenticationScreen(Activity activity, CharSequence title, CharSequence description, int requestCode)
+	private void showAuthenticationScreen()
 	{
-		KeyguardManager mKeyguardManager = (KeyguardManager) activity.getSystemService(Context.KEYGUARD_SERVICE);
+		KeyguardManager mKeyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
 
 		// Create the Confirm Credentials screen. You can customize the title and description. Or
 		// we will provide a generic one for you if you leave it null
-		Intent intent = mKeyguardManager.createConfirmDeviceCredentialIntent(title, description);
+		Intent intent = mKeyguardManager.createConfirmDeviceCredentialIntent(null, null);
 		if (intent != null) {
-			activity.startActivityForResult(intent, requestCode);
+			startActivityForResult(intent, REQUEST_CODE_USER_AUTHORIZED);
 		}
 	}
 
