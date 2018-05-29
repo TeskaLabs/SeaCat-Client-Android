@@ -69,9 +69,10 @@ public abstract class SeaCatPlugin {
 		chrs.add(String.format("%s\037%s", "dpxdpi", dm.xdpi));
 		chrs.add(String.format("%s\037%s", "dpydpi", dm.ydpi));
 
-		if (RootUtil.isRooted(context))
+		String rooted = RootUtil.isRooted(context);
+		if (rooted != null)
 		{
-			chrs.add(String.format("%s\037%s", "ROOTED", "1"));
+			chrs.add(String.format("%s\037%s", "ROOTED", rooted));
 		}
 
 		//TODO: How to obtain and add version of the SeaCat client for Android?
