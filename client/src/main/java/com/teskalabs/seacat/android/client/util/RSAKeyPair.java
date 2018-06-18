@@ -196,7 +196,12 @@ public class RSAKeyPair {
 
 		KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", "BC");
 		kpg.initialize(keySize);
-		KeyPair keyPair = kpg.genKeyPair();
+
+		try {
+			KeyPair kp = kpg.genKeyPair();
+		} catch (IllegalStateException e) {
+			throw new SecurityException("Failed to generate the key pair.");
+		}
 
 		//TODO: This code is not completed: how to generate self-signed certificate on Android <=17?
 	}
@@ -229,7 +234,11 @@ public class RSAKeyPair {
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", "AndroidKeyStore");
         kpg.initialize(builder.build());
 
-        KeyPair kp = kpg.generateKeyPair();
+        try {
+			KeyPair kp = kpg.generateKeyPair();
+		} catch (IllegalStateException e) {
+			throw new SecurityException("Failed to generate the key pair.");
+		}
 
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
         if (privateKey == null)
@@ -268,7 +277,11 @@ public class RSAKeyPair {
 
         kpg.initialize(builder.build());
 
-        KeyPair kp = kpg.generateKeyPair();
+		try {
+			KeyPair kp = kpg.generateKeyPair();
+		} catch (IllegalStateException e) {
+			throw new SecurityException("Failed to generate the key pair.");
+		}
 
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
         if (privateKey == null)
