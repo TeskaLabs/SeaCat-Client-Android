@@ -246,7 +246,7 @@ public class RSAKeyPair {
 
         PublicKey publicKey = keyStore.getCertificate(alias).getPublicKey();
         if (publicKey == null)
-            throw new SecurityException("Failed to obtain private key from a generated key pair");
+            throw new SecurityException("Failed to obtain public key from a generated key pair");
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -285,11 +285,11 @@ public class RSAKeyPair {
 
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, null);
         if (privateKey == null)
-            throw new SecurityException("Failed to obtain private key from a generated key pait");
+            throw new SecurityException("Failed to obtain private key from a generated key pair");
 
         PublicKey publicKey = keyStore.getCertificate(alias).getPublicKey();
         if (publicKey == null)
-            throw new SecurityException("Failed to obtain private key from a generated key pait");
+            throw new SecurityException("Failed to obtain public key from a generated key pair");
 
         // Following code works only on API 23+
         //KeyFactory kf = KeyFactory.getInstance(privateKey.getAlgorithm(), "AndroidKeyStore");
