@@ -200,6 +200,7 @@ public class RSAKeyPair {
 		try {
 			KeyPair kp = kpg.genKeyPair();
 		} catch (IllegalStateException e) {
+			Log.e(SeaCatInternals.L, "Failed to generate the key pair:", e);
 			throw new SecurityException("Failed to generate the key pair.");
 		}
 
@@ -237,6 +238,7 @@ public class RSAKeyPair {
         try {
 			KeyPair kp = kpg.generateKeyPair();
 		} catch (IllegalStateException e) {
+			Log.e(SeaCatInternals.L, "Failed to generate the key pair:", e);
 			throw new SecurityException("Failed to generate the key pair.");
 		}
 
@@ -280,6 +282,7 @@ public class RSAKeyPair {
 		try {
 			KeyPair kp = kpg.generateKeyPair();
 		} catch (IllegalStateException e) {
+			Log.e(SeaCatInternals.L, "Failed to generate the key pair:", e);
 			throw new SecurityException("Failed to generate the key pair.");
 		}
 
