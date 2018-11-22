@@ -10,8 +10,10 @@ import com.teskalabs.seacat.android.client.okhttp3.SeaCatInterceptor;
 
 import java.io.IOException;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,8 +36,12 @@ public class MainActivity extends AppCompatActivity {
 				.addInterceptor(new SeaCatInterceptor())
 				.build();
 
+			MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+			RequestBody body = RequestBody.create(JSON, "{'yes':1}");
+
 			Request request = new Request.Builder()
 				.url("https://jsontest.seacat/")
+				.put(body) //PUT
 				.build();
 
 			Response response = null;
