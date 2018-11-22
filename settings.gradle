@@ -1,1 +1,1 @@
-include ':demo', ':client', ':companion'
+include ':demo', ':client', ':companion', ':demookhttp', ':client_okhttp3'
