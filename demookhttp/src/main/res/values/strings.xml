@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">SeaCatDemo OkHttp</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="action_reset_identity">Reset Identity</string>
+    <string name="status_unknown">\?????</string>
+    <string name="emailaddress">Email Address</string>
+    <string name="title_activity_user_auth">Authorize</string>
+
+</resources>
