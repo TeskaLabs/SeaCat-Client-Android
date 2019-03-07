@@ -31,6 +31,8 @@ public class SeaCatInterceptor implements Interceptor {
 		HttpURLConnection conn = SeaCatClient.open(r.url().url());
 		conn.setRequestMethod(r.method());
 
+		conn.setConnectTimeout(3000); // 15 seconds is a default timeout
+
 		// Copy request headers
 		Headers rh = r.headers();
 		for(int i = 0; i<rh.size(); i++)
