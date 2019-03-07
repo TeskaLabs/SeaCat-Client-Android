@@ -1,5 +1,10 @@
 package com.teskalabs.seacat.android.client.http;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,6 +22,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.lang.System;
 
+import com.teskalabs.seacat.android.client.SeaCatClient;
 import com.teskalabs.seacat.android.client.core.Reactor;
 import com.teskalabs.seacat.android.client.core.SPDY;
 import com.teskalabs.seacat.android.client.intf.*;
@@ -24,6 +30,7 @@ import com.teskalabs.seacat.android.client.intf.*;
 public class URLConnection extends HttpURLConnection implements IFrameProvider, IStream
 {
 	protected final Reactor reactor;
+	private BroadcastReceiver receiver;
 
 	protected final InboundStream inboundStream;	
 	protected OutboundStream outboundStream = null;
@@ -32,6 +39,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
 	private final Headers.Builder requestHeaders = new Headers.Builder();
 
     private boolean launched = false;
+    private boolean reseted = false;
 	private int streamId = -1;
 	private int priority;
 
@@ -50,6 +58,26 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
 		this.priority = priority;
 
         this.inboundStream = new InboundStream(reactor, getReadTimeout());
+
+		receiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if (intent.hasCategory(SeaCatClient.CATEGORY_SEACAT))
+				{
+					String action = intent.getAction();
+					if (action.equals(SeaCatClient.ACTION_SEACAT_GWCONN_RESET)) {
+						reset();
+						return;
+					}
+
+				} }
+		};
+
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(SeaCatClient.ACTION_SEACAT_GWCONN_RESET);
+		intentFilter.addCategory(SeaCatClient.CATEGORY_SEACAT);
+		reactor.registerReceiver(receiver, intentFilter);
+
 	}
 
     ///
@@ -76,6 +104,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
 
             launched = true;
             reactor.registerFrameProvider(this, true);
+
         }
 	}
 
@@ -127,7 +156,7 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
         {
             while (responseReady != true) {
                 long awaitMillis = cutOfTimeMillis - (System.nanoTime() / 1000000L);
-                if (awaitMillis <= 0) throw new SocketTimeoutException("Connect timeout");
+                if (awaitMillis <= 0) throw new SocketTimeoutException("Connection timeout");
 
                 try {
                     responseReadyCondition.awaitNanos(awaitMillis * 1000000L);
@@ -139,6 +168,8 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
         finally {
             responseReadyLock.unlock();
         }
+
+        if (reseted) throw new SocketTimeoutException("Connection reset");
     }
 
 
@@ -214,8 +245,31 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
 	@Override
 	public void reset()
 	{
+		// Status
+		responseCode = 500; // TODO: Read reset code from a reset stream
+		responseMessage = HttpStatus.getMessage(responseCode);
+		reseted = true;
+
+		if (responseReady != true) {
+			responseReadyLock.lock();
+			try {
+				responseReady = true;
+				responseReadyCondition.signalAll();
+			} finally {
+				responseReadyLock.unlock();
+			}
+		}
+
 		if (outboundStream != null) outboundStream.reset();
 		inboundStream.reset();
+
+		try {
+			reactor.unregisterReceiver(receiver);
+		}
+		catch (java.lang.IllegalArgumentException e)
+		{
+		}
+
 	}
 
 	
@@ -262,21 +316,6 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
 	synchronized public boolean receivedSPD3_RST_STREAM(Reactor reactor, ByteBuffer frame, int frameLength, byte frameFlags)
 	{
 		reset();
-
-		// Status
-		responseCode = 500; // TODO: Read reset code from a reset stream
-		responseMessage = HttpStatus.getMessage(responseCode);
-
-		responseReadyLock.lock();
-		try
-		{
-			responseReady = true;
-			responseReadyCondition.signalAll();
-		}
-		finally {
-			responseReadyLock.unlock();
-		}
-
 		return true;
 	}
 
@@ -287,7 +326,17 @@ public class URLConnection extends HttpURLConnection implements IFrameProvider, 
 //		System.out.println(String.format("DATA %s", ((frameFlags & SPDY.FLAG_FIN) == SPDY.FLAG_FIN) ? "FIN" : ""));		
 		
 		boolean ret = inboundStream.inboundData(frame);
-		if ((frameFlags & SPDY.FLAG_FIN) == SPDY.FLAG_FIN) inboundStream.close();
+		if ((frameFlags & SPDY.FLAG_FIN) == SPDY.FLAG_FIN) {
+			inboundStream.close();
+
+			try {
+				reactor.unregisterReceiver(receiver);
+			}
+			catch (java.lang.IllegalArgumentException e)
+			{
+			}
+		}
+
 		return ret;		
 	}
 
