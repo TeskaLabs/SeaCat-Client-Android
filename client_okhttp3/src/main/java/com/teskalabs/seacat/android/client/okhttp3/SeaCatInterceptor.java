@@ -74,16 +74,22 @@ public class SeaCatInterceptor implements Interceptor {
 
 		// Copy response headers
 		Map<String, List<String>> map = conn.getHeaderFields();
-		for (Map.Entry<String, List<String>> entry : map.entrySet()) {
-			String key = entry.getKey();
-			if (key == null) continue;
-			for (String value: entry.getValue()) {
-				builder.addHeader(entry.getKey(), value);
+		if (map != null) {
+			for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+				String key = entry.getKey();
+				if (key == null) continue;
+				for (String value : entry.getValue()) {
+					builder.addHeader(entry.getKey(), value);
+				}
 			}
 		}
 
-		MediaType mt = MediaType.parse(conn.getContentType());
+		String content_type = conn.getContentType();
+		if (content_type == null) {
+			content_type = "text/plain";
+		}
 
+		MediaType mt = MediaType.parse(content_type);
 		ResponseBody body = ResponseBody.create(mt, buffer.size(), buffer);
 		builder.body(body);
 
