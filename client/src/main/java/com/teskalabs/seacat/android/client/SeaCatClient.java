@@ -239,12 +239,22 @@ public final class SeaCatClient
      */
 	public static void ping(Ping ping) throws IOException
 	{
-        getReactor().pingFactory.ping(reactor, ping);
+        Reactor reactor = getReactor();
+        if (reactor == null) {
+            throw new IOException("SeaCat is not initialized");
+        }
+
+        reactor.pingFactory.ping(reactor, ping);
 	}
 
     public static void ping() throws IOException
     {
-        getReactor().pingFactory.ping(reactor, new Ping() {});
+        Reactor reactor = getReactor();
+        if (reactor == null) {
+            throw new IOException("SeaCat is not initialized");
+        }
+
+        reactor.pingFactory.ping(reactor, new Ping() {});
     }
 
 
@@ -281,7 +291,11 @@ public final class SeaCatClient
      */
 	public static HttpURLConnection open(URL url) throws IOException
 	{
-		return new URLConnection(getReactor(), url, 3 /*priority*/);
+        Reactor reactor = getReactor();
+        if (reactor == null) {
+            throw new IOException("SeaCat is not initialized");
+        }
+		return new URLConnection(reactor, url, 3 /*priority*/);
 	}
 
     /**
