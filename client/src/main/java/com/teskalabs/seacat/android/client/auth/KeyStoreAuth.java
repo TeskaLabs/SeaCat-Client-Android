@@ -33,12 +33,18 @@ public class KeyStoreAuth
 	public void startAuth(Reactor reactor) {
 
 		boolean requireUserAuth = false;
+		int masterKeyLength = 2048;
 
+		Bundle bundle = null;
 		try {
 			ApplicationInfo ai = reactor.getPackageManager().getApplicationInfo(reactor.getPackageName(), PackageManager.GET_META_DATA);
-			Bundle bundle = ai.metaData;
-			requireUserAuth = bundle.getBoolean("seacat.require_user_auth", false);
+			bundle = ai.metaData;
 		} catch (PackageManager.NameNotFoundException|NullPointerException e) {
+
+		}
+		if (bundle != null) {
+			requireUserAuth = bundle.getBoolean("seacat.require_user_auth", requireUserAuth);
+			masterKeyLength = bundle.getInt("seacat.master_key_length", masterKeyLength);
 		}
 
 		if (!keypair.exists())
@@ -66,7 +72,7 @@ public class KeyStoreAuth
 			}
 
 			try {
-				keypair.generate(reactor, 4096, "CN=SeaCatAuthKey", valid_from, valid_to, 1, requireUserAuth);
+				keypair.generate(reactor, masterKeyLength, "CN=SeaCatAuthKey", valid_from, valid_to, 1, requireUserAuth);
 			} catch (GeneralSecurityException e) {
 				Log.e(SeaCatInternals.L, "Failed to generate SeaCat authorization key.", e);
 				return;
